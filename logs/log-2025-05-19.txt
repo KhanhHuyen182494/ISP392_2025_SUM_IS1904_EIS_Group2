@@ -1,0 +1,4 @@
+[2025-05-19 09:40:31] [INFO] Application started.
+[2025-05-19 09:40:31] [WARN] Low memory detected.
+[2025-05-19 09:40:31] [ERROR] Database connection failed.
+[2025-05-19 09:40:31] [DEBUG] Debug mode activated.
