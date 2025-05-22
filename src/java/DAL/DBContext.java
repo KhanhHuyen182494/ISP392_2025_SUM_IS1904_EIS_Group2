@@ -14,7 +14,7 @@ import java.sql.DriverManager;
  * @author admin
  */
 public class DBContext {
-    ResourceBundle bundle = ResourceBundle.getBundle("configurations.database");
+    ResourceBundle bundle = ResourceBundle.getBundle("Configuration.ConnectionString");
     
     public Connection getConnection() {
         try {
@@ -34,4 +34,14 @@ public class DBContext {
         return null;
     }
 
+    //Test out connection
+    public static void main(String[] args) {
+        DBContext db = new DBContext();
+        if(db.getConnection() != null) {
+            System.out.println("Ok");
+            return;
+        }
+        
+        System.out.println("Not ok");
+    }
 }
