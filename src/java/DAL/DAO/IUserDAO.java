@@ -4,29 +4,30 @@
  */
 package DAL.DAO;
 
+import DTO.UserDTO;
 import Model.User;
+import java.util.List;
 
 /**
  *
  * @author Huyen
  * Interface for User DAL
  */
-public interface IUserDAO {
+public interface IUserDAO extends IBaseUUID<User>{
     
     //Get
-    public User getUserById(String uid);
+    public User getByEmail(String email);
     
-    public User getUserByEmail(String email);
+    public User getByPhone(String phone);
     
-    public User getUserByPhone(String phone);
+    public UserDTO getListPaging();
     
     //Add
-    public boolean addUser(User u);
     
     //Delete
-    public boolean deletedUserById(String uid);
     
     //Update
+    public boolean updateSpecificInfo(String infoToUpdate, User u);
     
     //Search
     

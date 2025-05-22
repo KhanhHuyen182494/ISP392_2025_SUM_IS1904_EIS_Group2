@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Model;
+package DTO;
 
 import java.util.List;
 
@@ -10,6 +10,7 @@ import java.util.List;
  *
  * @author Huyen
  * Base paging for all items needed
+ * @param <T>
  */
 public class BasePaging<T> {
     private int current_page;
@@ -18,8 +19,11 @@ public class BasePaging<T> {
     private int total_pages;
     private List<T> items;
     private String sort_by;
+    
+    private String searchKey;
 
     public BasePaging() {
+        this.searchKey = "";
     }
 
     public int getCurrent_page() {
@@ -68,6 +72,14 @@ public class BasePaging<T> {
 
     public void setSort_by(String sort_by) {
         this.sort_by = sort_by;
+    }
+
+    public String getSearchKey() {
+        return searchKey;
+    }
+
+    public void setSearchKey(String searchKey) {
+        this.searchKey = searchKey;
     }
     
     
