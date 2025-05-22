@@ -19,6 +19,7 @@ public class User {
     private String description;
     private String username;
     private String password;
+    private Role role;
     private String phone;
     private String email;
     private String gender;
@@ -167,6 +168,14 @@ public class User {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
     
     

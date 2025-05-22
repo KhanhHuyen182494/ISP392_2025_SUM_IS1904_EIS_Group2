@@ -13,6 +13,7 @@ public class Room {
     private String description;
     private Status status;
     private House house;
+    private float star;
 
     public Room() {
     }
@@ -47,6 +48,14 @@ public class Room {
 
     public void setHouse(House house) {
         this.house = house;
+    }
+
+    public float getStar() {
+        return star;
+    }
+
+    public void setStar(float star) {
+        this.star = star;
     }
     
     

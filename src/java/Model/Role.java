@@ -4,6 +4,8 @@
  */
 package Model;
 
+import java.util.List;
+
 /**
  *
  * @author Huyen
@@ -11,6 +13,8 @@ package Model;
 public class Role {
     private int id;
     private String name;
+    
+    List<Feature> features;
 
     public Role() {
     }
@@ -29,6 +33,14 @@ public class Role {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Feature> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<Feature> features) {
+        this.features = features;
     }
     
     

@@ -21,6 +21,7 @@ public class House {
     private double down_payment;
     private Address address;
     private Status status;
+    private float star;
 
     private List<Room> rooms;
     
@@ -113,6 +114,14 @@ public class House {
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    public float getStar() {
+        return star;
+    }
+
+    public void setStar(float star) {
+        this.star = star;
     }
     
     
