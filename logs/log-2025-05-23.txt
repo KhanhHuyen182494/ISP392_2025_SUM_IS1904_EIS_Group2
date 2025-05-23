@@ -1,0 +1,3 @@
+[2025-05-23 23:25:37] [ERROR] java.sql.SQLException: Field 'username' doesn't have a default value
+[2025-05-23 23:27:30] [ERROR] java.sql.SQLException: Parameter index out of range (13 > number of parameters, which is 12).
+[2025-05-23 23:29:35] [ERROR] java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '' for key 'user.username'

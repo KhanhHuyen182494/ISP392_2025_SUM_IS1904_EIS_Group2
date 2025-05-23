@@ -6,7 +6,6 @@ package DAL.DAO;
 
 import DTO.UserDTO;
 import Model.User;
-import java.util.List;
 
 /**
  *
@@ -31,4 +30,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     //Search
     
+    //Validate
+    public boolean isValidPhoneNumber(String phone);
+    
+    public boolean isValidEmail(String email);
 }

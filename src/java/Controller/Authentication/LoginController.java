@@ -4,9 +4,11 @@
  */
 package Controller.Authentication;
 
+import Model.User;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
-    
+
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -29,24 +31,50 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Cookie Handler
-        CookieHandler();
-        //Session Handler
-        SessionHandler();
-        
-        //Logic for cookie and session
-        
+        // Check session first
+        if (SessionHandler(request, response)) {
+            return;
+        }
+
+        // Check cookie if no session
+        if (CookieHandler(request, response)) {
+            return;
+        }
+
+        request.getRequestDispatcher("./FE/Common/Login.jsp").forward(request, response);
     }
 
-    //Helper method for authentication
-    protected void CookieHandler(){
-        
+    protected boolean CookieHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (jakarta.servlet.http.Cookie cookie : cookies) {
+                if ("uid".equals(cookie.getName())) {
+                    // Example logic: set session and redirect if cookie is valid
+                    String uid = cookie.getValue();
+
+                    // TODO: Validate uid from DB if needed
+                    request.getSession().setAttribute("uid", uid);
+                    response.sendRedirect(request.getContextPath() + "/home"); // Redirect to home
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-    
-    protected void SessionHandler(){
-        
+
+    protected boolean SessionHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        User uid = (User) request.getSession().getAttribute("user");
+        if (uid != null) {
+            response.sendRedirect(request.getContextPath() + "/home"); // Already logged in
+            return true;
+        }
+        return false;
     }
-    
+
+    protected void SessionHandler() {
+
+    }
+
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -59,7 +87,7 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //Logic for login raw and google authentication if has
-        
+
     }
 
     /**
