@@ -4,6 +4,7 @@
  */
 package Controller.Authentication;
 
+import Base.EmailSender;
 import Base.Generator;
 import Base.Hashing;
 import Base.Logging;
@@ -20,6 +21,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -81,16 +84,17 @@ public class SignUpController extends HttpServlet {
             String hashedPassword = Hashing.SHA_256(password_raw);
             String username = firstName + lastName + day + month + year;
             Date bod = Date.valueOf(year + "-" + month + "-" + day);
-            
-            logger.debug(firstName + lastName + day + month + year + gender + hashedPassword);
-            
+
             Role r = new Role();
             r.setId(5);
-            
+
             Status s = new Status();
             s.setId(4);
-            
+
             String uid = Generator.generateUserId();
+            String verifyToken = Generator.generateVerifyToken();
+            Timestamp token_created = Timestamp.valueOf(LocalDateTime.now());
+
             User u = new User();
             u.setId(uid);
             u.setFirst_name(firstName);
@@ -102,16 +106,24 @@ public class SignUpController extends HttpServlet {
             u.setGender(gender);
             u.setRole(r);
             u.setStatus(s);
-            
-            if(uDao.add(u)){
-                responseJson.addProperty("ok", Boolean.TRUE);
-                sendJsonResponse(response, gson, responseJson);
+            u.setVerification_token(verifyToken);
+            u.setToken_created(token_created);
+
+            if (uDao.add(u)) {
+                if (EmailSender.sendEmailVerificationLink(u)) {
+                    responseJson.addProperty("ok", Boolean.TRUE);
+                    sendJsonResponse(response, gson, responseJson);
+                } else {
+                    responseJson.addProperty("ok", Boolean.FALSE);
+                    responseJson.addProperty("message", "Something wrong happen when we tried to send a verification mail, please try again later!");
+                    sendJsonResponse(response, gson, responseJson);
+                }
             } else {
                 responseJson.addProperty("ok", Boolean.FALSE);
                 responseJson.addProperty("message", "Signup failed! Please contact admin!");
                 sendJsonResponse(response, gson, responseJson);
             }
-            
+
         } catch (IOException e) {
             responseJson.addProperty("ok", Boolean.FALSE);
             responseJson.addProperty("message", "Something wrong when process signup!");

@@ -30,6 +30,10 @@ public class User {
     private Timestamp deactivated_at;
     private Address address;
     private Status status;
+    private boolean is_verified;
+    private String verification_token;
+    private Timestamp token_created;
+    private Timestamp last_verification_sent;
 
     public User() {
     }
@@ -176,6 +180,43 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean isIs_verified() {
+        return is_verified;
+    }
+
+    public void setIs_verified(boolean is_verified) {
+        this.is_verified = is_verified;
+    }
+
+    public String getVerification_token() {
+        return verification_token;
+    }
+
+    public void setVerification_token(String verification_token) {
+        this.verification_token = verification_token;
+    }
+
+    public Timestamp getToken_created() {
+        return token_created;
+    }
+
+    public void setToken_created(Timestamp token_created) {
+        this.token_created = token_created;
+    }
+
+    public Timestamp getLast_verification_sent() {
+        return last_verification_sent;
+    }
+
+    public void setLast_verification_sent(Timestamp last_verification_sent) {
+        this.last_verification_sent = last_verification_sent;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" + "id=" + id + ", first_name=" + first_name + ", last_name=" + last_name + ", birthdate=" + birthdate + ", description=" + description + ", username=" + username + ", password=" + password + ", role=" + role + ", phone=" + phone + ", email=" + email + ", gender=" + gender + ", avatar=" + avatar + ", cover=" + cover + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deactivated_at=" + deactivated_at + ", address=" + address + ", status=" + status + ", is_verified=" + is_verified + ", verification_token=" + verification_token + ", token_created=" + token_created + ", last_verification_sent=" + last_verification_sent + '}';
     }
     
     

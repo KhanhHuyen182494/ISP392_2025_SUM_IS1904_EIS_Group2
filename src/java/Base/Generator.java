@@ -11,8 +11,8 @@ import java.util.UUID;
  * @author Huyen
  */
 public class Generator {
-    public static String generate(String prefix) {
-        int totalLength = 36;
+    private static String generate(String prefix, int length) {
+        int totalLength = length;
         String cleanUUID = UUID.randomUUID().toString().replaceAll("-", "");
         
         // Ensure total ID length is exactly 36 characters
@@ -26,10 +26,14 @@ public class Generator {
     }
 
     public static String generatePostId() {
-        return generate("POST");
-    }
+        return generate("POST", 36);
+    } 
 
     public static String generateUserId() {
-        return generate("U");
+        return generate("U", 36);
+    }
+    
+    public static String generateVerifyToken(){
+        return generate("TOKEN", 64); 
     }
 }

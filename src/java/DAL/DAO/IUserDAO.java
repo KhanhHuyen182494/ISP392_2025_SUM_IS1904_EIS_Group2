@@ -21,12 +21,18 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     public UserDTO getListPaging();
     
+    public User getByToken(String token);
+    
+    public User authenticateUser(String contact, String password);
+    
     //Add
     
     //Delete
     
     //Update
     public boolean updateSpecificInfo(String infoToUpdate, User u);
+    
+    public boolean updateVerifiedStatus(User u);
     
     //Search
     

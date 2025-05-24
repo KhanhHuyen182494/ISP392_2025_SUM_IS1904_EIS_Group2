@@ -116,9 +116,12 @@
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                 </div>
 
-                <div>
-                    <input type="password" name="password" placeholder="Password" 
+                <div class="relative">
+                    <input type="password" name="password" placeholder="Password"  id="passwordField"
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <button type="button" id="togglePassword" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 focus:outline-none flex items-center justify-center w-6 h-6">
+                        <i id="eyeIcon" class="fas fa-eye"></i>
+                    </button>
                 </div>
 
                 <button type="submit" 
@@ -140,6 +143,22 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
+            // Password toggle functionality
+            document.getElementById('togglePassword').addEventListener('click', function () {
+                const passwordField = document.getElementById('passwordField');
+                const eyeIcon = document.getElementById('eyeIcon');
+
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                }
+            });
+
             function initializeDateSelectors() {
                 const daySelect = document.getElementById('daySelect');
                 const monthSelect = document.getElementById('monthSelect');
@@ -297,7 +316,7 @@
                         password: data.password
                     },
                     success: function (response) {
-                        if(response.ok == true){
+                        if (response.ok == true) {
                             location.href = '${pageContext.request.contextPath}/login';
                         } else {
                             showToast(response.message, "error");

@@ -4,6 +4,7 @@
  */
 package Base;
 
+import Model.User;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -13,6 +14,8 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
+import java.util.ResourceBundle;
+import org.eclipse.jdt.internal.compiler.batch.Main;
 
 /**
  *
@@ -20,59 +23,41 @@ import java.util.Properties;
  */
 public class EmailSender {
 
-//    public boolean sendEmailResetPass(User u, String newPass) {
-//        boolean test = false;
-//        try {
-//            String subject = "Reset Your Password";
-//            String content = "Hi " + u.getFull_name() + "\n"
-//                    + "Your new password: " + newPass + "\n"
-//                    + "To be able to log in, please enter with new password."
-//                    + "Please do not share the code with anyone.";
-//            test = sendEmail(u.getEmail(), subject, content);
-//        } catch (Exception e) {
-//        }
-//        return test;
-//    }
+    private static ResourceBundle bundle = ResourceBundle.getBundle("Configuration.EmailSender");
+    private static Logging log = new Logging();
 
-//    public boolean sendEmailChangePass(User u, String subject, int otp) {
-//        boolean test = false;
-//
-//        try {
-//            String content = "Hi " + u.getFull_name() + "\n"
-//                    + "OTP: " + otp + "\n"
-//                    + "To be able to change password, please enter the OTP." + "\n"
-//                    + "The OTP Code will be expired in 1 mins, please hurry up!" + "\n"
-//                    + "Please do not share the code with anyone.";
-//            test = sendEmail(u.getEmail(), subject, content);
-//        } catch (Exception e) {
-//        }
-//        return test;
-//    }
+    public static boolean sendEmailVerificationLink(User u) {
+        boolean ok = false;
 
-//    public boolean sendEmailChangeEmail(EditUserDTO u) {
-//        boolean test = false;
-//
-//        try {
-//            String subject = "Welcome to Human Resource Manager!";
-//            String content = "Dear " + u.getFullName() + ",\n\n"
-//                    + "Welcome to the Human Resource Manager family! We are thrilled to have you with us.\n\n"
-//                    + "Your account has been changed the Email, and you can login with new email:\n"
-//                    + "Email: " + u.getEmail() + "\n"
-//                    + "If you have any questions or need assistance, feel free to reach out to our support team.\n\n"
-//                    + "Best regards,\n"
-//                    + "The Human Resource Manager Team";
-//            test = sendEmail(u.getEmail(), subject, content);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return test;
-//    }
+        String link = "http://localhost:9999/fuhousefinder/activate?token=" + u.getVerification_token();
+        String subject = "FUHF Verification";
+        String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
+                + "Click this link to activate your account:\n" + link;
+        
+        ok = sendEmail(u.getEmail(), subject, message);
+        
+        return ok;
+    }
+
+    public static boolean sendEmailResetPass(User u, String newPass) {
+        boolean test = false;
+        try {
+            String subject = "Reset Your Password";
+            String content = "Hi " + u.getFirst_name() + " " + u.getLast_name() + "\n"
+                    + "Your new password: " + newPass + "\n"
+                    + "To be able to log in, please enter with new password."
+                    + "Please do not share the code with anyone.";
+            test = sendEmail(u.getEmail(), subject, content);
+        } catch (Exception e) {
+        }
+        return test;
+    }
 
     public static boolean sendEmail(String toEmail, String subject, String content) {
         boolean send = false;
 
-        String fromEmail = "uyenltths170141@fpt.edu.vn";
-        String password = "qvnpjszlhttwltuh";
+        String fromEmail = bundle.getString("fromEmail");
+        String password = bundle.getString("password");
         String toEmmail = toEmail;
         Properties pr = new Properties();
         pr.setProperty("mail.smtp.host", "smtp.gmail.com");
@@ -98,9 +83,12 @@ public class EmailSender {
             Transport.send(mess);
             send = true;
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.error("" + e);
         }
         return send;
     }
 
+    public static void main(String[] args) {
+        sendEmail("huyennkhe182494@fpt.edu.vn", "Test Email Sender FUHF", "test");
+    }
 }
