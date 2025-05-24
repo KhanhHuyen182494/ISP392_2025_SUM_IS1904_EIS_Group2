@@ -32,14 +32,14 @@ import java.time.LocalDateTime;
  */
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
-    
+
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
     private UserDAO userDAO;
     private RememberTokenDAO rememberTokenDAO;
     private TokenBaseAuthentication tokenBase;
     private Gson gson;
     private Logging log;
-    
+
     @Override
     public void init() throws ServletException {
         userDAO = new UserDAO();
@@ -87,10 +87,10 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try (PrintWriter out = response.getWriter()) {
             // Get form parameters
             String contact = request.getParameter("contact");
@@ -103,21 +103,32 @@ public class LoginController extends HttpServlet {
 
             // Authenticate user
             User user = authenticateUser(contact.trim(), password);
-            
-            if (user == null) {
+
+            if (user.getId() == null) {
                 // Log failed attempt for security monitoring
                 LOGGER.warning("Failed login attempt for contact: " + contact);
-                
+
                 result.put("success", false);
+                result.put("errorCode", 1);
                 result.put("message", "Invalid email/phone or password");
                 out.print(gson.toJson(result));
                 return;
             }
 
             // Check if account is active
-            if (user.getStatus().getId() == 2) {
+            if (user.getStatus().getId() == 2 || user.getStatus().getId() == 3) {
                 result.put("success", false);
+                result.put("errorCode", 2);
                 result.put("message", "Account is disabled. Please contact administrator.");
+                out.print(gson.toJson(result));
+                return;
+            }
+
+            if (!user.isIs_verified()) {
+                result.put("success", false);
+                result.put("errorCode", 3);
+                result.put("email", user.getEmail());
+                result.put("message", "Account is not verify. Please verify it first.");
                 out.print(gson.toJson(result));
                 return;
             }
@@ -131,22 +142,23 @@ public class LoginController extends HttpServlet {
             }
 
             // Log successful login
-            LOGGER.info("Successful login for user: " + user.getEmail());
+            LOGGER.info("Successful login for user: " + user);
 
             // Return success response
             result.put("success", true);
+            result.put("errorCode", 0);
             result.put("message", "Login successful");
             result.put("redirectUrl", request.getContextPath() + "/feeds");
-            
+
             out.print(gson.toJson(result));
-            
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error during login process", e);
-            
+
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "An error occurred during login. Please try again.");
-            
+
             try (PrintWriter out = response.getWriter()) {
                 out.print(gson.toJson(result));
             }
@@ -163,9 +175,9 @@ public class LoginController extends HttpServlet {
      */
     protected boolean sessionHandler(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        
+
         HttpSession session = request.getSession(false);
-        
+
         if (session != null) {
             User user = (User) session.getAttribute("user");
             if (user != null) {
@@ -174,7 +186,7 @@ public class LoginController extends HttpServlet {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -188,13 +200,13 @@ public class LoginController extends HttpServlet {
      */
     protected boolean cookieHandler(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        
+
         Cookie[] cookies = request.getCookies();
-        
+
         if (cookies == null) {
             return false;
         }
-        
+
         String rememberToken = null;
 
         // Extract remember token from cookies
@@ -204,15 +216,15 @@ public class LoginController extends HttpServlet {
                 break;
             }
         }
-        
+
         if (rememberToken == null || rememberToken.trim().isEmpty()) {
             return false;
         }
-        
+
         try {
             // Validate remember token
             RememberToken tokenObj = rememberTokenDAO.findByToken(rememberToken);
-            
+
             if (tokenObj == null) {
                 clearRememberMeCookie(response);
                 return false;
@@ -227,7 +239,7 @@ public class LoginController extends HttpServlet {
 
             // Get user associated with token
             User user = userDAO.getById(tokenObj.getUser_id());
-            
+
             if (user == null || user.getStatus().getId() != 2 || user.getStatus().getId() == 3) {
                 rememberTokenDAO.deleteToken(rememberToken);
                 clearRememberMeCookie(response);
@@ -242,11 +254,11 @@ public class LoginController extends HttpServlet {
 
             // Redirect to dashboard
             response.sendRedirect(request.getContextPath() + "/feeds");
-            
+
             LOGGER.info("User logged in via remember me token: " + user.getEmail());
-            
+
             return true;
-            
+
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error validating remember token", e);
             clearRememberMeCookie(response);
@@ -312,7 +324,7 @@ public class LoginController extends HttpServlet {
         rememberCookie.setHttpOnly(true);
         rememberCookie.setSecure(true); // Set to false for development
         rememberCookie.setPath("/");
-        
+
         response.addCookie(rememberCookie);
     }
 

@@ -83,7 +83,7 @@ public class AccountVerificationController extends HttpServlet {
     }
 
     protected void reSend(HttpServletRequest request, HttpServletResponse response) {
-
+        
     }
 
     /**

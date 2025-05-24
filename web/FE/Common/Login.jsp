@@ -14,12 +14,23 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <style>
+        <style>
+            .swal2-loader {
+                border-color: #FF7700 !important;          
+                border-top-color: transparent !important;
+            }
 
-    </style>
+            .swal2-loader {
+                width: 2.2em !important;
+                height: 2.2em !important;
+                border-width: 0.22em !important;
+            }
+        </style>
+    </head>
     <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+        <div id="spinner"></div>
 
         <div class="flex items-center space-x-16 max-w-4xl w-full">
             <!-- Logo Section -->
@@ -82,7 +93,6 @@
             document.getElementById('togglePassword').addEventListener('click', function () {
                 const passwordField = document.getElementById('passwordField');
                 const eyeIcon = document.getElementById('eyeIcon');
-                
                 if (passwordField.type === 'password') {
                     passwordField.type = 'text';
                     eyeIcon.classList.remove('fa-eye');
@@ -93,13 +103,10 @@
                     eyeIcon.classList.add('fa-eye');
                 }
             });
-
             document.getElementById('loginForm').addEventListener('submit', function (e) {
                 e.preventDefault();
-
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData);
-
                 if (!data.contact || !data.password) {
                     Toastify({
                         text: "Please fill in all fields",
@@ -116,19 +123,105 @@
                         contact: data.contact,
                         password: data.password,
                         rememberme: data.rememberme
-                    }, 
-                    success: function(response){
-                        
-                    }, 
-                    error: function(xhr){
-                        
+                    },
+                    success: function (response) {
+                        let errorCode = response.errorCode;
+                        let message = response.message;
+                        switch (errorCode) {
+                            case 1:
+                                showToast(message, "error");
+                                break;
+                            case 2:
+                                showToast(message, "error");
+                                break;
+                            case 3:
+                                showVerifyOption(response.email);
+                                break;
+                        }
+                    },
+                    error: function (xhr) {
+
                     }
                 });
             });
-            
+
+            function showVerifyOption(email) {
+                Swal.fire({
+                    title: 'Your account is not verified',
+                    html: `
+            <p>Please verify your email: <strong>${email}</strong> by clicking the button below or just view the feeds!</p>
+        `,
+                    imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                    imageWidth: 150,
+                    imageHeight: 150,
+                    imageAlt: 'Custom icon',
+                    showCancelButton: true,
+                    confirmButtonText: 'Send Verification',
+                    cancelButtonText: 'Back to Newsfeed',
+                    reverseButtons: true,
+                    focusConfirm: false,
+                    focusCancel: false,
+                    customClass: {
+                        popup: 'rounded-xl shadow-lg',
+                        title: 'text-xl font-semibold',
+                        confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                        actions: 'space-x-4'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        reSendVerification(email);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        location.href = `${pageContext.request.contextPath}/feeds`;
+                    }
+                });
+            }
+
+            function reSendVerification(email) {
+                $.ajax({
+                    url: `${pageContext.request.contextPath}/resend-verification`,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        showLoading();
+                    },
+                    data: {email: email},
+                    success: function (response) {
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Verification email sent.',
+                            customClass: {
+                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded'
+                            },
+                            buttonsStyling: false,
+                        });
+                    },
+                    error: function () {
+                        Swal.close();
+                        Swal.fire('Error', 'Failed to send verification email.', 'error');
+                    }
+                });
+            }
+
+            function showLoading() {
+                Swal.fire({
+                    title: 'Sending verification...',
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    customClass: {
+                        title: 'text-xl font-semibold'
+                    }
+                });
+            }
+
+
             function showToast(message, type = 'success') {
                 let backgroundColor;
-
                 if (type === "success") {
                     backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
                 } else if (type === "error") {

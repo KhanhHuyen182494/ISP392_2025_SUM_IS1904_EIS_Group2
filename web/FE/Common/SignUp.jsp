@@ -13,6 +13,7 @@
         <!-- Libs -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <style>
@@ -40,6 +41,17 @@
             border-radius: 50%;
             background-color: white;
             transform: translate(-50%, -50%);
+        }
+
+        .swal2-loader {
+            border-color: #FF7700 !important;
+            border-top-color: transparent !important;
+        }
+
+        .swal2-loader {
+            width: 2.2em !important;
+            height: 2.2em !important;
+            border-width: 0.22em !important;
         }
     </style>
     <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
@@ -305,6 +317,9 @@
                 $.ajax({
                     url: '${pageContext.request.contextPath}/signup',
                     type: 'POST',
+                    beforeSend: function (xhr) {
+                        showLoading();
+                    },
                     data: {
                         firstName: data.firstName,
                         lastName: data.lastName,
@@ -317,7 +332,30 @@
                     },
                     success: function (response) {
                         if (response.ok == true) {
-                            location.href = '${pageContext.request.contextPath}/login';
+                            Swal.close();
+                            Swal.fire({
+                                title: 'Email Verification',
+                                html: `
+        <p>We have sent a verification link to your email. Please click on the link to verify your account before logging in!</p>
+    `,
+                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                imageWidth: 150,
+                                imageHeight: 150,
+                                imageAlt: 'Custom icon',
+                                confirmButtonText: 'Ok',
+                                focusConfirm: false,
+                                allowOutsideClick: false,
+                                customClass: {
+                                    popup: 'rounded-xl shadow-lg',
+                                    title: 'text-xl font-semibold',
+                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                },
+                                buttonsStyling: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.href = '${pageContext.request.contextPath}/login';
+                                }
+                            });
                         } else {
                             showToast(response.message, "error");
                         }
@@ -328,6 +366,20 @@
                     }
                 });
             });
+
+            function showLoading() {
+                Swal.fire({
+                    title: 'Sending verification...',
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    customClass: {
+                        title: 'text-xl font-semibold'
+                    }
+                });
+            }
 
             function showToast(message, type = 'success') {
                 let backgroundColor;
