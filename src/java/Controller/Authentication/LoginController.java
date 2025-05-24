@@ -228,7 +228,7 @@ public class LoginController extends HttpServlet {
             // Get user associated with token
             User user = userDAO.getById(tokenObj.getUser_id());
             
-            if (user == null || user.getStatus().getId() != 2) {
+            if (user == null || user.getStatus().getId() != 2 || user.getStatus().getId() == 3) {
                 rememberTokenDAO.deleteToken(rememberToken);
                 clearRememberMeCookie(response);
                 return false;

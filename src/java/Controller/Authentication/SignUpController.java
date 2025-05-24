@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package Controller.Authentication;
 
 import Base.EmailSender;
@@ -12,141 +8,132 @@ import DAL.UserDAO;
 import Model.Role;
 import Model.Status;
 import Model.User;
-import java.io.IOException;
+import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- *
- * @author Huyen
- */
 @WebServlet(name = "SignUpController", urlPatterns = {"/signup"})
 public class SignUpController extends HttpServlet {
 
-    private UserDAO uDao = new UserDAO();
-    private Logging logger = new Logging();
+    private static final Logger LOGGER = Logger.getLogger(SignUpController.class.getName());
+    private UserDAO userDAO;
+    private Logging log;
+    private Gson gson;
 
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    @Override
+    public void init() throws ServletException {
+        userDAO = new UserDAO();
+        gson = new Gson();
+        log = new Logging();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("./FE/Common/SignUp.jsp");
+        request.getRequestDispatcher("./FE/Common/SignUp.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Logic for raw signup
-        Gson gson = new Gson();
-        JsonObject responseJson = new JsonObject();
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> result = new HashMap<>();
 
         try {
-            String contact_raw = request.getParameter("contact");
-            boolean isValidEmail = uDao.isValidEmail(contact_raw);
-
-            if (!isValidEmail) {
-                responseJson.addProperty("ok", Boolean.FALSE);
-                responseJson.addProperty("message", "Email Is Existed!");
-                sendJsonResponse(response, gson, responseJson);
-                return;
-            }
-
+            // Input
+            String contact = request.getParameter("contact");
             String firstName = request.getParameter("firstName");
             String lastName = request.getParameter("lastName");
             String day = request.getParameter("day");
             String month = request.getParameter("month");
             String year = request.getParameter("year");
             String gender = request.getParameter("gender");
-            String password_raw = request.getParameter("password");
-            String hashedPassword = Hashing.SHA_256(password_raw);
+            String passwordRaw = request.getParameter("password");
+
+            // Validate email
+            if (!userDAO.isValidEmail(contact)) {
+                result.put("ok", false);
+                result.put("message", "Email already exists.");
+                sendJsonResponse(response, result);
+                return;
+            }
+
+            // Compose user data
+            String hashedPassword = Hashing.SHA_256(passwordRaw);
             String username = firstName + lastName + day + month + year;
-            Date bod = Date.valueOf(year + "-" + month + "-" + day);
+            Date birthdate = Date.valueOf(String.format("%s-%s-%s", year, month, day));
+            String userId = Generator.generateUserId();
+            String verificationToken = Generator.generateVerifyToken();
+            Timestamp tokenCreated = Timestamp.valueOf(LocalDateTime.now());
 
-            Role r = new Role();
-            r.setId(5);
+            Role role = new Role();
+            role.setId(5); // Default role: user
 
-            Status s = new Status();
-            s.setId(4);
+            Status status = new Status();
+            status.setId(4); // Status 4: pending verification
 
-            String uid = Generator.generateUserId();
-            String verifyToken = Generator.generateVerifyToken();
-            Timestamp token_created = Timestamp.valueOf(LocalDateTime.now());
+            User user = new User();
+            user.setId(userId);
+            user.setFirst_name(firstName);
+            user.setLast_name(lastName);
+            user.setUsername(username);
+            user.setBirthdate(birthdate);
+            user.setGender(gender);
+            user.setPassword(hashedPassword);
+            user.setEmail(contact);
+            user.setRole(role);
+            user.setStatus(status);
+            user.setVerification_token(verificationToken);
+            user.setToken_created(tokenCreated);
 
-            User u = new User();
-            u.setId(uid);
-            u.setFirst_name(firstName);
-            u.setLast_name(lastName);
-            u.setUsername(username);
-            u.setBirthdate(bod);
-            u.setPassword(hashedPassword);
-            u.setEmail(contact_raw);
-            u.setGender(gender);
-            u.setRole(r);
-            u.setStatus(s);
-            u.setVerification_token(verifyToken);
-            u.setToken_created(token_created);
-
-            if (uDao.add(u)) {
-                if (EmailSender.sendEmailVerificationLink(u)) {
-                    responseJson.addProperty("ok", Boolean.TRUE);
-                    sendJsonResponse(response, gson, responseJson);
+            // Insert user and send email
+            if (userDAO.add(user)) {
+                if (EmailSender.sendEmailVerificationLink(user)) {
+                    result.put("ok", true);
+                    result.put("message", "Signup successful. Please check your email to verify your account.");
                 } else {
-                    responseJson.addProperty("ok", Boolean.FALSE);
-                    responseJson.addProperty("message", "Something wrong happen when we tried to send a verification mail, please try again later!");
-                    sendJsonResponse(response, gson, responseJson);
+                    result.put("ok", false);
+                    result.put("message", "Failed to send verification email. Please try again later.");
                 }
             } else {
-                responseJson.addProperty("ok", Boolean.FALSE);
-                responseJson.addProperty("message", "Signup failed! Please contact admin!");
-                sendJsonResponse(response, gson, responseJson);
+                result.put("ok", false);
+                result.put("message", "Signup failed. Please contact admin.");
             }
 
         } catch (IOException e) {
-            responseJson.addProperty("ok", Boolean.FALSE);
-            responseJson.addProperty("message", "Something wrong when process signup!");
-            sendJsonResponse(response, gson, responseJson);
+            LOGGER.log(Level.SEVERE, "Error during signup process", e);
+            result.put("ok", false);
+            result.put("message", "An unexpected error occurred during signup.");
         }
-    }
 
-    //Helper method
-    private void sendJsonResponse(HttpServletResponse response, Gson gson, JsonObject responseJson) throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(gson.toJson(responseJson));
-        response.getWriter().flush();
+        sendJsonResponse(response, result);
     }
 
     /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
+     * Utility method to send JSON response
      */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
+    private void sendJsonResponse(HttpServletResponse response, Map<String, Object> result) throws IOException {
+        response.getWriter().write(gson.toJson(result));
+        response.getWriter().flush();
     }
 
+    @Override
+    public String getServletInfo() {
+        return "SignUpController handles user registration and sends verification email";
+    }
 }
