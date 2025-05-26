@@ -54,7 +54,62 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User getByEmail(String email) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM fuhousefinder.user WHERE email = ?;";
+        User u = new User();
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, email);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                u.setId(rs.getString("id"));
+                u.setFirst_name(rs.getString("first_name"));
+                u.setLast_name(rs.getString("last_name"));
+                u.setUsername(rs.getString("username"));
+                u.setBirthdate(rs.getDate("birthdate"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setDescription(rs.getString("description"));
+                u.setPhone(rs.getString("phone"));
+                u.setCreated_at(rs.getTimestamp("created_at"));
+                u.setUpdated_at(rs.getTimestamp("updated_at"));
+                u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
+                u.setIs_verified(rs.getBoolean("is_verified"));
+                u.setLast_verification_sent(rs.getTimestamp("last_verification_sent"));
+
+                Image ava = new Image();
+                Image cov = new Image();
+                Role r = new Role();
+                Status s = new Status();
+                Address add = new Address();
+                r.setId(rs.getInt("role_id"));
+                s.setId(rs.getInt("status_id"));
+                ava.setId(rs.getInt("avatar"));
+                cov.setId(rs.getInt("cover"));
+                add.setId(rs.getInt("address_id"));
+
+                u.setAvatar(ava);
+                u.setCover(cov);
+                u.setRole(r);
+                u.setStatus(s);
+                u.setAddress(add);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return u;
     }
 
     @Override
@@ -343,6 +398,42 @@ public class UserDAO extends BaseDao implements IUserDAO {
         }
 
         return u;
+    }
+
+    @Override
+    public boolean updateVerificationInfo(User u) {
+        String sql = """
+                     UPDATE `fuhousefinder`.`user`
+                     SET
+                     `updated_at` = current_timestamp(),
+                     `verification_token` = ?,
+                     `token_created` = ?,
+                     `last_verification_sent` = ?
+                     WHERE `email` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, u.getVerification_token());
+            ps.setTimestamp(2, u.getToken_created());
+            ps.setTimestamp(3, u.getLast_verification_sent());
+            ps.setString(4, u.getEmail());
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected == 1;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
 }

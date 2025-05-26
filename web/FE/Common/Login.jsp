@@ -18,7 +18,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             .swal2-loader {
-                border-color: #FF7700 !important;          
+                border-color: #FF7700 !important;
                 border-top-color: transparent !important;
             }
 
@@ -188,15 +188,27 @@
                     data: {email: email},
                     success: function (response) {
                         Swal.close();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: 'Verification email sent.',
-                            customClass: {
-                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded'
-                            },
-                            buttonsStyling: false,
-                        });
+                        if (response.ok == true) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Verification email sent.',
+                                customClass: {
+                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded'
+                                },
+                                buttonsStyling: false,
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed!',
+                                text: response.message,
+                                customClass: {
+                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded'
+                                },
+                                buttonsStyling: false,
+                            });
+                        }
                     },
                     error: function () {
                         Swal.close();

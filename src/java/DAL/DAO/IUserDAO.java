@@ -34,6 +34,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     public boolean updateVerifiedStatus(User u);
     
+    public boolean updateVerificationInfo(User u);
+    
     //Search
     
     //Validate
