@@ -17,14 +17,15 @@ import java.time.format.DateTimeFormatter;
  * @author admin
  */
 public class Logging {
+
     private String logFilePath;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter fileDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public Logging() {
-        String projectRootPath = System.getProperty("user.dir");  // Get project root directory
+        String basePath = System.getProperty("catalina.base");  // Get project root directory
         String date = LocalDate.now().format(fileDateFormatter);   // Current date in 'yyyy-MM-dd' format
-        this.logFilePath = projectRootPath + "/logs/log-" + date + ".txt";  // File name with date
+        this.logFilePath = basePath + "/logs/log-" + date + ".txt";
         createLogDirectory();
     }
 
@@ -75,14 +76,9 @@ public class Logging {
     public void debug(String message) {
         writeLog("DEBUG", message);
     }
-    
-    public static void main(String[] args) {
-        Logging logger = new Logging();
 
-        logger.info("Application started.");
-        logger.warn("Low memory detected.");
-        logger.error("Database connection failed.");
-        logger.debug("Debug mode activated.");
+    public static void main(String[] args) {
+
     }
 
 }
