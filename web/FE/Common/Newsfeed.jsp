@@ -57,7 +57,7 @@
             }
             .search-focus:focus {
                 transform: scale(1.02);
-                box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+                box-shadow: 0 0 20px rgba(255, 165, 0, 0.3);
             }
         </style>
     </head>
@@ -70,7 +70,7 @@
                     <div class="flex items-center gap-4">
                         <!-- Logo -->
                         <div class="flex items-center gap-2">
-                            <img src="${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg" width="30"/>
+                            <a href="${pageContext.request.contextPath}/feeds"><img src="${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg" width="30"/></a>
                         </div>
 
                         <!-- Search -->
@@ -80,7 +80,7 @@
                                 placeholder="Search..." 
                                 class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
                                 />
-                            <i class="fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
+                            <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
                         </div>
                     </div>
 
@@ -114,7 +114,7 @@
         <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
             <!-- Sidebar - Top Feedback Section -->
             <div class="col-span-4">
-                <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+                <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-bold text-gray-800">Top House/Room</h2>
                         <i class="fas fa-star text-yellow-500"></i>
@@ -172,11 +172,18 @@
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                                                <i class="fas fa-user text-gray-400"></i>
+                                                <img class="rounded-[50%]" src="${post.owner.avatar}" />
                                             </div>
                                             <div>
-                                                <h3 class="font-semibold text-gray-800">Khoai</h3>
-                                                <p class="text-sm text-gray-500">Posted 2 hours ago</p>
+                                                <c:choose>
+                                                    <c:when test="${sessionScope.user_id == post.owner.id}">
+                                                        <h3 class="font-semibold text-gray-800">Posted by You</h3>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <h3 class="font-semibold text-gray-800">${post.owner.first_name} ${post.owner.last_name}</h3>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
                                             </div>
                                         </div>
                                         <div class="flex gap-2">
@@ -186,11 +193,11 @@
                                             <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
                                         </div>
                                     </div>
-                                    
+
                                     <p class="text-lg mb-4">
                                         ${post.content}
                                     </p>
-                                    
+
                                     <!-- Property Title -->
                                     <h2 class="text-xl font-bold text-gray-800 mb-3">${post.house.name}</h2>
 

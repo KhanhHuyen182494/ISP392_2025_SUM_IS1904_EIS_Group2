@@ -11,6 +11,7 @@ import Model.Address;
 import Model.House;
 import Model.Post;
 import Model.Status;
+import Model.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.PreparedStatement;
@@ -81,11 +82,17 @@ public class PostDAO extends BaseDao implements IPostDAO {
                                h.water_price as HouseWaterPrice,
                                h.down_payment as HouseDownPayment,
                                h.status_id as HouseStatusId,
-                               h.address_id as HouseAddressId
+                               h.address_id as HouseAddressId,
+                               u.id as UserPostId,
+                               u.first_name as UserPostFirstName,
+                               u.last_name as UserPostLastName,
+                               u.avatar as UserPostAvatar
                            FROM
                                post p
                                    JOIN
                                house h ON p.house_id = h.id
+                           		JOIN
+                           	user u ON p.created_by = u.id
                            WHERE 1=1
                            """;
         String countQuery = "SELECT COUNT(*) FROM post p WHERE 1=1";
@@ -164,6 +171,14 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 h.setStatus(hsta);
                 h.setAddress(a);
 
+                User owner = new User();
+                owner.setId(rs.getString("UserPostId"));
+                owner.setFirst_name(rs.getString("UserPostFirstName"));
+                owner.setLast_name(rs.getString("UserPostLastName"));
+                owner.setAvatar(rs.getString("UserPostAvatar"));
+
+                p.setOwner(owner);
+                
                 // TODO: load Room, House, Status, etc. if needed
                 posts.add(p);
             }
