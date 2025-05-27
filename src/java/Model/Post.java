@@ -24,6 +24,7 @@ public class Post {
 
     private List<Feedback> feedbacks;
     private List<Like> likes;
+    private List<Image> images;
     
     public Post() {
     }
@@ -115,6 +116,18 @@ public class Post {
     public void setLikes(List<Like> likes) {
         this.likes = likes;
     }
-    
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" + "id=" + id + ", content=" + content + ", status=" + status + ", house=" + house + ", room=" + room + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", created_by=" + created_by + ", feedbacks=" + feedbacks + ", likes=" + likes + ", images=" + images + '}';
+    }
     
 }

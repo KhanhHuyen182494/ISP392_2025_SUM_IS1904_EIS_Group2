@@ -5,6 +5,7 @@
 package DAL.DAO;
 
 import DTO.UserDTO;
+import Model.Image;
 import Model.User;
 
 /**

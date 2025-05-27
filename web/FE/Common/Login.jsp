@@ -37,7 +37,7 @@
             <div class="flex-1 flex flex-col items-center">
                 <img src="${pageContext.request.contextPath}/Asset/FUHF Logo/1.svg" width="290" alt="FU House Finder Logo" class="mb-4"/>
             </div>
-
+            
             <!-- Login Form -->
             <div class="flex-1">
                 <div class="bg-white rounded-2xl shadow-lg border-2 border-orange-500 p-8 w-full max-w-sm mx-auto">
@@ -128,6 +128,9 @@
                         let errorCode = response.errorCode;
                         let message = response.message;
                         switch (errorCode) {
+                            case 0:
+                                location.href = response.redirectUrl;
+                                break;
                             case 1:
                                 showToast(message, "error");
                                 break;
