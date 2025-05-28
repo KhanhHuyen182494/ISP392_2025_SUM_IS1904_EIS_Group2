@@ -6,10 +6,14 @@ package Controller.Common;
 
 import Base.Logging;
 import Controller.Authentication.LoginController;
+import DAL.AddressDAO;
+import DAL.ImageDAO;
 import DAL.PostDAO;
-import DTO.PostDTO;
 import Model.House;
 import DTO.PostDTO;
+import Model.Address;
+import Model.Image;
+import Model.Post;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;
 import java.io.IOException;
@@ -32,6 +36,8 @@ public class NewsfeedController extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
     private PostDAO pDao;
+    private AddressDAO aDao;
+    private ImageDAO iDao;
     private Gson gson;
     private Logging log;
 
@@ -40,6 +46,8 @@ public class NewsfeedController extends HttpServlet {
         pDao = new PostDAO();
         gson = new Gson();
         log = new Logging();
+        aDao = new AddressDAO();
+        iDao = new ImageDAO();
     }
 
     /**
@@ -60,16 +68,32 @@ public class NewsfeedController extends HttpServlet {
             //Logic get posts
             posts = pDao.getPaginatedPosts(1, 1, "", "");
             
+            fullLoadPostInfomation(posts);
+            
             //Logic get top house room
-            
-            
             request.setAttribute("topfeedbacks", topHouseRoom);
             request.setAttribute("posts", posts.getItems());
             request.getRequestDispatcher("/FE/Common/Newsfeed.jsp").forward(request, response);
 
-        } catch (Exception e) {
+        } catch (ServletException | IOException e) {
             LOGGER.log(Level.SEVERE, "Error during get post process", e);
             log.error("Error during get post process");
+        }
+    }
+
+    private void fullLoadPostInfomation(PostDTO posts) {
+        try {
+            //Load address, images, likes, feedbacks
+            for(Post p : posts.getItems()){
+                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+                List<Image> images = iDao.getImagesByObjectId(p.getId());
+                
+                p.getHouse().setAddress(a);
+                p.setImages(images);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
         }
     }
 

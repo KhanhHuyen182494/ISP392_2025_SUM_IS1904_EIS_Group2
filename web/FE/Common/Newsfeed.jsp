@@ -226,7 +226,7 @@
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-map-marker-alt text-red-500"></i>
-                                            <span class="text-sm"><strong>Địa chỉ:</strong> Thôn 4, Thạch Hoà, Thạch Thất, Hà Nội</span>
+                                            <span class="text-sm"><strong>Địa chỉ:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -234,17 +234,25 @@
                                 <!-- Images -->
                                 <div class="px-6 pb-4">
                                     <div class="grid grid-cols-2 gap-4">
-                                        <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                            <i class="fas fa-image text-gray-400 text-2xl"></i>
-                                        </div>
-                                        <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                            <i class="fas fa-image text-gray-400 text-2xl"></i>
-                                        </div>
+                                        <c:forEach items="${post.images}" var="image">
+                                            <div class="bg-gray-200 h-48 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
+                                                <img class="rounded-[20px] h-48 w-full object-cover" src="${image.path}" />
+                                            </div>
+                                        </c:forEach>
+                                        <!--                                        <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
+                                                                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
+                                                                                </div>
+                                                                                <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
+                                                                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
+                                                                                </div>
+                                                                                <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
+                                                                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
+                                                                                </div>-->
                                     </div>
                                 </div>
 
                                 <!-- Action Bar -->
-                                <div class="px-6 py-4 bg-gray-50 flex items-center justify-between">
+                                <div class="px-6 py-4 flex items-center justify-between">
                                     <div class="flex items-center gap-4">
                                         <button class="like-btn flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white transition-colors" onclick="toggleLike(this)">
                                             <i class="fas fa-thumbs-up"></i>
