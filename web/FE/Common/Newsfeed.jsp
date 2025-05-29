@@ -251,17 +251,13 @@
                                             <span class="like-count">${fn:length(post.likes)}</span>
                                         </button>
 
-                                        <c:if test="${fn:contains(post.likes, 'Java')}">
-                                            This post is about Java!
-                                        </c:if>
-
                                         <!-- Maybe have a like people here, like: Khanh Huyen, TamHS, ... -->
 
                                     </div>
 
                                     <div class="flex items-center gap-2">
                                         <div class="feedback-badge text-white px-3 py-1 rounded-full text-xs font-medium">
-                                            4 feedbacks
+                                            ${fn:length(post.feedbacks)} feedbacks
                                         </div>
                                     </div>
                                 </div>

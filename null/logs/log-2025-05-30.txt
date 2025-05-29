@@ -1,0 +1,1 @@
+[2025-05-30 00:21:32] [ERROR] java.sql.SQLException: Parameter index out of range (1 > number of parameters, which is 0).
