@@ -8,15 +8,18 @@ import Base.Logging;
 import Controller.Authentication.LoginController;
 import DAL.AddressDAO;
 import DAL.DAO.IAddressDAO;
+import DAL.DAO.IFeedbackDAO;
 import DAL.DAO.IImageDAO;
 import DAL.DAO.ILikeDAO;
 import DAL.DAO.IPostDAO;
+import DAL.FeedbackDAO;
 import DAL.ImageDAO;
 import DAL.LikeDAO;
 import DAL.PostDAO;
 import Model.House;
 import DTO.PostDTO;
 import Model.Address;
+import Model.Feedback;
 import Model.Image;
 import Model.Like;
 import Model.Post;
@@ -45,6 +48,7 @@ public class NewsfeedController extends HttpServlet {
     private IAddressDAO aDao;
     private IImageDAO iDao;
     private ILikeDAO lDao;
+    private IFeedbackDAO fDao;
     private Gson gson;
     private Logging log;
 
@@ -56,6 +60,7 @@ public class NewsfeedController extends HttpServlet {
         aDao = new AddressDAO();
         iDao = new ImageDAO();
         lDao = new LikeDAO();
+        fDao = new FeedbackDAO();
     }
 
     /**
@@ -98,7 +103,9 @@ public class NewsfeedController extends HttpServlet {
                 Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
                 List<Image> images = iDao.getImagesByObjectId(pid);
                 List<Like> likes = lDao.getListLikeByPostId(pid);
+                List<Feedback> feedbacks = fDao.getFeedbacksByPostId(pid);
                 
+                p.setFeedbacks(feedbacks);
                 p.getHouse().setAddress(a);
                 p.setImages(images);
                 p.setLikes(likes);
