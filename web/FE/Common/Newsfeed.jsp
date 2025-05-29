@@ -5,7 +5,8 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setLocale value="vi_VN" />
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -238,16 +239,7 @@
                                             <div class="bg-gray-200 h-48 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
                                                 <img class="rounded-[20px] h-48 w-full object-cover" src="${image.path}" />
                                             </div>
-                                        </c:forEach>
-                                        <!--                                        <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
-                                                                                </div>
-                                                                                <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
-                                                                                </div>
-                                                                                <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                                                    <i class="fas fa-image text-gray-400 text-2xl"></i>
-                                                                                </div>-->
+                                        </c:forEach> 
                                     </div>
                                 </div>
 
@@ -256,8 +248,15 @@
                                     <div class="flex items-center gap-4">
                                         <button class="like-btn flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white transition-colors" onclick="toggleLike(this)">
                                             <i class="fas fa-thumbs-up"></i>
-                                            <span class="like-count">1</span>
+                                            <span class="like-count">${fn:length(post.likes)}</span>
                                         </button>
+
+                                        <c:if test="${fn:contains(post.likes, 'Java')}">
+                                            This post is about Java!
+                                        </c:if>
+
+                                        <!-- Maybe have a like people here, like: Khanh Huyen, TamHS, ... -->
+
                                     </div>
 
                                     <div class="flex items-center gap-2">
@@ -305,5 +304,25 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script>
+                                            function toggleLike(button) {
+                                                const likeCount = button.querySelector('.like-count');
+                                                const currentCount = parseInt(likeCount.textContent);
+
+                                                if (button.classList.contains('liked')) {
+                                                    // Unlike
+                                                    button.classList.remove('liked');
+                                                    likeCount.textContent = currentCount - 1;
+                                                    button.style.backgroundColor = 'white';
+                                                    button.style.color = '#3b82f6';
+                                                } else {
+                                                    // Like
+                                                    button.classList.add('liked');
+                                                    likeCount.textContent = currentCount + 1;
+                                                    button.style.backgroundColor = '#3b82f6';
+                                                    button.style.color = 'white';
+                                                }
+                                            }
+        </script>
     </body>
 </html>

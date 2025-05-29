@@ -7,12 +7,18 @@ package Controller.Common;
 import Base.Logging;
 import Controller.Authentication.LoginController;
 import DAL.AddressDAO;
+import DAL.DAO.IAddressDAO;
+import DAL.DAO.IImageDAO;
+import DAL.DAO.ILikeDAO;
+import DAL.DAO.IPostDAO;
 import DAL.ImageDAO;
+import DAL.LikeDAO;
 import DAL.PostDAO;
 import Model.House;
 import DTO.PostDTO;
 import Model.Address;
 import Model.Image;
+import Model.Like;
 import Model.Post;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;
@@ -35,9 +41,10 @@ import java.util.logging.Logger;
 public class NewsfeedController extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
-    private PostDAO pDao;
-    private AddressDAO aDao;
-    private ImageDAO iDao;
+    private IPostDAO pDao;
+    private IAddressDAO aDao;
+    private IImageDAO iDao;
+    private ILikeDAO lDao;
     private Gson gson;
     private Logging log;
 
@@ -48,6 +55,7 @@ public class NewsfeedController extends HttpServlet {
         log = new Logging();
         aDao = new AddressDAO();
         iDao = new ImageDAO();
+        lDao = new LikeDAO();
     }
 
     /**
@@ -85,11 +93,15 @@ public class NewsfeedController extends HttpServlet {
         try {
             //Load address, images, likes, feedbacks
             for(Post p : posts.getItems()){
+                String pid = p.getId();
+                
                 Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-                List<Image> images = iDao.getImagesByObjectId(p.getId());
+                List<Image> images = iDao.getImagesByObjectId(pid);
+                List<Like> likes = lDao.getListLikeByPostId(pid);
                 
                 p.getHouse().setAddress(a);
                 p.setImages(images);
+                p.setLikes(likes);
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
