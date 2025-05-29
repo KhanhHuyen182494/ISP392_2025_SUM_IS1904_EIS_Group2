@@ -23,8 +23,8 @@ public class User {
     private String phone;
     private String email;
     private String gender;
-    private Image avatar;
-    private Image cover;
+    private String avatar;
+    private String cover;
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deactivated_at;
@@ -118,19 +118,19 @@ public class User {
         this.gender = gender;
     }
 
-    public Image getAvatar() {
+    public String getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(Image avatar) {
+    public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
 
-    public Image getCover() {
+    public String getCover() {
         return cover;
     }
 
-    public void setCover(Image cover) {
+    public void setCover(String cover) {
         this.cover = cover;
     }
 
