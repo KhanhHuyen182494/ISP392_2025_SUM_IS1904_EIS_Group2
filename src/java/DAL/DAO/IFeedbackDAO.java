@@ -13,6 +13,6 @@ import java.util.List;
  */
 public interface IFeedbackDAO extends IBaseUUID<Feedback>{
     
-    public List<Feedback> getFeedbacksByPostId(String postId);
+    public List<Feedback> getFeedbacksByHouseId(String houseId);
     
 }

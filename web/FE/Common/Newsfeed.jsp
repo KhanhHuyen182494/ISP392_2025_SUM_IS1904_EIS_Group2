@@ -60,6 +60,70 @@
                 transform: scale(1.02);
                 box-shadow: 0 0 20px rgba(255, 165, 0, 0.3);
             }
+
+            /* Modal Styles */
+            .modal-overlay {
+                background-color: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(4px);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .modal-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .modal-content {
+                transform: translateY(-50px);
+                transition: transform 0.3s ease;
+            }
+
+            .modal-overlay.active .modal-content {
+                transform: translateY(0);
+            }
+
+            .feedback-item {
+                transition: all 0.2s ease;
+            }
+
+            .feedback-item:hover {
+                background-color: #f8fafc;
+                transform: translateX(5px);
+            }
+
+            .star-rating {
+                color: #fbbf24;
+            }
+
+            .loading-spinner {
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #3498db;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .modal-close-btn {
+                transition: all 0.2s ease;
+            }
+
+            .modal-close-btn:hover {
+                background-color: #ef4444;
+                color: white;
+                transform: scale(1.1);
+            }
         </style>
     </head>
     <body>
@@ -118,7 +182,13 @@
                 <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-bold text-gray-800">Top House/Room</h2>
-                        <i class="fas fa-star text-yellow-500"></i>
+                        <div class="filter-top-house-room flex items-center gap-5">
+                            <div class="filter-button">
+                                <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-lg font-medium transition-colors px-2">Booking</button>
+                                <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-lg font-medium transition-colors px-2">Star</button>
+                            </div>
+                            <i class="fas fa-star text-yellow-500"></i>
+                        </div>
                     </div>
 
                     <!-- Top Feedback Items -->
@@ -237,7 +307,7 @@
                                     <div class="grid grid-cols-2 gap-4">
                                         <c:forEach items="${post.images}" var="image">
                                             <div class="bg-gray-200 h-48 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                <img class="rounded-[20px] h-48 w-full object-cover" src="${image.path}" />
+                                                <img class="rounded-[20px] h-48 w-full object-cover" src="${image.path}" onclick="showImageModal('${image.path}')"/>
                                             </div>
                                         </c:forEach> 
                                     </div>
@@ -252,7 +322,7 @@
                                         </button>
 
                                         <!-- Maybe have a like people here, like: Khanh Huyen, TamHS, ... -->
-                                        
+
                                     </div>
 
                                     <div class="flex items-center gap-2">
@@ -272,7 +342,9 @@
                                         <i class="fa-solid fa-house text-white"></i>
                                         View Detail
                                     </button>
-                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors">
+                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
+                                            data-house-id="${post.house.id}" 
+                                            data-house-name="${post.house.name}">
                                         <i class="fas fa-comments mr-2"></i>
                                         View Feedback
                                     </button>
@@ -301,6 +373,67 @@
             </div>
         </div>
 
+        <!-- Feedback Modal -->
+        <div id="feedbackModal" class="fixed inset-0 z-50 modal-overlay">
+            <div class="flex items-center justify-center min-h-screen px-4 py-8">
+                <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold">Feedbacks</h2>
+                                <p id="modalHouseName" class="text-blue-100 text-sm"></p>
+                            </div>
+                            <button id="closeModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all">
+                                <i class="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+
+                        <!-- Loading State -->
+                        <div id="feedbackLoading" class="text-center py-8">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            <p class="text-gray-500">Loading feedbacks...</p>
+                        </div>
+
+                        <!-- Error State -->
+                        <div id="feedbackError" class="text-center py-8 hidden">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                            <p class="text-red-500 font-medium">Failed to load feedbacks</p>
+                            <button id="retryFeedback" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-redo mr-2"></i>
+                                Retry
+                            </button>
+                        </div>
+
+                        <!-- No Feedback State -->
+                        <div id="noFeedback" class="text-center py-8 hidden">
+                            <i class="fas fa-comment-slash text-gray-400 text-3xl mb-4"></i>
+                            <p class="text-gray-500">No feedbacks available for this property</p>
+                        </div>
+
+                        <!-- Feedbacks Container -->
+                        <div id="feedbackContainer" class="space-y-4">
+                            <!-- Dynamic feedback items will be inserted here -->
+                        </div>
+
+                        <!-- Load More Feedbacks -->
+                        <div id="loadMoreFeedback" class="text-center mt-6 hidden">
+                            <button id="loadMoreFeedbackBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-chevron-down mr-2"></i>
+                                Load More Feedbacks
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -322,6 +455,222 @@
                                                     button.style.backgroundColor = '#3b82f6';
                                                     button.style.color = 'white';
                                                 }
+                                            }
+
+                                            $(document).ready(function () {
+                                                const modal = $('#feedbackModal');
+                                                const modalHouseName = $('#modalHouseName');
+                                                const feedbackContainer = $('#feedbackContainer');
+                                                const loadingDiv = $('#feedbackLoading');
+                                                const errorDiv = $('#feedbackError');
+                                                const noFeedbackDiv = $('#noFeedback');
+                                                const loadMoreDiv = $('#loadMoreFeedback');
+
+                                                let currentHouseId = null;
+                                                let currentPage = 1;
+                                                let isLoading = false;
+
+                                                $('.view-feedback-btn').on('click', function () {
+                                                    const houseId = $(this).data('house-id');
+                                                    const houseName = $(this).data('house-name');
+
+                                                    currentHouseId = houseId;
+                                                    currentPage = 1;
+
+                                                    modalHouseName.text(houseName);
+                                                    modal.addClass('active');
+                                                    $('body').addClass('overflow-hidden');
+
+                                                    loadFeedbacks(houseId, 1, true);
+                                                });
+
+                                                // Close modal
+                                                $('#closeModalBtn').on('click', function (e) {
+                                                    closeModal();
+
+                                                });
+
+                                                // Retry loading feedbacks
+                                                $('#retryFeedback').on('click', function () {
+                                                    if (currentHouseId) {
+                                                        loadFeedbacks(currentHouseId, 1, true);
+                                                    }
+                                                });
+
+                                                // Load more feedbacks
+                                                $('#loadMoreFeedbackBtn').on('click', function () {
+                                                    if (currentHouseId && !isLoading) {
+                                                        loadFeedbacks(currentHouseId, currentPage + 1, false);
+                                                    }
+                                                });
+
+                                                // ESC key to close modal
+                                                $(document).on('keydown', function (e) {
+                                                    if (e.key === 'Escape' && modal.hasClass('active')) {
+                                                        closeModal();
+                                                    }
+                                                });
+
+                                                function closeModal() {
+                                                    modal.removeClass('active');
+                                                    $('body').removeClass('overflow-hidden');
+                                                    // Reset modal state after animation
+                                                    setTimeout(() => {
+                                                        resetModalState();
+                                                    }, 300);
+                                                }
+
+                                                function resetModalState() {
+                                                    feedbackContainer.empty();
+                                                    loadingDiv.show();
+                                                    errorDiv.addClass('hidden');
+                                                    noFeedbackDiv.addClass('hidden');
+                                                    loadMoreDiv.addClass('hidden');
+                                                    currentHouseId = null;
+                                                    currentPage = 1;
+                                                }
+
+                                                function loadFeedbacks(houseId, page, isNewLoad) {
+                                                    if (isLoading)
+                                                        return;
+
+                                                    isLoading = true;
+
+                                                    if (isNewLoad) {
+                                                        // Show loading for new load
+                                                        loadingDiv.show();
+                                                        errorDiv.addClass('hidden');
+                                                        noFeedbackDiv.addClass('hidden');
+                                                        loadMoreDiv.addClass('hidden');
+                                                        feedbackContainer.empty();
+                                                    } else {
+                                                        // Show loading on load more button
+                                                        $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                                    }
+
+                                                    $.ajax({
+                                                        url: '${pageContext.request.contextPath}/api/feedbacks',
+                                                        method: 'GET',
+                                                        data: {
+                                                            houseId: houseId,
+                                                            page: page,
+                                                            limit: 10
+                                                        },
+                                                        success: function (response) {
+                                                            loadingDiv.hide();
+
+                                                            if (isNewLoad) {
+                                                                feedbackContainer.empty();
+                                                            }
+
+                                                            if (response.feedbacks && response.feedbacks.length > 0) {
+                                                                appendFeedbacks(response.feedbacks);
+                                                                currentPage = page;
+
+                                                                // Show load more if there are more feedbacks
+                                                                if (response.hasMore) {
+                                                                    loadMoreDiv.removeClass('hidden');
+                                                                } else {
+                                                                    loadMoreDiv.addClass('hidden');
+                                                                }
+
+                                                                errorDiv.addClass('hidden');
+                                                                noFeedbackDiv.addClass('hidden');
+                                                            } else if (isNewLoad) {
+                                                                // No feedbacks found
+                                                                noFeedbackDiv.removeClass('hidden');
+                                                                errorDiv.addClass('hidden');
+                                                                loadMoreDiv.addClass('hidden');
+                                                            }
+                                                        },
+                                                        error: function (xhr, status, error) {
+                                                            console.error('Error loading feedbacks:', error);
+                                                            loadingDiv.hide();
+
+                                                            if (isNewLoad) {
+                                                                errorDiv.removeClass('hidden');
+                                                                noFeedbackDiv.addClass('hidden');
+                                                            } else {
+                                                                // Show error toast for load more
+                                                                showToast('Failed to load more feedbacks', 'error');
+                                                            }
+                                                        },
+                                                        complete: function () {
+                                                            isLoading = false;
+                                                            $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
+                                                        }
+                                                    });
+                                                }
+
+                                                function appendFeedbacks(feedbacks) {
+                                                    feedbacks.forEach(function (feedback) {
+                                                        const feedbackHtml = createFeedbackHtml(feedback);
+                                                        feedbackContainer.append(feedbackHtml);
+                                                    });
+                                                }
+
+                                                function createFeedbackHtml(feedback) {
+                                                    const stars = generateStarRating(feedback.rating || 5);
+                                                    const timeAgo = formatTimeAgo(feedback.created_at);
+
+                                                }
+
+                                                function generateStarRating(rating) {
+                                                    let stars = '';
+                                                    for (let i = 1; i <= 5; i++) {
+                                                        if (i <= rating) {
+                                                            stars += '<i class="fas fa-star text-xs"></i>';
+                                                        } else {
+                                                            stars += '<i class="far fa-star text-xs"></i>';
+                                                        }
+                                                    }
+                                                    return stars;
+                                                }
+
+                                                function formatTimeAgo(dateString) {
+                                                    const date = new Date(dateString);
+                                                    const now = new Date();
+                                                    const diffInSeconds = Math.floor((now - date) / 1000);
+
+                                                    if (diffInSeconds < 60) {
+                                                        return 'Just now';
+                                                    } else if (diffInSeconds < 3600) {
+                                                        const minutes = Math.floor(diffInSeconds / 60);
+                                                        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                                                    } else if (diffInSeconds < 86400) {
+                                                        const hours = Math.floor(diffInSeconds / 3600);
+                                                        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                                                    } else if (diffInSeconds < 2592000) {
+                                                        const days = Math.floor(diffInSeconds / 86400);
+                                                        return `${days} day${days > 1 ? 's' : ''} ago`;
+                                                    } else {
+                                                        return date.toLocaleDateString('vi-VN');
+                                                    }
+                                                }
+
+                                                function showToast(message, type = 'success') {
+                                                    Toastify({
+                                                        text: message,
+                                                        duration: 3000,
+                                                        gravity: "top",
+                                                        position: "right",
+                                                        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+                                                        stopOnFocus: true
+                                                    }).showToast();
+                                                }
+                                            });
+
+                                            function showImageModal(imageSrc) {
+                                                Swal.fire({
+                                                    imageUrl: imageSrc,
+                                                    imageWidth: 'auto',
+                                                    imageHeight: 'auto',
+                                                    showCloseButton: false,
+                                                    showConfirmButton: false,
+                                                    customClass: {
+                                                        image: 'rounded-lg p-5'
+                                                    }
+                                                });
                                             }
         </script>
     </body>

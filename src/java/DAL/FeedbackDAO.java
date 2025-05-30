@@ -23,29 +23,30 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
     
     public static void main(String[] args) {
         FeedbackDAO fDao = new FeedbackDAO();
-        System.out.println(fDao.getFeedbacksByPostId("POST-35334b61da31443da5f850b5856fb"));
+        System.out.println(fDao.getFeedbacksByHouseId("POST-35334b61da31443da5f850b5856fb"));
     }
     
     @Override
-    public List<Feedback> getFeedbacksByPostId(String postId) {
+    public List<Feedback> getFeedbacksByHouseId(String houseId) {
         List<Feedback> feedbacks = new ArrayList<>();
         String sql = """
                      SELECT 
                          f.*,
                          u.id as UserId,
                          u.first_name as UserFirstName,
-                         u.last_name as UserLastName
+                         u.last_name as UserLastName,
+                         u.avatar as UserAvatar
                      FROM
                          fuhousefinder.feedback f
                      JOIN User u ON f.user_id = u.id
-                     WHERE f.post_id = ?;
+                     WHERE f.house_id = ?;
                      """;
         
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
             
-            ps.setString(1, postId);
+            ps.setString(1, houseId);
             
             rs = ps.executeQuery();
             
@@ -68,6 +69,7 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
                 u.setId(rs.getString("user_id"));
                 u.setFirst_name(rs.getString("UserFirstName"));
                 u.setLast_name(rs.getString("UserLastName"));
+                u.setAvatar(rs.getString("UserAvatar"));
                 
                 f.setUser(u);
                 

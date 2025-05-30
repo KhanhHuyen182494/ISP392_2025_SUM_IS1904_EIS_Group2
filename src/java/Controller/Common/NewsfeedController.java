@@ -63,7 +63,7 @@ public class NewsfeedController extends BaseAuthorization {
                 Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
                 List<Image> images = iDao.getImagesByObjectId(pid);
                 List<Like> likes = lDao.getListLikeByPostId(pid);
-                List<Feedback> feedbacks = fDao.getFeedbacksByPostId(pid);
+                List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(p.getHouse().getId());
 
                 p.setFeedbacks(feedbacks);
                 p.getHouse().setAddress(a);
