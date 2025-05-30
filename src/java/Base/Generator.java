@@ -11,10 +11,11 @@ import java.util.UUID;
  * @author Huyen
  */
 public class Generator {
+
     private static String generate(String prefix, int length) {
         int totalLength = length;
         String cleanUUID = UUID.randomUUID().toString().replaceAll("-", "");
-        
+
         // Ensure total ID length is exactly 36 characters
         int uuidPartLength = totalLength - prefix.length() - 1; // -1 for the dash
         if (uuidPartLength <= 0) {
@@ -27,13 +28,17 @@ public class Generator {
 
     public static String generatePostId() {
         return generate("POST", 36);
-    } 
+    }
 
     public static String generateUserId() {
         return generate("U", 36);
     }
-    
-    public static String generateVerifyToken(){
-        return generate("TOKEN", 64); 
+
+    public static String generateGuestId() {
+        return generate("GUEST", 36);
+    }
+
+    public static String generateVerifyToken() {
+        return generate("TOKEN", 64);
     }
 }

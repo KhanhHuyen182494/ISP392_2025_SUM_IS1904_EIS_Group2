@@ -252,7 +252,7 @@
                                         </button>
 
                                         <!-- Maybe have a like people here, like: Khanh Huyen, TamHS, ... -->
-
+                                        
                                     </div>
 
                                     <div class="flex items-center gap-2">
@@ -267,6 +267,10 @@
                                     <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
                                         <i class="fas fa-key mr-2"></i>
                                         Rent
+                                    </button>
+                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                        <i class="fa-solid fa-house text-white"></i>
+                                        View Detail
                                     </button>
                                     <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors">
                                         <i class="fas fa-comments mr-2"></i>
