@@ -104,5 +104,10 @@ public class Feedback {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "Feedback{" + "id=" + id + ", user=" + user + ", post_id=" + post_id + ", house_id=" + house_id + ", room_id=" + room_id + ", status=" + status + ", star=" + star + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + '}';
+    }
     
 }

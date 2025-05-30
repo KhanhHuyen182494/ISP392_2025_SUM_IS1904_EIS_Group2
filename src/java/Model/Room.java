@@ -16,6 +16,7 @@ public class Room {
     private House house;
     private float star;
     private double price_per_month;
+    private String room_position;
 
     public Room() {
     }
@@ -66,6 +67,14 @@ public class Room {
 
     public void setPrice_per_month(double price_per_month) {
         this.price_per_month = price_per_month;
+    }
+
+    public String getRoom_position() {
+        return room_position;
+    }
+
+    public void setRoom_position(String room_position) {
+        this.room_position = room_position;
     }
 
 }

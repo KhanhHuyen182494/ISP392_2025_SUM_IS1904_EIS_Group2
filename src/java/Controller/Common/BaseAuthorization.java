@@ -36,7 +36,7 @@ public abstract class BaseAuthorization extends HttpServlet {
     public ILikeDAO lDao;
     public IFeedbackDAO fDao;
     public IFeatureDao feaDao;
-    private Gson gson;
+    Gson gson;
     public Logging log;
 
     @Override

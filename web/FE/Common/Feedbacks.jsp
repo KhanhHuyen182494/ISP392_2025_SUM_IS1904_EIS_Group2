@@ -1,7 +1,7 @@
 <%-- 
-    Document   : Newsfeed
-    Created on : May 24, 2025, 9:21:47 PM
-    Author     : Huyen
+    Document   : Feedbacks
+    Created on : May 31, 2025, 12:15:44 AM
+    Author     : Tam
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -379,15 +379,14 @@
                 <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
 
                     <!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 text-white">
                         <div class="flex items-center justify-between">
-                            <div class="flex gap-2 items-center">
-                                <h2 class="text-xl font-bold text-[#FF7700]">Feedbacks</h2>
-                                <p> <b>-</b> </p>
-                                <p id="modalHouseName" class="text-blue-500 text-xl font-bold"></p>
+                            <div>
+                                <h2 class="text-xl font-bold">Feedbacks</h2>
+                                <p id="modalHouseName" class="text-blue-100 text-sm"></p>
                             </div>
-                            <button id="closeModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
-                                <i class="fas fa-times text-lg text-white"></i>
+                            <button id="closeModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all">
+                                <i class="fas fa-times text-lg"></i>
                             </button>
                         </div>
                     </div>
@@ -424,11 +423,12 @@
 
                         <!-- Load More Feedbacks -->
                         <div id="loadMoreFeedback" class="text-center mt-6 hidden">
-                            <button id="loadMoreFeedbackBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            <button id="loadMoreFeedbackBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition-colors">
                                 <i class="fas fa-chevron-down mr-2"></i>
                                 Load More Feedbacks
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -490,18 +490,6 @@
 
                                                 });
 
-                                                modal.on('click', function (e) {
-                                                    if (e.target === this) {
-                                                        closeModal();
-                                                    }
-                                                });
-
-                                                modal.on('click', function (e) {
-                                                    if (!$(e.target).closest('.modal-content').length) {
-                                                        closeModal();
-                                                    }
-                                                });
-
                                                 // Retry loading feedbacks
                                                 $('#retryFeedback').on('click', function () {
                                                     if (currentHouseId) {
@@ -561,12 +549,12 @@
                                                     }
 
                                                     $.ajax({
-                                                        url: '${pageContext.request.contextPath}/feedback/house',
+                                                        url: '${pageContext.request.contextPath}/api/v1/feedback/house',
                                                         method: 'GET',
                                                         data: {
                                                             houseId: houseId,
                                                             page: page,
-                                                            limit: 5
+                                                            limit: 10
                                                         },
                                                         success: function (response) {
                                                             loadingDiv.hide();
@@ -622,31 +610,9 @@
                                                 }
 
                                                 function createFeedbackHtml(feedback) {
-                                                    const stars = generateStarRating(feedback.star);
+                                                    const stars = generateStarRating(feedback.rating || 5);
+                                                    const timeAgo = formatTimeAgo(feedback.created_at);
 
-                                                    return `
-                                                        <div class="feedback-item p-4 border border-gray-200 rounded-xl bg-gray-50">
-                                                            <div class="flex items-start gap-4">
-                                                                <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                                    <img class="w-12 h-12 rounded-full object-cover" src="` + feedback.user.avatar + `" 
-                                                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                                                    <i class="fas fa-user text-white text-sm" style="display: none;"></i>
-                                                                </div>
-                                                                <div class="flex-1">
-                                                                    <div class="flex items-center justify-between mb-2">
-                                                                        <div class="flex items-center gap-3">
-                                                                            <a href="${pageContext.request.contextPath}/profile?id=` + feedback.user.id + `" class="font-semibold text-gray-800">` + feedback.user.first_name + ` ` + feedback.user.last_name + `</a>
-                                                                            <div class="star-rating flex">
-                                                                                ` + stars + `
-                                                                            </div>
-                                                                        </div>
-                                                                        <span class="text-xs text-gray-500">` + feedback.created_at + ` </span>
-                                                                    </div>
-                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + feedback.content + `</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    `;
                                                 }
 
                                                 function generateStarRating(rating) {
@@ -659,6 +625,27 @@
                                                         }
                                                     }
                                                     return stars;
+                                                }
+
+                                                function formatTimeAgo(dateString) {
+                                                    const date = new Date(dateString);
+                                                    const now = new Date();
+                                                    const diffInSeconds = Math.floor((now - date) / 1000);
+
+                                                    if (diffInSeconds < 60) {
+                                                        return 'Just now';
+                                                    } else if (diffInSeconds < 3600) {
+                                                        const minutes = Math.floor(diffInSeconds / 60);
+                                                        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                                                    } else if (diffInSeconds < 86400) {
+                                                        const hours = Math.floor(diffInSeconds / 3600);
+                                                        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                                                    } else if (diffInSeconds < 2592000) {
+                                                        const days = Math.floor(diffInSeconds / 86400);
+                                                        return `${days} day${days > 1 ? 's' : ''} ago`;
+                                                    } else {
+                                                        return date.toLocaleDateString('vi-VN');
+                                                    }
                                                 }
 
                                                 function showToast(message, type = 'success') {

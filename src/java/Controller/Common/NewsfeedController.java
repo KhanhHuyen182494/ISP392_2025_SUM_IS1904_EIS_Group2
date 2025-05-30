@@ -32,49 +32,6 @@ public class NewsfeedController extends BaseAuthorization {
 
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
 
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        try {
-//            List<House> topHouseRoom = new ArrayList<>();
-//            PostDTO posts;
-//
-//            //Logic get posts
-//            posts = pDao.getPaginatedPosts(1, 1, "", "");
-//            
-//            fullLoadPostInfomation(posts);
-//            
-//            //Logic get top house room
-//            request.setAttribute("topfeedbacks", topHouseRoom);
-//            request.setAttribute("posts", posts.getItems());
-//            request.getRequestDispatcher("/FE/Common/Newsfeed.jsp").forward(request, response);
-//
-//        } catch (ServletException | IOException e) {
-//            LOGGER.log(Level.SEVERE, "Error during get post process", e);
-//            log.error("Error during get post process");
-//        }
-//    }
-    private void fullLoadPostInfomation(PostDTO posts) {
-        try {
-            //Load address, images, likes, feedbacks
-            for (Post p : posts.getItems()) {
-                String pid = p.getId();
-
-                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-                List<Image> images = iDao.getImagesByObjectId(pid);
-                List<Like> likes = lDao.getListLikeByPostId(pid);
-                List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(p.getHouse().getId());
-
-                p.setFeedbacks(feedbacks);
-                p.getHouse().setAddress(a);
-                p.setImages(images);
-                p.setLikes(likes);
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
-            log.error("Error during fullLoadPostInfomation process");
-        }
-    }
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -88,7 +45,7 @@ public class NewsfeedController extends BaseAuthorization {
             PostDTO posts;
 
             //Logic get posts
-            posts = pDao.getPaginatedPosts(1, 1, "", "");
+            posts = pDao.getPaginatedPosts(1, 10, "", "");
 
             fullLoadPostInfomation(posts);
 
@@ -103,4 +60,25 @@ public class NewsfeedController extends BaseAuthorization {
         }
     }
 
+    private void fullLoadPostInfomation(PostDTO posts) {
+        try {
+            //Load address, images, likes, feedbacks
+            for (Post p : posts.getItems()) {
+                String pid = p.getId();
+
+                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+                List<Image> images = iDao.getImagesByObjectId(p.getHouse().getId());
+                List<Like> likes = lDao.getListLikeByPostId(pid);
+                List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+
+                p.setFeedbacks(feedbacks);
+                p.getHouse().setAddress(a);
+                p.setImages(images);
+                p.setLikes(likes);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
 }

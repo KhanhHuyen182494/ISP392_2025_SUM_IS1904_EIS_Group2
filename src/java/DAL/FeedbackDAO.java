@@ -18,16 +18,16 @@ import java.util.List;
  * @author Tam
  */
 public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
-    
+
     private Logging logger = new Logging();
-    
+
     public static void main(String[] args) {
         FeedbackDAO fDao = new FeedbackDAO();
-        System.out.println(fDao.getFeedbacksByHouseId("POST-35334b61da31443da5f850b5856fb"));
+        System.out.println(fDao.getFeedbacksByHouseId("HOUSE-35334b61da31443da5f850b5856f", 1, 0));
     }
-    
+
     @Override
-    public List<Feedback> getFeedbacksByHouseId(String houseId) {
+    public List<Feedback> getFeedbacksByHouseId(String houseId, int limit, int offset) {
         List<Feedback> feedbacks = new ArrayList<>();
         String sql = """
                      SELECT 
@@ -39,17 +39,21 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
                      FROM
                          fuhousefinder.feedback f
                      JOIN User u ON f.user_id = u.id
-                     WHERE f.house_id = ?;
+                     WHERE f.house_id = ?
+                     ORDER BY f.created_at DESC
+                     LIMIT ? OFFSET ?
                      """;
-        
+
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setString(1, houseId);
-            
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
             rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 Feedback f = new Feedback();
                 f.setId(rs.getString("id"));
@@ -60,22 +64,22 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
                 f.setStar(rs.getInt("star"));
                 f.setCreated_at(rs.getTimestamp("created_at"));
                 f.setUpdated_at(rs.getTimestamp("udpated_at"));
-                
+
                 User u = new User();
                 Status s = new Status();
-                
+
                 s.setId(rs.getInt("status_id"));
-                
+
                 u.setId(rs.getString("user_id"));
                 u.setFirst_name(rs.getString("UserFirstName"));
                 u.setLast_name(rs.getString("UserLastName"));
                 u.setAvatar(rs.getString("UserAvatar"));
-                
+
                 f.setUser(u);
-                
+
                 feedbacks.add(f);
             }
-            
+
         } catch (SQLException e) {
             logger.error("" + e);
         } finally {
@@ -85,33 +89,33 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
                 logger.error("" + ex);
             }
         }
-        
+
         return feedbacks;
     }
-    
+
     @Override
     public Feedback getById(String id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public List<Feedback> getAll() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public boolean add(Feedback t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public boolean deleteById(String id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public boolean update(Feedback t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
 }
