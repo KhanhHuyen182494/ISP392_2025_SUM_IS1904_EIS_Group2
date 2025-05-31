@@ -126,7 +126,7 @@ public class NewsfeedController extends BaseAuthorization {
             // Check if user already liked this post
             Like existingLike = lDao.getLikeByPostAndUser(pid, user.getId());
 
-            if (existingLike != null) {
+            if (existingLike != null && existingLike.getUser_id() != null && existingLike.getPost_id() != null) {
                 // User already has a like record, update it
                 existingLike.setIs_like(true);
                 existingLike.setLiked_at(Timestamp.valueOf(LocalDateTime.now()));
