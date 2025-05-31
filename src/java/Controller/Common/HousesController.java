@@ -7,6 +7,7 @@ package Controller.Common;
 import DTO.PostDTO;
 import Model.Address;
 import Model.Feedback;
+import Model.House;
 import Model.Image;
 import Model.Like;
 import Model.Post;
@@ -24,10 +25,10 @@ import java.util.logging.Logger;
  *
  * @author Ha
  */
-@WebServlet(name = "ProfileController", urlPatterns = {"/profile"})
-public class ProfileController extends BaseAuthorization {
+@WebServlet(name = "HousesController", urlPatterns = {"/owner-house"})
+public class HousesController extends BaseAuthorization {
 
-    private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HousesController.class.getName());
 
     @Override
     protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -41,30 +42,33 @@ public class ProfileController extends BaseAuthorization {
             }
 
             PostDTO posts;
+            List<House> houses;
             User u = uDao.getByUidForProfile(uid);
-            
+
             posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
             fullLoadPostInfomation(posts, user);
-            
+
+            houses = hDao.getListPaging(10, 0, "", uid);
+            fullLoadHouseInfomation(houses);
+
             int totalLikes = 0;
-            
-            for(Post p : posts.getItems()){
+
+            for (Post p : posts.getItems()) {
                 totalLikes += p.getLikes().size();
             }
 
             request.setAttribute("totalLikes", totalLikes);
+            request.setAttribute("houses", houses);
             request.setAttribute("profile", u);
-            request.setAttribute("posts", posts.getItems());
-            request.getRequestDispatcher("./FE/Common/Profile.jsp").forward(request, response);
-
+            request.getRequestDispatcher("./FE/Common/HousesList.jsp").forward(request, response);
         } catch (ServletException | IOException e) {
-            LOGGER.log(Level.SEVERE, "Something error when trying to get user data!", e);
+            LOGGER.log(Level.SEVERE, "Something error when trying to get list house data!", e);
         }
     }
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     private void fullLoadPostInfomation(PostDTO posts, User user) {
@@ -95,5 +99,20 @@ public class ProfileController extends BaseAuthorization {
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-    
+
+    private void fullLoadHouseInfomation(List<House> houses) {
+        try {
+            //Load address, images, likes, feedbacks
+            for (House h : houses) {
+                String hid = h.getId();
+
+                Address a = aDao.getAddressById(h.getAddress().getId());
+                
+                h.setAddress(a);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
 }

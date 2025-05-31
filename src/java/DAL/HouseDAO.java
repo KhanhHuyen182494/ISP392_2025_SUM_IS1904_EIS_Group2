@@ -6,6 +6,7 @@ package DAL;
 
 import Base.Logging;
 import DAL.DAO.IHouseDAO;
+import Model.Address;
 import Model.House;
 import Model.Status;
 import java.sql.SQLException;
@@ -77,7 +78,13 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                 Status s = new Status();
                 s.setId(rs.getInt("status_id"));
                 s.setName(rs.getString("StatusName"));
+                
+                Address a = new Address();
+                a.setId(rs.getInt("address_id"));
 
+                h.setAddress(a);
+                h.setStatus(s);
+                
                 houses.add(h);
             }
 
