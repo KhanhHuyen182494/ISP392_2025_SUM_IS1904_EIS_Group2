@@ -124,6 +124,17 @@
                 color: white;
                 transform: scale(1.1);
             }
+
+            .swal2-loader {
+                border-color: #FF7700 !important;
+                border-top-color: transparent !important;
+            }
+
+            .swal2-loader {
+                width: 2.2em !important;
+                height: 2.2em !important;
+                border-width: 0.22em !important;
+            }
         </style>
     </head>
     <body>
@@ -280,6 +291,12 @@
                             <i class="fas fa-edit"></i>
                             Edit Profile
                         </button>
+                        <!--<a href="${pageContext.request.contextPath}/change-password">-->
+                        <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >
+                            <i class="fa-solid fa-lock"></i>
+                            Change Password
+                        </button>
+                        <!--</a>-->
                         <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             Add Post
@@ -803,7 +820,52 @@
                                                                 stopOnFocus: true
                                                             }).showToast();
                                                         }
+
+
                                                     });
+
+                                                    function showChangePassword() {
+                                                        Swal.fire({
+                                                            title: 'Caution',
+                                                            html: 'We’ll send a email with a OTP code expired in <b><span class="text-red-500">5 mins</span></b> for you to change password! Do you want to continue change password?',
+                                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                            imageWidth: 150,
+                                                            imageHeight: 150,
+                                                            imageAlt: 'Custom icon',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes',
+                                                            cancelButtonText: 'Cancel',
+                                                            reverseButtons: true,
+                                                            focusConfirm: false,
+                                                            focusCancel: false,
+                                                            customClass: {
+                                                                popup: 'rounded-xl shadow-lg',
+                                                                title: 'text-xl font-semibold',
+                                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                actions: 'space-x-4'
+                                                            },
+                                                            buttonsStyling: false
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                $.ajax({
+                                                                    url: '${pageContext.request.contextPath}/send-otp',
+                                                                    type: 'GET',
+                                                                    beforeSend: function (xhr) {
+                                                                        showLoading();
+                                                                    },
+                                                                    success: function (response) {
+                                                                        Swal.close();
+                                                                        if (response.ok == true) {
+                                                                            location.href = '${pageContext.request.contextPath}/get-verify-otp';
+                                                                        }
+                                                                    }
+                                                                });
+                                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                Swal.close();
+                                                            }
+                                                        });
+                                                    }
 
                                                     function showImageModal(imageSrc) {
                                                         Swal.fire({
@@ -814,6 +876,20 @@
                                                             showConfirmButton: false,
                                                             customClass: {
                                                                 image: 'rounded-lg p-5'
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function showLoading() {
+                                                        Swal.fire({
+                                                            title: 'Sending OTP ...',
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            },
+                                                            allowOutsideClick: false,
+                                                            showConfirmButton: false,
+                                                            customClass: {
+                                                                title: 'text-xl font-semibold'
                                                             }
                                                         });
                                                     }

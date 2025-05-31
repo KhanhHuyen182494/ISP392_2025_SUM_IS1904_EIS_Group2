@@ -4,6 +4,7 @@
  */
 package Base;
 
+import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
@@ -26,6 +27,18 @@ public class Generator {
         return prefix + "-" + uuidPart;
     }
 
+    public static String generateOTP(int length) {
+        String digits = "0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder otp = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            otp.append(digits.charAt(random.nextInt(digits.length())));
+        }
+
+        return otp.toString();
+    }
+
     public static String generatePostId() {
         return generate("POST", 36);
     }
@@ -40,5 +53,13 @@ public class Generator {
 
     public static String generateVerifyToken() {
         return generate("TOKEN", 64);
+    }
+
+    public static String generateOTP() {
+        return generateOTP(6);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(generateOTP());
     }
 }
