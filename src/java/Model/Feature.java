@@ -9,9 +9,11 @@ package Model;
  * @author Huyen
  */
 public class Feature {
+
     private int id;
     private String name;
     private String path;
+    private Status status;
 
     public Feature() {
     }
@@ -39,6 +41,13 @@ public class Feature {
     public void setPath(String path) {
         this.path = path;
     }
-    
-    
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
 }

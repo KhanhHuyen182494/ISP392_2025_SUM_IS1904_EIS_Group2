@@ -1,7 +1,7 @@
 <%-- 
-    Document   : Newsfeed
-    Created on : May 24, 2025, 9:21:47 PM
-    Author     : Huyen
+    Document   : Feedbacks
+    Created on : May 31, 2025, 12:15:44 AM
+    Author     : Tam
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -313,14 +313,10 @@
                                     </div>
                                 </div>
 
-
                                 <!-- Action Bar -->
                                 <div class="px-6 py-4 flex items-center justify-between">
                                     <div class="flex items-center gap-4">
-                                        <button data-post-id="${post.id}" 
-                                                class="like-btn ${post.likedByCurrentUser ? 'liked' : ''} flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white transition-colors" 
-                                                onclick="toggleLike(this)"
-                                                style="${post.likedByCurrentUser ? 'background-color: #3b82f6; color: white;' : ''}">
+                                        <button class="like-btn flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white transition-colors" onclick="toggleLike(this)">
                                             <i class="fas fa-thumbs-up"></i>
                                             <span class="like-count">${fn:length(post.likes)}</span>
                                         </button>
@@ -383,15 +379,14 @@
                 <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
 
                     <!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 text-white">
                         <div class="flex items-center justify-between">
-                            <div class="flex gap-2 items-center">
-                                <h2 class="text-xl font-bold text-[#FF7700]">Feedbacks</h2>
-                                <p> <b>-</b> </p>
-                                <p id="modalHouseName" class="text-blue-500 text-xl font-bold"></p>
+                            <div>
+                                <h2 class="text-xl font-bold">Feedbacks</h2>
+                                <p id="modalHouseName" class="text-blue-100 text-sm"></p>
                             </div>
-                            <button id="closeModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
-                                <i class="fas fa-times text-lg text-white"></i>
+                            <button id="closeModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-20 flex items-center justify-center hover:bg-opacity-30 transition-all">
+                                <i class="fas fa-times text-lg"></i>
                             </button>
                         </div>
                     </div>
@@ -428,11 +423,12 @@
 
                         <!-- Load More Feedbacks -->
                         <div id="loadMoreFeedback" class="text-center mt-6 hidden">
-                            <button id="loadMoreFeedbackBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            <button id="loadMoreFeedbackBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition-colors">
                                 <i class="fas fa-chevron-down mr-2"></i>
                                 Load More Feedbacks
                             </button>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -442,299 +438,240 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                    function toggleLike(button) {
-                        const uid = '${sessionScope.user_id}';
+                                            function toggleLike(button) {
+                                                const likeCount = button.querySelector('.like-count');
+                                                const currentCount = parseInt(likeCount.textContent);
 
-                        if (uid || uid.trim()) {
-                            const likeCount = button.querySelector('.like-count');
-                            const currentCount = parseInt(likeCount.textContent);
-                            const pid = $(button).data('post-id');
+                                                if (button.classList.contains('liked')) {
+                                                    // Unlike
+                                                    button.classList.remove('liked');
+                                                    likeCount.textContent = currentCount - 1;
+                                                    button.style.backgroundColor = 'white';
+                                                    button.style.color = '#3b82f6';
+                                                } else {
+                                                    // Like
+                                                    button.classList.add('liked');
+                                                    likeCount.textContent = currentCount + 1;
+                                                    button.style.backgroundColor = '#3b82f6';
+                                                    button.style.color = 'white';
+                                                }
+                                            }
 
-                            if (button.classList.contains('liked')) {
-                                // Unlike
-                                button.classList.remove('liked');
-                                likeCount.textContent = currentCount - 1;
-                                button.style.backgroundColor = 'white';
-                                button.style.color = '#3b82f6';
-                                sendLikeRequest(pid, 'unLike');
-                            } else {
-                                // Like
-                                button.classList.add('liked');
-                                likeCount.textContent = currentCount + 1;
-                                button.style.backgroundColor = '#3b82f6';
-                                button.style.color = 'white';
-                                sendLikeRequest(pid, 'like');
-                            }
-                        } else {
-                            Swal.fire({
-                                title: 'You must login to use this feature',
-                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                imageWidth: 150,
-                                imageHeight: 150,
-                                imageAlt: 'Custom icon',
-                                showCancelButton: true,
-                                confirmButtonText: 'Login now',
-                                cancelButtonText: 'Back to Newsfeed',
-                                reverseButtons: true,
-                                focusConfirm: false,
-                                focusCancel: false,
-                                customClass: {
-                                    popup: 'rounded-xl shadow-lg',
-                                    title: 'text-xl font-semibold',
-                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                    actions: 'space-x-4'
-                                },
-                                buttonsStyling: false
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.href = '${pageContext.request.contextPath}/login';
-                                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                    Swal.close();
-                                }
-                            });
-                        }
-                    }
+                                            $(document).ready(function () {
+                                                const modal = $('#feedbackModal');
+                                                const modalHouseName = $('#modalHouseName');
+                                                const feedbackContainer = $('#feedbackContainer');
+                                                const loadingDiv = $('#feedbackLoading');
+                                                const errorDiv = $('#feedbackError');
+                                                const noFeedbackDiv = $('#noFeedback');
+                                                const loadMoreDiv = $('#loadMoreFeedback');
 
-                    function sendLikeRequest(postId, type) {
-                        $.ajax({
-                            url: '${pageContext.request.contextPath}/feeds',
-                            type: 'POST',
-                            data: {
-                                pid: postId,
-                                type: type
-                            }
-                        });
-                    }
+                                                let currentHouseId = null;
+                                                let currentPage = 1;
+                                                let isLoading = false;
 
-                    $(document).ready(function () {
-                        const modal = $('#feedbackModal');
-                        const modalHouseName = $('#modalHouseName');
-                        const feedbackContainer = $('#feedbackContainer');
-                        const loadingDiv = $('#feedbackLoading');
-                        const errorDiv = $('#feedbackError');
-                        const noFeedbackDiv = $('#noFeedback');
-                        const loadMoreDiv = $('#loadMoreFeedback');
+                                                $('.view-feedback-btn').on('click', function () {
+                                                    const houseId = $(this).data('house-id');
+                                                    const houseName = $(this).data('house-name');
 
-                        let currentHouseId = null;
-                        let currentPage = 1;
-                        let isLoading = false;
+                                                    currentHouseId = houseId;
+                                                    currentPage = 1;
 
-                        $('.view-feedback-btn').on('click', function () {
-                            const houseId = $(this).data('house-id');
-                            const houseName = $(this).data('house-name');
+                                                    modalHouseName.text(houseName);
+                                                    modal.addClass('active');
+                                                    $('body').addClass('overflow-hidden');
 
-                            currentHouseId = houseId;
-                            currentPage = 1;
+                                                    loadFeedbacks(houseId, 1, true);
+                                                });
 
-                            modalHouseName.text(houseName);
-                            modal.addClass('active');
-                            $('body').addClass('overflow-hidden');
+                                                // Close modal
+                                                $('#closeModalBtn').on('click', function (e) {
+                                                    closeModal();
 
-                            loadFeedbacks(houseId, 1, true);
-                        });
+                                                });
 
-                        // Close modal
-                        $('#closeModalBtn').on('click', function (e) {
-                            closeModal();
+                                                // Retry loading feedbacks
+                                                $('#retryFeedback').on('click', function () {
+                                                    if (currentHouseId) {
+                                                        loadFeedbacks(currentHouseId, 1, true);
+                                                    }
+                                                });
 
-                        });
+                                                // Load more feedbacks
+                                                $('#loadMoreFeedbackBtn').on('click', function () {
+                                                    if (currentHouseId && !isLoading) {
+                                                        loadFeedbacks(currentHouseId, currentPage + 1, false);
+                                                    }
+                                                });
 
-                        modal.on('click', function (e) {
-                            if (e.target === this) {
-                                closeModal();
-                            }
-                        });
+                                                // ESC key to close modal
+                                                $(document).on('keydown', function (e) {
+                                                    if (e.key === 'Escape' && modal.hasClass('active')) {
+                                                        closeModal();
+                                                    }
+                                                });
 
-                        modal.on('click', function (e) {
-                            if (!$(e.target).closest('.modal-content').length) {
-                                closeModal();
-                            }
-                        });
+                                                function closeModal() {
+                                                    modal.removeClass('active');
+                                                    $('body').removeClass('overflow-hidden');
+                                                    // Reset modal state after animation
+                                                    setTimeout(() => {
+                                                        resetModalState();
+                                                    }, 300);
+                                                }
 
-                        // Retry loading feedbacks
-                        $('#retryFeedback').on('click', function () {
-                            if (currentHouseId) {
-                                loadFeedbacks(currentHouseId, 1, true);
-                            }
-                        });
+                                                function resetModalState() {
+                                                    feedbackContainer.empty();
+                                                    loadingDiv.show();
+                                                    errorDiv.addClass('hidden');
+                                                    noFeedbackDiv.addClass('hidden');
+                                                    loadMoreDiv.addClass('hidden');
+                                                    currentHouseId = null;
+                                                    currentPage = 1;
+                                                }
 
-                        // Load more feedbacks
-                        $('#loadMoreFeedbackBtn').on('click', function () {
-                            if (currentHouseId && !isLoading) {
-                                loadFeedbacks(currentHouseId, currentPage + 1, false);
-                            }
-                        });
+                                                function loadFeedbacks(houseId, page, isNewLoad) {
+                                                    if (isLoading)
+                                                        return;
 
-                        // ESC key to close modal
-                        $(document).on('keydown', function (e) {
-                            if (e.key === 'Escape' && modal.hasClass('active')) {
-                                closeModal();
-                            }
-                        });
+                                                    isLoading = true;
 
-                        function closeModal() {
-                            modal.removeClass('active');
-                            $('body').removeClass('overflow-hidden');
-                            // Reset modal state after animation
-                            setTimeout(() => {
-                                resetModalState();
-                            }, 300);
-                        }
+                                                    if (isNewLoad) {
+                                                        // Show loading for new load
+                                                        loadingDiv.show();
+                                                        errorDiv.addClass('hidden');
+                                                        noFeedbackDiv.addClass('hidden');
+                                                        loadMoreDiv.addClass('hidden');
+                                                        feedbackContainer.empty();
+                                                    } else {
+                                                        // Show loading on load more button
+                                                        $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                                    }
 
-                        function resetModalState() {
-                            feedbackContainer.empty();
-                            loadingDiv.show();
-                            errorDiv.addClass('hidden');
-                            noFeedbackDiv.addClass('hidden');
-                            loadMoreDiv.addClass('hidden');
-                            currentHouseId = null;
-                            currentPage = 1;
-                        }
+                                                    $.ajax({
+                                                        url: '${pageContext.request.contextPath}/api/v1/feedback/house',
+                                                        method: 'GET',
+                                                        data: {
+                                                            houseId: houseId,
+                                                            page: page,
+                                                            limit: 10
+                                                        },
+                                                        success: function (response) {
+                                                            loadingDiv.hide();
 
-                        function loadFeedbacks(houseId, page, isNewLoad) {
-                            if (isLoading)
-                                return;
+                                                            if (isNewLoad) {
+                                                                feedbackContainer.empty();
+                                                            }
 
-                            isLoading = true;
+                                                            if (response.feedbacks && response.feedbacks.length > 0) {
+                                                                appendFeedbacks(response.feedbacks);
+                                                                currentPage = page;
 
-                            if (isNewLoad) {
-                                // Show loading for new load
-                                loadingDiv.show();
-                                errorDiv.addClass('hidden');
-                                noFeedbackDiv.addClass('hidden');
-                                loadMoreDiv.addClass('hidden');
-                                feedbackContainer.empty();
-                            } else {
-                                // Show loading on load more button
-                                $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
-                            }
+                                                                // Show load more if there are more feedbacks
+                                                                if (response.hasMore) {
+                                                                    loadMoreDiv.removeClass('hidden');
+                                                                } else {
+                                                                    loadMoreDiv.addClass('hidden');
+                                                                }
 
-                            $.ajax({
-                                url: '${pageContext.request.contextPath}/feedback/house',
-                                method: 'GET',
-                                data: {
-                                    houseId: houseId,
-                                    page: page,
-                                    limit: 5
-                                },
-                                success: function (response) {
-                                    loadingDiv.hide();
+                                                                errorDiv.addClass('hidden');
+                                                                noFeedbackDiv.addClass('hidden');
+                                                            } else if (isNewLoad) {
+                                                                // No feedbacks found
+                                                                noFeedbackDiv.removeClass('hidden');
+                                                                errorDiv.addClass('hidden');
+                                                                loadMoreDiv.addClass('hidden');
+                                                            }
+                                                        },
+                                                        error: function (xhr, status, error) {
+                                                            console.error('Error loading feedbacks:', error);
+                                                            loadingDiv.hide();
 
-                                    if (isNewLoad) {
-                                        feedbackContainer.empty();
-                                    }
+                                                            if (isNewLoad) {
+                                                                errorDiv.removeClass('hidden');
+                                                                noFeedbackDiv.addClass('hidden');
+                                                            } else {
+                                                                // Show error toast for load more
+                                                                showToast('Failed to load more feedbacks', 'error');
+                                                            }
+                                                        },
+                                                        complete: function () {
+                                                            isLoading = false;
+                                                            $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
+                                                        }
+                                                    });
+                                                }
 
-                                    if (response.feedbacks && response.feedbacks.length > 0) {
-                                        appendFeedbacks(response.feedbacks);
-                                        currentPage = page;
+                                                function appendFeedbacks(feedbacks) {
+                                                    feedbacks.forEach(function (feedback) {
+                                                        const feedbackHtml = createFeedbackHtml(feedback);
+                                                        feedbackContainer.append(feedbackHtml);
+                                                    });
+                                                }
 
-                                        // Show load more if there are more feedbacks
-                                        if (response.hasMore) {
-                                            loadMoreDiv.removeClass('hidden');
-                                        } else {
-                                            loadMoreDiv.addClass('hidden');
-                                        }
+                                                function createFeedbackHtml(feedback) {
+                                                    const stars = generateStarRating(feedback.rating || 5);
+                                                    const timeAgo = formatTimeAgo(feedback.created_at);
 
-                                        errorDiv.addClass('hidden');
-                                        noFeedbackDiv.addClass('hidden');
-                                    } else if (isNewLoad) {
-                                        // No feedbacks found
-                                        noFeedbackDiv.removeClass('hidden');
-                                        errorDiv.addClass('hidden');
-                                        loadMoreDiv.addClass('hidden');
-                                    }
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error('Error loading feedbacks:', error);
-                                    loadingDiv.hide();
+                                                }
 
-                                    if (isNewLoad) {
-                                        errorDiv.removeClass('hidden');
-                                        noFeedbackDiv.addClass('hidden');
-                                    } else {
-                                        // Show error toast for load more
-                                        showToast('Failed to load more feedbacks', 'error');
-                                    }
-                                },
-                                complete: function () {
-                                    isLoading = false;
-                                    $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
-                                }
-                            });
-                        }
+                                                function generateStarRating(rating) {
+                                                    let stars = '';
+                                                    for (let i = 1; i <= 5; i++) {
+                                                        if (i <= rating) {
+                                                            stars += '<i class="fas fa-star text-xs"></i>';
+                                                        } else {
+                                                            stars += '<i class="far fa-star text-xs"></i>';
+                                                        }
+                                                    }
+                                                    return stars;
+                                                }
 
-                        function appendFeedbacks(feedbacks) {
-                            feedbacks.forEach(function (feedback) {
-                                const feedbackHtml = createFeedbackHtml(feedback);
-                                feedbackContainer.append(feedbackHtml);
-                            });
-                        }
+                                                function formatTimeAgo(dateString) {
+                                                    const date = new Date(dateString);
+                                                    const now = new Date();
+                                                    const diffInSeconds = Math.floor((now - date) / 1000);
 
-                        function createFeedbackHtml(feedback) {
-                            const stars = generateStarRating(feedback.star);
+                                                    if (diffInSeconds < 60) {
+                                                        return 'Just now';
+                                                    } else if (diffInSeconds < 3600) {
+                                                        const minutes = Math.floor(diffInSeconds / 60);
+                                                        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                                                    } else if (diffInSeconds < 86400) {
+                                                        const hours = Math.floor(diffInSeconds / 3600);
+                                                        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                                                    } else if (diffInSeconds < 2592000) {
+                                                        const days = Math.floor(diffInSeconds / 86400);
+                                                        return `${days} day${days > 1 ? 's' : ''} ago`;
+                                                    } else {
+                                                        return date.toLocaleDateString('vi-VN');
+                                                    }
+                                                }
 
-                            return `
-                                                        <div class="feedback-item p-4 border border-gray-200 rounded-xl bg-gray-50">
-                                                            <div class="flex items-start gap-4">
-                                                                <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                                    <img class="w-12 h-12 rounded-full object-cover" src="` + feedback.user.avatar + `" 
-                                                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                                                    <i class="fas fa-user text-white text-sm" style="display: none;"></i>
-                                                                </div>
-                                                                <div class="flex-1">
-                                                                    <div class="flex items-center justify-between mb-2">
-                                                                        <div class="flex items-center gap-3">
-                                                                            <a href="${pageContext.request.contextPath}/profile?id=` + feedback.user.id + `" class="font-semibold text-gray-800">` + feedback.user.first_name + ` ` + feedback.user.last_name + `</a>
-                                                                            <div class="star-rating flex">
-                                                                                ` + stars + `
-                                                                            </div>
-                                                                        </div>
-                                                                        <span class="text-xs text-gray-500">` + feedback.created_at + ` </span>
-                                                                    </div>
-                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + feedback.content + `</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    `;
-                        }
+                                                function showToast(message, type = 'success') {
+                                                    Toastify({
+                                                        text: message,
+                                                        duration: 3000,
+                                                        gravity: "top",
+                                                        position: "right",
+                                                        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+                                                        stopOnFocus: true
+                                                    }).showToast();
+                                                }
+                                            });
 
-                        function generateStarRating(rating) {
-                            let stars = '';
-                            for (let i = 1; i <= 5; i++) {
-                                if (i <= rating) {
-                                    stars += '<i class="fas fa-star text-xs"></i>';
-                                } else {
-                                    stars += '<i class="far fa-star text-xs"></i>';
-                                }
-                            }
-                            return stars;
-                        }
-
-                        function showToast(message, type = 'success') {
-                            Toastify({
-                                text: message,
-                                duration: 3000,
-                                gravity: "top",
-                                position: "right",
-                                backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
-                                stopOnFocus: true
-                            }).showToast();
-                        }
-                    });
-
-                    function showImageModal(imageSrc) {
-                        Swal.fire({
-                            imageUrl: imageSrc,
-                            imageWidth: 'auto',
-                            imageHeight: 'auto',
-                            showCloseButton: false,
-                            showConfirmButton: false,
-                            customClass: {
-                                image: 'rounded-lg p-5'
-                            }
-                        });
-                    }
+                                            function showImageModal(imageSrc) {
+                                                Swal.fire({
+                                                    imageUrl: imageSrc,
+                                                    imageWidth: 'auto',
+                                                    imageHeight: 'auto',
+                                                    showCloseButton: false,
+                                                    showConfirmButton: false,
+                                                    customClass: {
+                                                        image: 'rounded-lg p-5'
+                                                    }
+                                                });
+                                            }
         </script>
     </body>
 </html>

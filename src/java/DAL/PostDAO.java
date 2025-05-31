@@ -28,7 +28,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
     public static void main(String[] args) {
         PostDAO pDao = new PostDAO();
-        System.out.println(pDao.getPaginatedPosts(1, 1, "Cho Thuê Nhà giá cực hời", "").getItems());
+        System.out.println(pDao.getPaginatedPosts(1, 1, "", "").getItems());
     }
 
     @Override

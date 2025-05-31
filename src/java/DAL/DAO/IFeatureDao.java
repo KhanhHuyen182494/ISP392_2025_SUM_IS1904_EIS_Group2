@@ -4,20 +4,22 @@
  */
 package DAL.DAO;
 
-import Model.Like;
+import Model.Feature;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface ILikeDAO {
+public interface IFeatureDao {
 
-    public List<Like> getListLikeByPostId(String postId);
+    public Feature getFeatureById(int id);
 
-    public Like getLikeByPostAndUser(String postId, String userId);
+    public List<Feature> getAllFeaturesByRoleId(int role);
 
-    public boolean add(Like l);
+    public List<Feature> getAllFeature();
 
-    public boolean update(Like l);
+    public boolean add(Feature f);
+
+    public boolean update(Feature f);
 }
