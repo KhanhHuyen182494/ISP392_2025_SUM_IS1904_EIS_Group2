@@ -26,6 +26,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     public User authenticateUser(String contact, String password);
     
+    public User getByUidForProfile(String uid);
+    
     //Add
     
     //Delete

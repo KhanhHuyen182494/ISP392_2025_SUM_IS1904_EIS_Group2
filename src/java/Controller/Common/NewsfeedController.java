@@ -4,9 +4,6 @@
  */
 package Controller.Common;
 
-import Base.EmailSender;
-import Base.Generator;
-import Base.Hashing;
 import Controller.Authentication.LoginController;
 import Model.House;
 import DTO.PostDTO;
@@ -15,15 +12,12 @@ import Model.Feedback;
 import Model.Image;
 import Model.Like;
 import Model.Post;
-import Model.Role;
-import Model.Status;
 import Model.User;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,9 +56,9 @@ public class NewsfeedController extends BaseAuthorization {
             }
 
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during signup process", e);
+            LOGGER.log(Level.SEVERE, "Error during like process", e);
             result.put("ok", false);
-            result.put("message", "An unexpected error occurred during signup.");
+            result.put("message", "An unexpected error occurred during like.");
         }
 
         sendJsonResponse(response, result);
@@ -78,7 +72,6 @@ public class NewsfeedController extends BaseAuthorization {
 
             //Logic get posts
             posts = pDao.getPaginatedPosts(1, 10, "", "");
-
             fullLoadPostInfomation(posts, user);
 
             //Logic get top house room
@@ -126,7 +119,7 @@ public class NewsfeedController extends BaseAuthorization {
             // Check if user already liked this post
             Like existingLike = lDao.getLikeByPostAndUser(pid, user.getId());
 
-            if (existingLike != null) {
+            if (existingLike != null && existingLike.getUser_id() != null && existingLike.getPost_id() != null) {
                 // User already has a like record, update it
                 existingLike.setIs_like(true);
                 existingLike.setLiked_at(Timestamp.valueOf(LocalDateTime.now()));

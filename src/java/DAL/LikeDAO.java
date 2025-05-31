@@ -21,7 +21,7 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
 
     public static void main(String[] args) {
         LikeDAO lDao = new LikeDAO();
-        System.out.println(lDao.getListLikeByPostId("POST-35334b61da31443da5f850b5856fb"));
+        System.out.println(lDao.getLikeByPostAndUser("POST-35334b61da31443da5f13jhd7282u", "U-35334b61da31443da5f850b5856fb4bf"));
     }
 
     @Override

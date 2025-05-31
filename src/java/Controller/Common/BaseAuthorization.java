@@ -9,11 +9,13 @@ import DAL.DAO.IFeedbackDAO;
 import DAL.DAO.IImageDAO;
 import DAL.DAO.ILikeDAO;
 import DAL.DAO.IPostDAO;
+import DAL.DAO.IUserDAO;
 import DAL.FeatureDAO;
 import DAL.FeedbackDAO;
 import DAL.ImageDAO;
 import DAL.LikeDAO;
 import DAL.PostDAO;
+import DAL.UserDAO;
 import Model.User;
 import Model.Role;
 import Model.Feature;
@@ -30,14 +32,15 @@ import java.io.IOException;
  */
 public abstract class BaseAuthorization extends HttpServlet {
 
-    protected IPostDAO pDao;
+    public IUserDAO uDao;
+    public IPostDAO pDao;
     public IAddressDAO aDao;
     public IImageDAO iDao;
     public ILikeDAO lDao;
     public IFeedbackDAO fDao;
     public IFeatureDao feaDao;
-    Gson gson;
     public Logging log;
+    Gson gson;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -49,6 +52,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         lDao = new LikeDAO();
         fDao = new FeedbackDAO();
         feaDao = new FeatureDAO();
+        uDao = new UserDAO();
     }
 
     private User getUser(HttpServletRequest request) {
@@ -128,8 +132,8 @@ public abstract class BaseAuthorization extends HttpServlet {
     }
 
     protected abstract void doPostAuthorized(HttpServletRequest request,
-            HttpServletResponse resp, User user) throws ServletException, IOException;
+            HttpServletResponse response, User user) throws ServletException, IOException;
 
     protected abstract void doGetAuthorized(HttpServletRequest request,
-            HttpServletResponse resp, User user) throws ServletException, IOException;
+            HttpServletResponse response, User user) throws ServletException, IOException;
 }

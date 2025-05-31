@@ -11,6 +11,7 @@ import java.sql.Timestamp;
  * @author Huyen
  */
 public class Like {
+
     private int id;
     private String user_id;
     private String post_id;
@@ -68,6 +69,10 @@ public class Like {
     public void setDeleted_at(Timestamp deleted_at) {
         this.deleted_at = deleted_at;
     }
-    
-     
+
+    @Override
+    public String toString() {
+        return "Like{" + "id=" + id + ", user_id=" + user_id + ", post_id=" + post_id + ", is_like=" + is_like + ", liked_at=" + liked_at + ", deleted_at=" + deleted_at + '}';
+    }
+
 }
