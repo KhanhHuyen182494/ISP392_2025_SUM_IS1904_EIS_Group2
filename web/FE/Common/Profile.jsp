@@ -269,10 +269,12 @@
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
                         <c:if test="${sessionScope.user.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View your's houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/owner-house?uid=${sessionScope.user.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-home"></i>
+                                    View your's houses
+                                </button>
+                            </a>
                         </c:if>
                         <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-edit"></i>
@@ -286,18 +288,16 @@
                     <c:otherwise>
                         <!-- Other User Profile Actions -->
                         <c:if test="${requestScope.profile.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View all houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/owner-house?uid=${requestScope.profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-home"></i>
+                                    View all houses
+                                </button>
+                            </a>
                         </c:if>
                         <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-user-plus"></i>
                             Follow
-                        </button>
-                        <button class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-envelope"></i>
-                            Message
                         </button>
                     </c:otherwise>
                 </c:choose>

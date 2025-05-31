@@ -4,8 +4,8 @@
  */
 package DAL.DAO;
 
-import DTO.HouseDTO;
 import Model.House;
+import java.util.List;
 
 /**
  *
@@ -13,7 +13,7 @@ import Model.House;
  */
 public interface IHouseDAO extends IBaseUUID<House>{
     //Get
-    public HouseDTO getListPaging();
+    public List<House> getListPaging(int limit, int offset, String searchKey, String uid);
     
     //Add
     
@@ -22,7 +22,7 @@ public interface IHouseDAO extends IBaseUUID<House>{
     
     
     //Update
-    public boolean updateSpecificInfo(String infoToUpdate, House h);
+    
     
     //Search
     
