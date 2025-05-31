@@ -309,11 +309,50 @@
             <div class="col-span-8">
                 <c:choose>
                     <c:when test="${empty requestScope.posts}">
-                        <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden max-h-[100rem] min-h-[23rem] p-4">
+                        <div class="bg-gray-100 rounded-2xl shadow-lg mb-8 overflow-hidden max-h-[80rem] min-h-[20rem] p-4 overflow-y-auto">
                             <div class="grid grid-cols-8">
-                                <div class="house-card card-hover p-2 rounded col-span-2 mb-2">
-                                    <p>ok</p>
+                                <div class="bg-white house-card card-hover p-2 rounded-lg col-span-2 m-2 border border-dashed border-orange-500">
+                                    <div class="house-name mb-3">
+                                        <p><b>An Thu House</b></p>
+                                    </div>
+                                    <div class="space-y-2 ml-2 mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-dollar-sign text-green-500"></i>
+                                            <span class="text-sm"><strong>Giá thuê:</strong> <fmt:formatNumber value="${post.house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / tháng</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-bolt text-yellow-500"></i>
+                                            <span class="text-sm"><strong>Tiền điện:</strong> <fmt:formatNumber value="${post.house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / số</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-tint text-blue-500"></i>
+                                            <span class="text-sm"><strong>Tiền nước:</strong> <fmt:formatNumber value="${post.house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / khối</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
+                                            <span class="text-sm"><strong>Tiền cọc:</strong> <fmt:formatNumber value="${post.house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-map-marker-alt text-red-500"></i>
+                                            <span class="text-sm"><strong>Địa chỉ:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-6 py-4 flex gap-3">
+                                        <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
+                                            <i class="fas fa-key"></i>
+                                        </button>
+                                        <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                            <i class="fa-solid fa-house text-white"></i>
+                                        </button>
+                                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
+                                                data-house-id="${post.house.id}" 
+                                                data-house-name="${post.house.name}">
+                                            <i class="fas fa-comments"></i>
+                                        </button>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </c:when>
