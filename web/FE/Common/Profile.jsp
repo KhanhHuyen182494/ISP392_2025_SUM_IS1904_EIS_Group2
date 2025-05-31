@@ -242,11 +242,11 @@
                             <div class="flex gap-6 text-sm">
                                 <div class="flex items-center gap-1">
                                     <i class="fas fa-home"></i>
-                                    <span>${requestScope.totalPosts != null ? requestScope.totalPosts : 0} Posts</span>
+                                    <span>${fn:length(posts)} Posts</span>
                                 </div>
                                 <div class="flex items-center gap-1">
                                     <i class="fas fa-thumbs-up"></i>
-                                    <span>${requestScope.totalLikes != null ? requestScope.totalLikes : 0} Likes</span>
+                                    <span>${requestScope.totalLikes} Likes</span>
                                 </div>
                                 <div class="flex items-center gap-1">
                                     <i class="fas fa-calendar-alt"></i>

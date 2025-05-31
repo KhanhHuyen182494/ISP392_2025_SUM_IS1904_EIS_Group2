@@ -72,7 +72,6 @@ public class NewsfeedController extends BaseAuthorization {
 
             //Logic get posts
             posts = pDao.getPaginatedPosts(1, 10, "", "");
-
             fullLoadPostInfomation(posts, user);
 
             //Logic get top house room
