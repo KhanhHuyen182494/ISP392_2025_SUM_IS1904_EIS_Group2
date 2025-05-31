@@ -27,6 +27,8 @@ public class Post {
     private List<Like> likes;
     private List<Image> images;
     
+    private boolean likedByCurrentUser;
+    
     public Post() {
     }
 
@@ -132,6 +134,14 @@ public class Post {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public boolean isLikedByCurrentUser() {
+        return likedByCurrentUser;
+    }
+
+    public void setLikedByCurrentUser(boolean likedByCurrentUser) {
+        this.likedByCurrentUser = likedByCurrentUser;
     }
     
     @Override

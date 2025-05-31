@@ -12,5 +12,12 @@ import java.util.List;
  * @author Tam
  */
 public interface ILikeDAO {
+
     public List<Like> getListLikeByPostId(String postId);
+
+    public Like getLikeByPostAndUser(String postId, String userId);
+
+    public boolean add(Like l);
+
+    public boolean update(Like l);
 }
