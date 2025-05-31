@@ -33,9 +33,9 @@ public class EmailSender {
         String subject = "FUHF Verification";
         String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
                 + "Click this link to activate your account:\n" + link;
-        
+
         ok = sendEmail(u.getEmail(), subject, message);
-        
+
         return ok;
     }
 
@@ -51,6 +51,14 @@ public class EmailSender {
         } catch (Exception e) {
         }
         return test;
+    }
+
+    public static boolean sendEmailOTP(User u, String otp) {
+        String subject = "FUHF Change Password OTP";
+        String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
+                + "This is your change password OTP:\n" + otp;
+
+        return sendEmail(u.getEmail(), subject, message);
     }
 
     public static boolean sendEmail(String toEmail, String subject, String content) {
