@@ -295,10 +295,6 @@
                             <i class="fas fa-user-plus"></i>
                             Follow
                         </button>
-                        <button class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-envelope"></i>
-                            Message
-                        </button>
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -307,73 +303,71 @@
         <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-8 gap-8">
             <div class="col-span-8">
-                <c:choose>
-                    <c:when test="${empty requestScope.posts}">
-                        <div class="bg-gray-100 rounded-2xl shadow-lg mb-8 overflow-hidden max-h-[80rem] min-h-[20rem] p-4 overflow-y-auto">
-                            <div class="grid grid-cols-8">
-                                <div class="bg-white house-card card-hover p-2 rounded-lg col-span-2 m-2 border border-dashed border-orange-500">
-                                    <div class="house-name mb-3">
-                                        <p><b>An Thu House</b></p>
-                                    </div>
-                                    <div class="space-y-2 ml-2 mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-dollar-sign text-green-500"></i>
-                                            <span class="text-sm"><strong>Giá thuê:</strong> <fmt:formatNumber value="${post.house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / tháng</span>
+                <div class="bg-gray-50 rounded-2xl shadow-lg mb-8 overflow-hidden max-h-[80rem] min-h-[20rem] p-4 overflow-y-auto">
+                    <div class="grid grid-cols-8">
+                        <c:choose>
+                            <c:when test="${not empty requestScope.houses}">
+                                <c:forEach items="${requestScope.houses}" var="house">
+                                    <div class="bg-white house-card card-hover p-2 rounded-lg col-span-2 m-2 border border-dashed border-orange-500">
+                                        <div class="house-name mb-3 text-lg">
+                                            <p><b>${house.name}</b></p>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-bolt text-yellow-500"></i>
-                                            <span class="text-sm"><strong>Tiền điện:</strong> <fmt:formatNumber value="${post.house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / số</span>
+                                        <div class="space-y-2 ml-2 mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <c:if test="${house.status.id == 6}">
+                                                    <i class="fa-solid fa-check text-green-500"></i>
+                                                </c:if>
+                                                <c:if test="${house.status.id == 7}">
+                                                    <i class="fa-solid fa-xmark text-red-500"></i>
+                                                </c:if>
+                                                <span class="text-sm"><strong>Status: </strong> ${house.status.name}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-dollar-sign text-green-500"></i>
+                                                <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / month</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-bolt text-yellow-500"></i>
+                                                <span class="text-sm"><strong>Electricity:</strong> <fmt:formatNumber value="${house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-tint text-blue-500"></i>
+                                                <span class="text-sm"><strong>Water:</strong> <fmt:formatNumber value="${house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
+                                                <span class="text-sm"><strong>Down Payment:</strong> <fmt:formatNumber value="${house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-map-marker-alt text-red-500"></i>
+                                                <span class="text-sm"><strong>Address:</strong> ${house.address.detail} ${house.address.ward}, ${house.address.district}, ${house.address.province}, ${house.address.country}</span>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-tint text-blue-500"></i>
-                                            <span class="text-sm"><strong>Tiền nước:</strong> <fmt:formatNumber value="${post.house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / khối</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
-                                            <span class="text-sm"><strong>Tiền cọc:</strong> <fmt:formatNumber value="${post.house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-map-marker-alt text-red-500"></i>
-                                            <span class="text-sm"><strong>Địa chỉ:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
-                                        </div>
-                                    </div>
 
-                                    <div class="px-6 py-4 flex gap-3">
-                                        <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
-                                            <i class="fas fa-key"></i>
-                                        </button>
-                                        <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
-                                            <i class="fa-solid fa-house text-white"></i>
-                                        </button>
-                                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
-                                                data-house-id="${post.house.id}" 
-                                                data-house-name="${post.house.name}">
-                                            <i class="fas fa-comments"></i>
-                                        </button>
+                                        <div class="px-6 py-4 flex gap-3">
+                                            <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+                                            <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                                <i class="fa-solid fa-house text-white"></i>
+                                            </button>
+                                            <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
+                                                    data-house-id="${house.id}" 
+                                                    data-house-name="${house.name}">
+                                                <i class="fas fa-comments"></i>
+                                            </button>
+                                        </div>
                                     </div>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="text-center p-2 mb-3 col-span-8">
+                                    <p class="text-black decoration-wavy">This owner does not have any houses yet!</p>
                                 </div>
-
-                            </div>
-                        </div>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="text-center p-2 mb-3">
-                            <p class="text-gray-500 decoration-wavy">This owner does not have any houses yet!</p>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-
-                <!-- Load More Button -->
-                <c:choose>
-                    <c:when test="${not empty requestScope.posts}">
-                        <div class="text-center">
-                            <button class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-medium transition-all transform hover:scale-105">
-                                <i class="fas fa-plus mr-2"></i>
-                                Load More Posts
-                            </button>
-                        </div>
-                    </c:when>
-                </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
             </div>
         </div>
 

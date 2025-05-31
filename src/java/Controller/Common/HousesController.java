@@ -57,6 +57,7 @@ public class HousesController extends BaseAuthorization {
                 totalLikes += p.getLikes().size();
             }
 
+            request.setAttribute("posts", posts.getItems());
             request.setAttribute("totalLikes", totalLikes);
             request.setAttribute("houses", houses);
             request.setAttribute("profile", u);
@@ -107,7 +108,7 @@ public class HousesController extends BaseAuthorization {
                 String hid = h.getId();
 
                 Address a = aDao.getAddressById(h.getAddress().getId());
-                
+
                 h.setAddress(a);
             }
         } catch (Exception e) {
