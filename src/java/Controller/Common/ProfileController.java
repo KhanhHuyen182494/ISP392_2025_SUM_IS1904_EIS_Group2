@@ -45,7 +45,14 @@ public class ProfileController extends BaseAuthorization {
             
             posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
             fullLoadPostInfomation(posts, user);
+            
+            int totalLikes = 0;
+            
+            for(Post p : posts.getItems()){
+                totalLikes += p.getLikes().size();
+            }
 
+            request.setAttribute("totalLikes", totalLikes);
             request.setAttribute("profile", u);
             request.setAttribute("posts", posts.getItems());
             request.getRequestDispatcher("./FE/Common/Profile.jsp").forward(request, response);
