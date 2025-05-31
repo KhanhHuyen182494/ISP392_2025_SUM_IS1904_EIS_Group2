@@ -163,7 +163,7 @@
                                 <div class="name">
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
-                                <a href="${pageContext.request.contextPath}/profile">
+                                <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
                                         <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
                                     </div>
@@ -243,15 +243,17 @@
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                                                <img class="rounded-[50%]" src="${post.owner.avatar}" />
+                                                <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
+                                                    <img class="rounded-[50%]" src="${post.owner.avatar}" />
+                                                </a>
                                             </div>
                                             <div>
                                                 <c:choose>
                                                     <c:when test="${sessionScope.user_id == post.owner.id}">
-                                                        <h3 class="font-semibold text-gray-800">Posted by You</h3>
+                                                        <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}"><h3 class="font-semibold text-gray-800">Posted by You</h3></a>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <h3 class="font-semibold text-gray-800">${post.owner.first_name} ${post.owner.last_name}</h3>
+                                                        <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}"><h3 class="font-semibold text-gray-800">${post.owner.first_name} ${post.owner.last_name}</h3></a>
                                                     </c:otherwise>
                                                 </c:choose>
                                                 <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
