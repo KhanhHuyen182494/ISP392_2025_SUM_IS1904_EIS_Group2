@@ -87,26 +87,15 @@
             <div class="bg-white rounded-lg border border-orange-200 p-6">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">OTP sent to your mail</h2>
 
-                <p class="text-sm text-gray-600 mb-4">
-                    Enter a new password for your account:
+                <p class="text-sm text-gray-600 mb-6">
+                    We have sent a OTP to ${sessionScope.user.email}
                 </p>
-                <ul class="list-disc list-inside text-sm text-gray-700 space-y-1 mb-6">
-                    <li>Password length must be between <strong>6 and 20 characters</strong></li>
-                    <li>Password must contain at least <strong>1 special character</strong> (e.g. !@#$%^&*)</li>
-                    <li>Password must include at least <strong>1 uppercase letter</strong> and <strong>1 number</strong></li>
-                </ul>
 
                 <div class="mb-6">
                     <input 
-                        id="newpass"
-                        type="password" 
-                        placeholder="New Password" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2"
-                        >
-                    <input 
-                        id="renewpass"
-                        type="password" 
-                        placeholder="Re-new Password" 
+                        id="otp"
+                        type="text" 
+                        placeholder="OTP" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         >
                 </div>
@@ -130,73 +119,54 @@
                             const confirmBtn = $('#confirmOtp');
 
                             confirmBtn.on('click', function () {
-                                const newPass = $('#newpass').val().trim();
-                                const reNewPass = $('#renewpass').val().trim();
+                                let otp = $('#otp').val().trim();
 
-                                const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]).{6,20}$/;
-
-                                if (!newPass || !reNewPass) {
-                                    showToast("Both password fields are required", "warning");
+                                if (!otp) {
+                                    showToast("OTP cannot be blank!", "error");
                                     return;
+                                } else {
+                                    $.ajax({
+                                        url: '${pageContext.request.contextPath}/verify-otp',
+                                        type: 'GET',
+                                        data: {
+                                            otp: otp
+                                        },
+                                        success: function (response) {
+                                            if (response.ok == true) {
+                                                location.href = '${pageContext.request.contextPath}/verify-otp';
+                                            } else {
+                                                showToast(response.message, 'error');
+                                            }
+                                        }
+                                    });
                                 }
+                            });
+                        });
 
-                                if (!passwordRegex.test(newPass)) {
-                                    showToast("Password must be 6-20 chars, include 1 uppercase letter, 1 number, 1 special character", "error");
-                                    return;
-                                }
+                        function showToast(message, type = 'success') {
+                            let backgroundColor;
+                            if (type === "success") {
+                                backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)";
+                            } else if (type === "error") {
+                                backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)";
+                            } else if (type === "warning") {
+                                backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)";
+                            } else if (type === "info") {
+                                backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)";
+                            } else {
+                                backgroundColor = "#333";
+                            }
 
-                                if (newPass !== reNewPass) {
-                                    showToast("Passwords do not match", "error");
-                                    return;
-                                }
-
-                                $.ajax({
-                                    url: '${pageContext.request.contextPath}/change-password',
-                                    type: 'POST',
-                                    data: {
-                                        pass: reNewPass
-                                    },
-                                    success: function (response) {
-                                        if (response.ok) {
-                                            showToast(response.message, "success");
-                                            setTimeout(function () {
-                                                location.href = '${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}';
-                                                                        }, 1000);
-                                                                    } else {
-                                                                        showToast(response.message || "Something went wrong", "error");
-                                                                    }
-                                                                },
-                                                                error: function () {
-                                                                    showToast("Server error. Please try again later", "error");
-                                                                }
-                                                            });
-                                                        });
-                                                    });
-
-                                                    function showToast(message, type = 'success') {
-                                                        let backgroundColor;
-                                                        if (type === "success") {
-                                                            backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)";
-                                                        } else if (type === "error") {
-                                                            backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)";
-                                                        } else if (type === "warning") {
-                                                            backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)";
-                                                        } else if (type === "info") {
-                                                            backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)";
-                                                        } else {
-                                                            backgroundColor = "#333";
-                                                        }
-
-                                                        Toastify({
-                                                            text: message,
-                                                            duration: 2000,
-                                                            close: true,
-                                                            gravity: "top",
-                                                            position: "right",
-                                                            backgroundColor: backgroundColor,
-                                                            stopOnFocus: true
-                                                        }).showToast();
-                                                    }
+                            Toastify({
+                                text: message,
+                                duration: 2000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                backgroundColor: backgroundColor,
+                                stopOnFocus: true
+                            }).showToast();
+                        }
         </script>
     </body>
 </html>

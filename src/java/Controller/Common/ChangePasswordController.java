@@ -6,6 +6,7 @@ package Controller.Common;
 
 import Base.EmailSender;
 import Base.Generator;
+import Base.Hashing;
 import Model.OTPRecord;
 import Model.User;
 import jakarta.servlet.ServletException;
@@ -41,7 +42,7 @@ public class ChangePasswordController extends BaseAuthorization {
             case "/verify-otp" ->
                 verifyOtp(request, response, user);
             case "/change-password" ->
-                verifyOtp(request, response, user);
+                changePassword(request, response, user);
         }
     }
 
@@ -152,7 +153,22 @@ public class ChangePasswordController extends BaseAuthorization {
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            String pass = request.getParameter("pass");
+            String passHashed = Hashing.SHA_256(pass);
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Something went wrong while updating password.", e);
+            result.put("ok", false);
+            result.put("message", "An unexpected error occurred during updating password.");
+        }
+
+        sendJsonResponse(response, result);
     }
 
 }
