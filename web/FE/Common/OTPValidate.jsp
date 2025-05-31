@@ -117,29 +117,52 @@
         <script>
                         $('document').ready(function () {
                             const confirmBtn = $('#confirmOtp');
+                            const otpInput = $('#otp');
+
+                            otpInput.on('keypress', function (e) {
+                                if (e.which === 13) {
+                                    confirmBtn.click();
+                                }
+                            });
 
                             confirmBtn.on('click', function () {
-                                let otp = $('#otp').val().trim();
+                                let otp = otpInput.val().trim();
 
                                 if (!otp) {
                                     showToast("OTP cannot be blank!", "error");
+                                    otpInput.focus();
                                     return;
-                                } else {
-                                    $.ajax({
-                                        url: '${pageContext.request.contextPath}/verify-otp',
-                                        type: 'GET',
-                                        data: {
-                                            otp: otp
-                                        },
-                                        success: function (response) {
-                                            if (response.ok == true) {
-                                                location.href = '${pageContext.request.contextPath}/verify-otp';
-                                            } else {
-                                                showToast(response.message, 'error');
-                                            }
-                                        }
-                                    });
                                 }
+
+                                confirmBtn.prop('disabled', true);
+                                confirmBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...');
+
+                                $.ajax({
+                                    url: '${pageContext.request.contextPath}/verify-otp',
+                                    type: 'GET',
+                                    data: {
+                                        otp: otp
+                                    },
+                                    success: function (response) {
+                                        if (response.ok) {
+                                            showToast("OTP verified successfully!", "success");
+                                            setTimeout(() => {
+                                                location.href = '${pageContext.request.contextPath}/change-password';
+                                            }, 1000);
+                                        } else {
+                                            showToast(response.message, 'error');
+                                            otpInput.focus();
+                                        }
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error('AJAX Error:', error);
+                                        showToast("An error occurred while verifying OTP. Please try again.", 'error');
+                                    },
+                                    complete: function () {
+                                        confirmBtn.prop('disabled', false);
+                                        confirmBtn.html('Next');
+                                    }
+                                });
                             });
                         });
 
@@ -159,7 +182,7 @@
 
                             Toastify({
                                 text: message,
-                                duration: 2000,
+                                duration: 3000, // Increased duration for better UX
                                 close: true,
                                 gravity: "top",
                                 position: "right",

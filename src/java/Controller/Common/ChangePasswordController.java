@@ -57,34 +57,22 @@ public class ChangePasswordController extends BaseAuthorization {
     protected void verifyOtp(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
         Map<String, Object> result = new HashMap<>();
 
         try {
             String otp = request.getParameter("otp");
 
-            String otpMessage = verifyOtp(user.getEmail(), otp);
-
-            boolean otpOk = false;
-
-            switch (otpMessage) {
-                case "OTP does not exist, please try sending OTP again in profile!" ->
-                    otpOk = false;
-                case "OTP is expired!" ->
-                    otpOk = false;
-                case "Not Valid" ->
-                    otpOk = false;
-                case "OTP Valid" ->
-                    otpOk = true;
-            }
-
-            if (otpOk) {
-                result.put("ok", true);
-                result.put("message", otpMessage);
-            } else {
+            if (otp == null || otp.trim().isEmpty()) {
                 result.put("ok", false);
+                result.put("message", "OTP is required");
+            } else {
+                String otpMessage = verifyOtp(user.getEmail(), otp.trim());
+                boolean otpOk = "OTP Valid".equals(otpMessage);
+
+                result.put("ok", otpOk);
                 result.put("message", otpMessage);
             }
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Something went wrong while validating OTP.", e);
             result.put("ok", false);
@@ -103,10 +91,6 @@ public class ChangePasswordController extends BaseAuthorization {
         try {
             String otp = Generator.generateOTP();
             long expirationTime = System.currentTimeMillis() + OTP_VALIDITY_DURATION;
-
-            if (otpStore.containsKey(user.getEmail())) {
-                otpStore.remove(user.getEmail());
-            }
 
             otpStore.put(user.getEmail(), new OTPRecord(otp, expirationTime));
 
@@ -127,7 +111,12 @@ public class ChangePasswordController extends BaseAuthorization {
     }
 
     public static String verifyOtp(String email, String inputOtp) {
+        if (email == null || email.trim().isEmpty() || inputOtp == null || inputOtp.trim().isEmpty()) {
+            return "Not Valid";
+        }
+
         OTPRecord record = otpStore.get(email);
+
         if (record == null) {
             return "OTP does not exist, please try sending OTP again in profile!";
         }
@@ -137,7 +126,8 @@ public class ChangePasswordController extends BaseAuthorization {
             return "OTP is expired!";
         }
 
-        boolean valid = record.getOtp().equals(inputOtp);
+        boolean valid = record.getOtp().equals(inputOtp.trim());
+
         if (valid) {
             otpStore.remove(email);
             return "OTP Valid";
@@ -162,6 +152,13 @@ public class ChangePasswordController extends BaseAuthorization {
             String pass = request.getParameter("pass");
             String passHashed = Hashing.SHA_256(pass);
 
+            if (uDao.updatePassword(user.getId(), passHashed)) {
+                result.put("ok", true);
+                result.put("message", "Change password success fully!");
+            } else {
+                result.put("ok", false);
+                result.put("message", "Something went wrong while updating password.");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Something went wrong while updating password.", e);
             result.put("ok", false);
