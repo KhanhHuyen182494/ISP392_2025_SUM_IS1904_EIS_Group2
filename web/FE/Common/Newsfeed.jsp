@@ -145,6 +145,8 @@
                                     type="text" 
                                     placeholder="Search..." 
                                     name="searchKey"
+                                    required=""
+                                    tabindex="1"
                                     class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
                                     />
                                 <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
