@@ -140,12 +140,15 @@
 
                         <!-- Search -->
                         <div class="relative">
-                            <input 
-                                type="text" 
-                                placeholder="Search..." 
-                                class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
-                                />
-                            <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
+                            <form action="search" method="GET">
+                                <input 
+                                    type="text" 
+                                    placeholder="Search..." 
+                                    name="searchKey"
+                                    class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
+                                    />
+                                <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
+                            </form>
                         </div>
                     </div>
 
@@ -443,239 +446,239 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                    function toggleLike(button) {
-                        const uid = '${sessionScope.user_id}';
+                                                    function toggleLike(button) {
+                                                        const uid = '${sessionScope.user_id}';
 
-                        if (uid || uid.trim()) {
-                            const likeCount = button.querySelector('.like-count');
-                            const currentCount = parseInt(likeCount.textContent);
-                            const pid = $(button).data('post-id');
+                                                        if (uid || uid.trim()) {
+                                                            const likeCount = button.querySelector('.like-count');
+                                                            const currentCount = parseInt(likeCount.textContent);
+                                                            const pid = $(button).data('post-id');
 
-                            if (button.classList.contains('liked')) {
-                                // Unlike
-                                button.classList.remove('liked');
-                                likeCount.textContent = currentCount - 1;
-                                button.style.backgroundColor = 'white';
-                                button.style.color = '#3b82f6';
-                                sendLikeRequest(pid, 'unLike');
-                            } else {
-                                // Like
-                                button.classList.add('liked');
-                                likeCount.textContent = currentCount + 1;
-                                button.style.backgroundColor = '#3b82f6';
-                                button.style.color = 'white';
-                                sendLikeRequest(pid, 'like');
-                            }
-                        } else {
-                            Swal.fire({
-                                title: 'You must login to use this feature',
-                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                imageWidth: 150,
-                                imageHeight: 150,
-                                imageAlt: 'Custom icon',
-                                showCancelButton: true,
-                                confirmButtonText: 'Login now',
-                                cancelButtonText: 'Back to Newsfeed',
-                                reverseButtons: true,
-                                focusConfirm: false,
-                                focusCancel: false,
-                                customClass: {
-                                    popup: 'rounded-xl shadow-lg',
-                                    title: 'text-xl font-semibold',
-                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                    actions: 'space-x-4'
-                                },
-                                buttonsStyling: false
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.href = '${pageContext.request.contextPath}/login';
-                                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                    Swal.close();
-                                }
-                            });
-                        }
-                    }
+                                                            if (button.classList.contains('liked')) {
+                                                                // Unlike
+                                                                button.classList.remove('liked');
+                                                                likeCount.textContent = currentCount - 1;
+                                                                button.style.backgroundColor = 'white';
+                                                                button.style.color = '#3b82f6';
+                                                                sendLikeRequest(pid, 'unLike');
+                                                            } else {
+                                                                // Like
+                                                                button.classList.add('liked');
+                                                                likeCount.textContent = currentCount + 1;
+                                                                button.style.backgroundColor = '#3b82f6';
+                                                                button.style.color = 'white';
+                                                                sendLikeRequest(pid, 'like');
+                                                            }
+                                                        } else {
+                                                            Swal.fire({
+                                                                title: 'You must login to use this feature',
+                                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                imageWidth: 150,
+                                                                imageHeight: 150,
+                                                                imageAlt: 'Custom icon',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Login now',
+                                                                cancelButtonText: 'Back to Newsfeed',
+                                                                reverseButtons: true,
+                                                                focusConfirm: false,
+                                                                focusCancel: false,
+                                                                customClass: {
+                                                                    popup: 'rounded-xl shadow-lg',
+                                                                    title: 'text-xl font-semibold',
+                                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                    actions: 'space-x-4'
+                                                                },
+                                                                buttonsStyling: false
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    location.href = '${pageContext.request.contextPath}/login';
+                                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                    Swal.close();
+                                                                }
+                                                            });
+                                                        }
+                                                    }
 
-                    function sendLikeRequest(postId, type) {
-                        $.ajax({
-                            url: '${pageContext.request.contextPath}/feeds',
-                            type: 'POST',
-                            data: {
-                                pid: postId,
-                                type: type
-                            }
-                        });
-                    }
+                                                    function sendLikeRequest(postId, type) {
+                                                        $.ajax({
+                                                            url: '${pageContext.request.contextPath}/feeds',
+                                                            type: 'POST',
+                                                            data: {
+                                                                pid: postId,
+                                                                type: type
+                                                            }
+                                                        });
+                                                    }
 
-                    $(document).ready(function () {
-                        const modal = $('#feedbackModal');
-                        const modalHouseName = $('#modalHouseName');
-                        const feedbackContainer = $('#feedbackContainer');
-                        const loadingDiv = $('#feedbackLoading');
-                        const errorDiv = $('#feedbackError');
-                        const noFeedbackDiv = $('#noFeedback');
-                        const loadMoreDiv = $('#loadMoreFeedback');
+                                                    $(document).ready(function () {
+                                                        const modal = $('#feedbackModal');
+                                                        const modalHouseName = $('#modalHouseName');
+                                                        const feedbackContainer = $('#feedbackContainer');
+                                                        const loadingDiv = $('#feedbackLoading');
+                                                        const errorDiv = $('#feedbackError');
+                                                        const noFeedbackDiv = $('#noFeedback');
+                                                        const loadMoreDiv = $('#loadMoreFeedback');
 
-                        let currentHouseId = null;
-                        let currentPage = 1;
-                        let isLoading = false;
+                                                        let currentHouseId = null;
+                                                        let currentPage = 1;
+                                                        let isLoading = false;
 
-                        $('.view-feedback-btn').on('click', function () {
-                            const houseId = $(this).data('house-id');
-                            const houseName = $(this).data('house-name');
+                                                        $('.view-feedback-btn').on('click', function () {
+                                                            const houseId = $(this).data('house-id');
+                                                            const houseName = $(this).data('house-name');
 
-                            currentHouseId = houseId;
-                            currentPage = 1;
+                                                            currentHouseId = houseId;
+                                                            currentPage = 1;
 
-                            modalHouseName.text(houseName);
-                            modal.addClass('active');
-                            $('body').addClass('overflow-hidden');
+                                                            modalHouseName.text(houseName);
+                                                            modal.addClass('active');
+                                                            $('body').addClass('overflow-hidden');
 
-                            loadFeedbacks(houseId, 1, true);
-                        });
+                                                            loadFeedbacks(houseId, 1, true);
+                                                        });
 
-                        // Close modal
-                        $('#closeModalBtn').on('click', function (e) {
-                            closeModal();
+                                                        // Close modal
+                                                        $('#closeModalBtn').on('click', function (e) {
+                                                            closeModal();
 
-                        });
+                                                        });
 
-                        modal.on('click', function (e) {
-                            if (e.target === this) {
-                                closeModal();
-                            }
-                        });
+                                                        modal.on('click', function (e) {
+                                                            if (e.target === this) {
+                                                                closeModal();
+                                                            }
+                                                        });
 
-                        modal.on('click', function (e) {
-                            if (!$(e.target).closest('.modal-content').length) {
-                                closeModal();
-                            }
-                        });
+                                                        modal.on('click', function (e) {
+                                                            if (!$(e.target).closest('.modal-content').length) {
+                                                                closeModal();
+                                                            }
+                                                        });
 
-                        // Retry loading feedbacks
-                        $('#retryFeedback').on('click', function () {
-                            if (currentHouseId) {
-                                loadFeedbacks(currentHouseId, 1, true);
-                            }
-                        });
+                                                        // Retry loading feedbacks
+                                                        $('#retryFeedback').on('click', function () {
+                                                            if (currentHouseId) {
+                                                                loadFeedbacks(currentHouseId, 1, true);
+                                                            }
+                                                        });
 
-                        // Load more feedbacks
-                        $('#loadMoreFeedbackBtn').on('click', function () {
-                            if (currentHouseId && !isLoading) {
-                                loadFeedbacks(currentHouseId, currentPage + 1, false);
-                            }
-                        });
+                                                        // Load more feedbacks
+                                                        $('#loadMoreFeedbackBtn').on('click', function () {
+                                                            if (currentHouseId && !isLoading) {
+                                                                loadFeedbacks(currentHouseId, currentPage + 1, false);
+                                                            }
+                                                        });
 
-                        // ESC key to close modal
-                        $(document).on('keydown', function (e) {
-                            if (e.key === 'Escape' && modal.hasClass('active')) {
-                                closeModal();
-                            }
-                        });
+                                                        // ESC key to close modal
+                                                        $(document).on('keydown', function (e) {
+                                                            if (e.key === 'Escape' && modal.hasClass('active')) {
+                                                                closeModal();
+                                                            }
+                                                        });
 
-                        function closeModal() {
-                            modal.removeClass('active');
-                            $('body').removeClass('overflow-hidden');
-                            // Reset modal state after animation
-                            setTimeout(() => {
-                                resetModalState();
-                            }, 300);
-                        }
+                                                        function closeModal() {
+                                                            modal.removeClass('active');
+                                                            $('body').removeClass('overflow-hidden');
+                                                            // Reset modal state after animation
+                                                            setTimeout(() => {
+                                                                resetModalState();
+                                                            }, 300);
+                                                        }
 
-                        function resetModalState() {
-                            feedbackContainer.empty();
-                            loadingDiv.show();
-                            errorDiv.addClass('hidden');
-                            noFeedbackDiv.addClass('hidden');
-                            loadMoreDiv.addClass('hidden');
-                            currentHouseId = null;
-                            currentPage = 1;
-                        }
+                                                        function resetModalState() {
+                                                            feedbackContainer.empty();
+                                                            loadingDiv.show();
+                                                            errorDiv.addClass('hidden');
+                                                            noFeedbackDiv.addClass('hidden');
+                                                            loadMoreDiv.addClass('hidden');
+                                                            currentHouseId = null;
+                                                            currentPage = 1;
+                                                        }
 
-                        function loadFeedbacks(houseId, page, isNewLoad) {
-                            if (isLoading)
-                                return;
+                                                        function loadFeedbacks(houseId, page, isNewLoad) {
+                                                            if (isLoading)
+                                                                return;
 
-                            isLoading = true;
+                                                            isLoading = true;
 
-                            if (isNewLoad) {
-                                // Show loading for new load
-                                loadingDiv.show();
-                                errorDiv.addClass('hidden');
-                                noFeedbackDiv.addClass('hidden');
-                                loadMoreDiv.addClass('hidden');
-                                feedbackContainer.empty();
-                            } else {
-                                // Show loading on load more button
-                                $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
-                            }
+                                                            if (isNewLoad) {
+                                                                // Show loading for new load
+                                                                loadingDiv.show();
+                                                                errorDiv.addClass('hidden');
+                                                                noFeedbackDiv.addClass('hidden');
+                                                                loadMoreDiv.addClass('hidden');
+                                                                feedbackContainer.empty();
+                                                            } else {
+                                                                // Show loading on load more button
+                                                                $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                                            }
 
-                            $.ajax({
-                                url: '${pageContext.request.contextPath}/feedback/house',
-                                method: 'GET',
-                                data: {
-                                    houseId: houseId,
-                                    page: page,
-                                    limit: 5
-                                },
-                                success: function (response) {
-                                    loadingDiv.hide();
+                                                            $.ajax({
+                                                                url: '${pageContext.request.contextPath}/feedback/house',
+                                                                method: 'GET',
+                                                                data: {
+                                                                    houseId: houseId,
+                                                                    page: page,
+                                                                    limit: 5
+                                                                },
+                                                                success: function (response) {
+                                                                    loadingDiv.hide();
 
-                                    if (isNewLoad) {
-                                        feedbackContainer.empty();
-                                    }
+                                                                    if (isNewLoad) {
+                                                                        feedbackContainer.empty();
+                                                                    }
 
-                                    if (response.feedbacks && response.feedbacks.length > 0) {
-                                        appendFeedbacks(response.feedbacks);
-                                        currentPage = page;
+                                                                    if (response.feedbacks && response.feedbacks.length > 0) {
+                                                                        appendFeedbacks(response.feedbacks);
+                                                                        currentPage = page;
 
-                                        // Show load more if there are more feedbacks
-                                        if (response.hasMore) {
-                                            loadMoreDiv.removeClass('hidden');
-                                        } else {
-                                            loadMoreDiv.addClass('hidden');
-                                        }
+                                                                        // Show load more if there are more feedbacks
+                                                                        if (response.hasMore) {
+                                                                            loadMoreDiv.removeClass('hidden');
+                                                                        } else {
+                                                                            loadMoreDiv.addClass('hidden');
+                                                                        }
 
-                                        errorDiv.addClass('hidden');
-                                        noFeedbackDiv.addClass('hidden');
-                                    } else if (isNewLoad) {
-                                        // No feedbacks found
-                                        noFeedbackDiv.removeClass('hidden');
-                                        errorDiv.addClass('hidden');
-                                        loadMoreDiv.addClass('hidden');
-                                    }
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error('Error loading feedbacks:', error);
-                                    loadingDiv.hide();
+                                                                        errorDiv.addClass('hidden');
+                                                                        noFeedbackDiv.addClass('hidden');
+                                                                    } else if (isNewLoad) {
+                                                                        // No feedbacks found
+                                                                        noFeedbackDiv.removeClass('hidden');
+                                                                        errorDiv.addClass('hidden');
+                                                                        loadMoreDiv.addClass('hidden');
+                                                                    }
+                                                                },
+                                                                error: function (xhr, status, error) {
+                                                                    console.error('Error loading feedbacks:', error);
+                                                                    loadingDiv.hide();
 
-                                    if (isNewLoad) {
-                                        errorDiv.removeClass('hidden');
-                                        noFeedbackDiv.addClass('hidden');
-                                    } else {
-                                        // Show error toast for load more
-                                        showToast('Failed to load more feedbacks', 'error');
-                                    }
-                                },
-                                complete: function () {
-                                    isLoading = false;
-                                    $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
-                                }
-                            });
-                        }
+                                                                    if (isNewLoad) {
+                                                                        errorDiv.removeClass('hidden');
+                                                                        noFeedbackDiv.addClass('hidden');
+                                                                    } else {
+                                                                        // Show error toast for load more
+                                                                        showToast('Failed to load more feedbacks', 'error');
+                                                                    }
+                                                                },
+                                                                complete: function () {
+                                                                    isLoading = false;
+                                                                    $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
+                                                                }
+                                                            });
+                                                        }
 
-                        function appendFeedbacks(feedbacks) {
-                            feedbacks.forEach(function (feedback) {
-                                const feedbackHtml = createFeedbackHtml(feedback);
-                                feedbackContainer.append(feedbackHtml);
-                            });
-                        }
+                                                        function appendFeedbacks(feedbacks) {
+                                                            feedbacks.forEach(function (feedback) {
+                                                                const feedbackHtml = createFeedbackHtml(feedback);
+                                                                feedbackContainer.append(feedbackHtml);
+                                                            });
+                                                        }
 
-                        function createFeedbackHtml(feedback) {
-                            const stars = generateStarRating(feedback.star);
+                                                        function createFeedbackHtml(feedback) {
+                                                            const stars = generateStarRating(feedback.star);
 
-                            return `
+                                                            return `
                                                         <div class="feedback-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
                                                                 <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -698,44 +701,44 @@
                                                             </div>
                                                         </div>
                                                     `;
-                        }
+                                                        }
 
-                        function generateStarRating(rating) {
-                            let stars = '';
-                            for (let i = 1; i <= 5; i++) {
-                                if (i <= rating) {
-                                    stars += '<i class="fas fa-star text-xs"></i>';
-                                } else {
-                                    stars += '<i class="far fa-star text-xs"></i>';
-                                }
-                            }
-                            return stars;
-                        }
+                                                        function generateStarRating(rating) {
+                                                            let stars = '';
+                                                            for (let i = 1; i <= 5; i++) {
+                                                                if (i <= rating) {
+                                                                    stars += '<i class="fas fa-star text-xs"></i>';
+                                                                } else {
+                                                                    stars += '<i class="far fa-star text-xs"></i>';
+                                                                }
+                                                            }
+                                                            return stars;
+                                                        }
 
-                        function showToast(message, type = 'success') {
-                            Toastify({
-                                text: message,
-                                duration: 3000,
-                                gravity: "top",
-                                position: "right",
-                                backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
-                                stopOnFocus: true
-                            }).showToast();
-                        }
-                    });
+                                                        function showToast(message, type = 'success') {
+                                                            Toastify({
+                                                                text: message,
+                                                                duration: 3000,
+                                                                gravity: "top",
+                                                                position: "right",
+                                                                backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+                                                                stopOnFocus: true
+                                                            }).showToast();
+                                                        }
+                                                    });
 
-                    function showImageModal(imageSrc) {
-                        Swal.fire({
-                            imageUrl: imageSrc,
-                            imageWidth: 'auto',
-                            imageHeight: 'auto',
-                            showCloseButton: false,
-                            showConfirmButton: false,
-                            customClass: {
-                                image: 'rounded-lg p-5'
-                            }
-                        });
-                    }
+                                                    function showImageModal(imageSrc) {
+                                                        Swal.fire({
+                                                            imageUrl: imageSrc,
+                                                            imageWidth: 'auto',
+                                                            imageHeight: 'auto',
+                                                            showCloseButton: false,
+                                                            showConfirmButton: false,
+                                                            customClass: {
+                                                                image: 'rounded-lg p-5'
+                                                            }
+                                                        });
+                                                    }
         </script>
     </body>
 </html>
