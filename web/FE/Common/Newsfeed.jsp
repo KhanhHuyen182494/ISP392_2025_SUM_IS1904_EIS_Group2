@@ -343,11 +343,11 @@
                                         <i class="fas fa-key mr-2"></i>
                                         Rent
                                     </button>
-                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
                                         <i class="fa-solid fa-house text-white"></i>
                                         View Detail
                                     </button>
-                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
+                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
                                             data-house-id="${post.house.id}" 
                                             data-house-name="${post.house.name}">
                                         <i class="fas fa-comments mr-2"></i>
