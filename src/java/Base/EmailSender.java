@@ -15,7 +15,6 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import org.eclipse.jdt.internal.compiler.batch.Main;
 
 /**
  *
@@ -46,7 +45,7 @@ public class EmailSender {
             String content = "Hi " + u.getFirst_name() + " " + u.getLast_name() + "\n"
                     + "Your new password: " + newPass + "\n"
                     + "To be able to log in, please enter with new password."
-                    + "Please do not share the code with anyone.";
+                    + "Please do not share the this with anyone.";
             test = sendEmail(u.getEmail(), subject, content);
         } catch (Exception e) {
         }
