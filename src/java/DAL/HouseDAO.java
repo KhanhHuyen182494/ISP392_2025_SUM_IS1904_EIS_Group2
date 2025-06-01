@@ -20,10 +20,10 @@ import java.util.List;
 public class HouseDAO extends BaseDao implements IHouseDAO {
 
     private Logging logger = new Logging();
-    
+
     public static void main(String[] args) {
         HouseDAO hDao = new HouseDAO();
-        System.out.println(hDao.getListPaging(10, 0, "", "U-89d667bc8e6343cfa4cc55b93439ef4f"));
+        System.out.println(hDao.getListPaging(10, 0, "", "").size());
     }
 
     @Override
@@ -37,8 +37,12 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                          fuhousefinder.house h
                              JOIN
                          status s ON h.status_id = s.id
-                     WHERE h.owner_id = ? AND 1 = 1 
+                     WHERE 1 = 1 
                      """;
+
+        if (uid != null && !uid.isBlank()) {
+            sql += " AND h.owner_id = ? ";
+        }
 
         if (searchKey != null && !searchKey.isBlank()) {
             sql += " AND h.name LIKE ? ";
@@ -52,7 +56,9 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
             int index = 1;
 
-            ps.setString(index++, uid);
+            if (uid != null && !uid.isBlank()) {
+                ps.setString(index++, uid);
+            }
 
             if (searchKey != null && !searchKey.isBlank()) {
                 ps.setString(index++, "%" + searchKey + "%");
@@ -78,13 +84,13 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                 Status s = new Status();
                 s.setId(rs.getInt("status_id"));
                 s.setName(rs.getString("StatusName"));
-                
+
                 Address a = new Address();
                 a.setId(rs.getInt("address_id"));
 
                 h.setAddress(a);
                 h.setStatus(s);
-                
+
                 houses.add(h);
             }
 
