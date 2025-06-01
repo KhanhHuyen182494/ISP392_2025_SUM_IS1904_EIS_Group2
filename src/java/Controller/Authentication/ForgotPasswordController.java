@@ -4,8 +4,12 @@
  */
 package Controller.Authentication;
 
+import Base.EmailSender;
+import Base.Generator;
+import Base.Hashing;
 import DAL.DAO.IUserDAO;
 import DAL.UserDAO;
+import Model.User;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;
 import java.io.IOException;
@@ -47,7 +51,7 @@ public class ForgotPasswordController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        request.getRequestDispatcher("./FE/Common/ForgotPassword.jsp").forward(request, response);
     }
 
     /**
@@ -69,12 +73,50 @@ public class ForgotPasswordController extends HttpServlet {
             String email = request.getParameter("contact");
 
             if (email == null || email.isEmpty() || email.isBlank()) {
-
+                result.put("ok", false);
+                result.put("message", "Email can not be empty!");
+                sendJsonResponse(response, result);
+                return;
             }
 
-        } catch (Exception e) {
+            User u = uDao.getByEmail(email);
+
+            if (u == null || u.getId().trim().isEmpty()) {
+                result.put("ok", false);
+                result.put("message", "Oops, we can not find your account, would you mind sign up?");
+                sendJsonResponse(response, result);
+                return;
+            }
+
+            String password = Generator.generatePassword(8);
+            String passwordHashed = Hashing.SHA_256(password);
+
+            if (EmailSender.sendEmailResetPass(u, password)) {
+                if (uDao.updatePassword(u.getId(), passwordHashed)) {
+                    result.put("ok", true);
+                    result.put("message", "An email with instruction sent to your email, please check your email carefully!");
+                } else {
+                    result.put("ok", false);
+                    result.put("message", "If an account exists with this email, you will receive reset instructions.");
+                }
+            } else {
+                result.put("ok", false);
+                result.put("message", "Oops, we can not find your account, would you mind sign up?");
+            }
+
+            sendJsonResponse(response, result);
+
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Something went wrong in reset password!", e);
+            result.put("ok", false);
+            result.put("message", "Something went wrong in reset password!");
+            sendJsonResponse(response, result);
         }
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, Map<String, Object> result) throws IOException {
+        response.getWriter().write(gson.toJson(result));
+        response.getWriter().flush();
     }
 
     /**

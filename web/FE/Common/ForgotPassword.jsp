@@ -115,7 +115,29 @@
                     success: function (response) {
                         Swal.close();
                         if (response.ok) {
-                            showToast("Password reset instructions sent!", "success");
+                            Swal.fire({
+                                title: 'Email Instruction Sent',
+                                html: `
+        <p>` + response.message + `</p>
+    `,
+                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                imageWidth: 150,
+                                imageHeight: 150,
+                                imageAlt: 'Custom icon',
+                                confirmButtonText: 'Ok',
+                                focusConfirm: false,
+                                allowOutsideClick: false,
+                                customClass: {
+                                    popup: 'rounded-xl shadow-lg',
+                                    title: 'text-xl font-semibold',
+                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                },
+                                buttonsStyling: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.href = '${pageContext.request.contextPath}/login';
+                                }
+                            });
                         } else {
                             showToast(response.message || "Account not found", "error");
                         }
