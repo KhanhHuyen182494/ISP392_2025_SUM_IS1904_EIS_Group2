@@ -11,15 +11,16 @@ import java.sql.Timestamp;
  * @author Huyen
  */
 public class Address {
+
     private int id;
     private String detail;
     private Timestamp created_at;
     private Timestamp updated_at;
     private String created_by;
-    private int country_id;
-    private int district_id;
-    private int province_id;
-    private int ward_id;
+    private String country;
+    private String district;
+    private String province;
+    private String ward;
 
     public Address() {
     }
@@ -64,37 +65,36 @@ public class Address {
         this.created_by = created_by;
     }
 
-    public int getCountry_id() {
-        return country_id;
+    public String getCountry() {
+        return country;
     }
 
-    public void setCountry_id(int country_id) {
-        this.country_id = country_id;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
-    public int getDistrict_id() {
-        return district_id;
+    public String getDistrict() {
+        return district;
     }
 
-    public void setDistrict_id(int district_id) {
-        this.district_id = district_id;
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
-    public int getProvince_id() {
-        return province_id;
+    public String getProvince() {
+        return province;
     }
 
-    public void setProvince_id(int province_id) {
-        this.province_id = province_id;
+    public void setProvince(String province) {
+        this.province = province;
     }
 
-    public int getWard_id() {
-        return ward_id;
+    public String getWard() {
+        return ward;
     }
 
-    public void setWard_id(int ward_id) {
-        this.ward_id = ward_id;
+    public void setWard(String ward) {
+        this.ward = ward;
     }
-    
-    
+
 }

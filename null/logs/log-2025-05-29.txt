@@ -1,0 +1,2 @@
+[2025-05-29 15:19:19] [ERROR] java.sql.SQLSyntaxErrorException: Column 'like_at' not found.
+[2025-05-29 15:20:47] [ERROR] java.sql.SQLSyntaxErrorException: Column 'like_at' not found.

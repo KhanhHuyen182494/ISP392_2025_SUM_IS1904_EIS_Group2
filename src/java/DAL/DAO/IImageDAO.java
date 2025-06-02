@@ -4,27 +4,22 @@
  */
 package DAL.DAO;
 
-import Model.House;
+import Model.Image;
 import java.util.List;
 
 /**
  *
- * @author Huyen
+ * @author Tam
  */
-public interface IHouseDAO extends IBaseUUID<House>{
+public interface IImageDAO {
     //Get
-    public List<House> getListPaging(int limit, int offset, String searchKey, String uid);
+    public List<Image> getImagesByObjectId(String id);
     
-    //Add
+    //Update
     
     
     //Delete
     
     
-    //Update
-    
-    
-    //Search
-    
-    
+    //Add
 }

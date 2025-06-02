@@ -5,6 +5,7 @@
 package DAL.DAO;
 
 import DTO.UserDTO;
+import Model.Image;
 import Model.User;
 
 /**
@@ -25,6 +26,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     public User authenticateUser(String contact, String password);
     
+    public User getByUidForProfile(String uid);
+    
     //Add
     
     //Delete
@@ -35,6 +38,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     public boolean updateVerifiedStatus(User u);
     
     public boolean updateVerificationInfo(User u);
+    
+    public boolean updatePassword(String uid, String newPass);
     
     //Search
     

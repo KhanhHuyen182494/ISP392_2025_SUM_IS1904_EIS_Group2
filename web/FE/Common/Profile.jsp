@@ -1,7 +1,7 @@
 <%-- 
-    Document   : Newsfeed
-    Created on : May 24, 2025, 9:21:47 PM
-    Author     : Huyen
+    Document   : Profile
+    Created on : May 31, 2025, 8:30:33 PM
+    Author     : Ha
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Feeds</title>
+        <title>Profile</title>
 
         <!-- Libs -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -124,6 +124,17 @@
                 color: white;
                 transform: scale(1.1);
             }
+
+            .swal2-loader {
+                border-color: #FF7700 !important;
+                border-top-color: transparent !important;
+            }
+
+            .swal2-loader {
+                width: 2.2em !important;
+                height: 2.2em !important;
+                border-width: 0.22em !important;
+            }
         </style>
     </head>
     <body>
@@ -140,17 +151,12 @@
 
                         <!-- Search -->
                         <div class="relative">
-                            <form action="search" method="GET">
-                                <input 
-                                    type="text" 
-                                    placeholder="Search..." 
-                                    name="searchKey"
-                                    required=""
-                                    tabindex="1"
-                                    class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
-                                    />
-                                <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
-                            </form>
+                            <input 
+                                type="text" 
+                                placeholder="Search..." 
+                                class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
+                                />
+                            <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
                         </div>
                     </div>
 
@@ -168,7 +174,7 @@
                                 <div class="name">
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
-                                <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
+                                <a href="${pageContext.request.contextPath}/profile">
                                     <div class="avatar">
                                         <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
                                     </div>
@@ -180,70 +186,163 @@
             </div>
         </header>
 
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
-            <!-- Sidebar - Top Feedback Section -->
-            <div class="col-span-4">
-                <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">Top House/Room</h2>
-                        <div class="filter-top-house-room flex items-center gap-5">
-                            <div class="filter-button">
-                                <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-lg font-medium transition-colors px-2">Booking</button>
-                                <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-lg font-medium transition-colors px-2">Star</button>
+        <!-- Avatar, Cover Section -->
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <!-- Cover Photo Container -->
+            <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
+                <!-- Cover Image (if available) -->
+                <c:if test="${not empty requestScope.profile.cover}">
+                    <img src="${requestScope.profile.cover}" 
+                         alt="Cover Photo" 
+                         class="w-full h-full object-cover"/>
+                </c:if>
+
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+
+                <!-- Edit Cover Button (only for own profile) -->
+                <c:if test="${sessionScope.user.id == requestScope.profile.id}">
+                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
+                        <i class="fas fa-camera"></i>
+                        <span class="hidden sm:inline">Edit Cover</span>
+                    </button>
+                </c:if>
+
+                <!-- Profile Info Overlay -->
+                <div class="absolute bottom-0 left-0 right-0 p-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+                        <!-- Avatar -->
+                        <div class="relative">
+                            <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
+                                <c:choose>
+                                    <c:when test="${not empty requestScope.profile.avatar}">
+                                        <img src="${requestScope.profile.avatar}" 
+                                             alt="Profile Avatar" 
+                                             class="w-full h-full object-cover"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-400 text-4xl"></i>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
-                            <i class="fas fa-star text-yellow-500"></i>
+
+                            <!-- Edit Avatar Button (only for own profile) -->
+                            <c:if test="${sessionScope.user.id == requestScope.profile.id}">
+                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
+                                    <i class="fas fa-camera text-xs"></i>
+                                </button>
+                            </c:if>
+                        </div>
+
+                        <!-- User Info -->
+                        <div class="flex-1 text-white">
+                            <h1 class="text-3xl font-bold mb-2">
+                                <c:choose>
+                                    <c:when test="${sessionScope.user.id == requestScope.profile.id}">
+                                        ${sessionScope.user.first_name} ${sessionScope.user.last_name}
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${requestScope.profile.first_name} ${requestScope.profile.last_name}
+                                    </c:otherwise>
+                                </c:choose>
+                            </h1>
+
+                            <!-- User Stats -->
+                            <div class="flex gap-6 text-sm">
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-home"></i>
+                                    <span>${fn:length(posts)} Posts</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>${requestScope.totalLikes} Likes</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Joined <fmt:formatDate value="${requestScope.profile.created_at}" pattern="MMM yyyy" /></span>
+                                </div>
+                            </div>
+
+                            <!-- Bio (if available) -->
+                            <c:if test="${not empty requestScope.profile.description}">
+                                <p class="mt-2 text-gray-100 max-w-md">${requestScope.profile.description}</p>
+                            </c:if>
                         </div>
                     </div>
-
-                    <!-- Top Feedback Items -->
-                    <div class="space-y-4">
-                        <!-- Feedback items -->
-                        <c:choose>
-                            <c:when test="${not empty requestScope.topHouseRoom}">
-                                <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer items-center">
-                                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-user text-white text-sm"></i>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <span class="font-semibold text-sm text-gray-800">An Thu House - Phong 402</span>
-                                            <div class="flex text-yellow-400">
-                                                <i class="fas fa-star text-xs"></i>
-                                                <i class="fas fa-star text-xs"></i>
-                                                <i class="fas fa-star text-xs"></i>
-                                                <i class="fas fa-star text-xs"></i>
-                                                <i class="fas fa-star text-xs"></i>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs text-gray-600 line-clamp-2">104 Feedbacks</p>
-                                        <span class="text-xs text-gray-400">2 days ago</span>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="text-center p-2 mb-3">
-                                    <p class="text-gray-500 decoration-wavy">No top house/room available!</p>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-
-                    <!-- View All Button -->
-                    <button class="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 rounded-lg text-sm font-medium transition-all">
-                        View All Feedback
-                    </button>
                 </div>
             </div>
 
-            <!-- Main Feed -->
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 mt-4">
+                <c:choose>
+                    <c:when test="${sessionScope.user.id == requestScope.profile.id}">
+                        <!-- Own Profile Actions -->
+                        <c:if test="${sessionScope.user.role.id == 3}">
+                            <a href="${pageContext.request.contextPath}/owner-house?uid=${sessionScope.user.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-home"></i>
+                                    View your's houses
+                                </button>
+                            </a>
+                        </c:if>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </button>
+                        <!--<a href="${pageContext.request.contextPath}/change-password">-->
+                        <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >
+                            <i class="fa-solid fa-lock"></i>
+                            Change Password
+                        </button>
+                        <!--</a>-->
+                        <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            Add Post
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Other User Profile Actions -->
+                        <c:if test="${requestScope.profile.role.id == 3}">
+                            <a href="${pageContext.request.contextPath}/owner-house?uid=${requestScope.profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-home"></i>
+                                    View all houses
+                                </button>
+                            </a>
+                        </c:if>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            <i class="fas fa-user-plus"></i>
+                            Follow
+                        </button>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
+            <!-- Sidebar - Infomation Section -->
+            <div class="col-span-4">
+                <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
+                    <div class="flex items-center mb-6">
+                        <h2 class="text-center text-xl font-bold text-gray-800">About me</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <p>BOD: ${not empty requestScope.profile.birthdate ? requestScope.profile.birthdate : 'Nothing here!'}</p>
+                        <p>Gender: ${not empty requestScope.profile.gender ? requestScope.profile.gender : 'Nothing here!'}</p></p>
+                        <p>Email: ${not empty requestScope.profile.email ? requestScope.profile.email : 'Nothing here!'}</p></p>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-span-8">
-                <!-- Feed Items -->
                 <c:choose>
                     <c:when test="${not empty requestScope.posts}">
                         <c:forEach items="${requestScope.posts}" var="post">
                             <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden card-hover">
-                                <!-- User Info -->
                                 <div class="p-6 pb-4">
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center gap-3">
@@ -276,15 +375,12 @@
                                         ${post.content}
                                     </p>
 
-                                    <!-- Property Title -->
                                     <h2 class="text-xl font-bold text-gray-800 mb-3">${post.house.name} ${not empty post.room.id ? ' - ' + post.room.id : ''}</h2>
 
-                                    <!-- Description -->
                                     <p class="text-gray-600 mb-4">
                                         ${post.house.description}
                                     </p>
 
-                                    <!-- Property Details -->
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-dollar-sign text-green-500"></i>
@@ -309,7 +405,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Images -->
                                 <div class="px-6 pb-4">
                                     <div class="grid grid-cols-2 gap-4">
                                         <c:forEach items="${post.images}" var="image">
@@ -320,7 +415,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Action Bar -->
+
                                 <div class="px-6 py-4 flex items-center justify-between">
                                     <div class="flex items-center gap-4">
                                         <button data-post-id="${post.id}" 
@@ -331,7 +426,6 @@
                                             <span class="like-count">${fn:length(post.likes)}</span>
                                         </button>
 
-                                        <!-- Maybe have a like people here, like: Khanh Huyen, TamHS, ... -->
 
                                     </div>
 
@@ -342,17 +436,16 @@
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons -->
                                 <div class="px-6 py-4 flex gap-3">
                                     <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
                                         <i class="fas fa-key mr-2"></i>
                                         Rent
                                     </button>
-                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
                                         <i class="fa-solid fa-house text-white"></i>
                                         View Detail
                                     </button>
-                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
+                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
                                             data-house-id="${post.house.id}" 
                                             data-house-name="${post.house.name}">
                                         <i class="fas fa-comments mr-2"></i>
@@ -727,7 +820,52 @@
                                                                 stopOnFocus: true
                                                             }).showToast();
                                                         }
+
+
                                                     });
+
+                                                    function showChangePassword() {
+                                                        Swal.fire({
+                                                            title: 'Caution',
+                                                            html: 'We’ll send a email with a OTP code expired in <b><span class="text-red-500">5 mins</span></b> for you to change password! Do you want to continue change password?',
+                                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                            imageWidth: 150,
+                                                            imageHeight: 150,
+                                                            imageAlt: 'Custom icon',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes',
+                                                            cancelButtonText: 'Cancel',
+                                                            reverseButtons: true,
+                                                            focusConfirm: false,
+                                                            focusCancel: false,
+                                                            customClass: {
+                                                                popup: 'rounded-xl shadow-lg',
+                                                                title: 'text-xl font-semibold',
+                                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                actions: 'space-x-4'
+                                                            },
+                                                            buttonsStyling: false
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                $.ajax({
+                                                                    url: '${pageContext.request.contextPath}/send-otp',
+                                                                    type: 'GET',
+                                                                    beforeSend: function (xhr) {
+                                                                        showLoading();
+                                                                    },
+                                                                    success: function (response) {
+                                                                        Swal.close();
+                                                                        if (response.ok == true) {
+                                                                            location.href = '${pageContext.request.contextPath}/get-verify-otp';
+                                                                        }
+                                                                    }
+                                                                });
+                                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                Swal.close();
+                                                            }
+                                                        });
+                                                    }
 
                                                     function showImageModal(imageSrc) {
                                                         Swal.fire({
@@ -738,6 +876,20 @@
                                                             showConfirmButton: false,
                                                             customClass: {
                                                                 image: 'rounded-lg p-5'
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function showLoading() {
+                                                        Swal.fire({
+                                                            title: 'Sending OTP ...',
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            },
+                                                            allowOutsideClick: false,
+                                                            showConfirmButton: false,
+                                                            customClass: {
+                                                                title: 'text-xl font-semibold'
                                                             }
                                                         });
                                                     }

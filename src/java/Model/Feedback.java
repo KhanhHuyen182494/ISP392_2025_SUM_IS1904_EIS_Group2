@@ -16,6 +16,7 @@ public class Feedback {
     private String post_id;
     private String house_id;
     private String room_id;
+    private Status status;
     private int star;
     private String content;
     private Timestamp created_at;
@@ -94,6 +95,19 @@ public class Feedback {
 
     public void setUpdated_at(Timestamp updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Feedback{" + "id=" + id + ", user=" + user + ", post_id=" + post_id + ", house_id=" + house_id + ", room_id=" + room_id + ", status=" + status + ", star=" + star + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + '}';
     }
     
 }

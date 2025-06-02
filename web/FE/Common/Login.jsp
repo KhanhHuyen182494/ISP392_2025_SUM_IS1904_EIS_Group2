@@ -66,7 +66,7 @@
                         </button>
 
                         <div class="text-center">
-                            <a href="#" class="text-blue-500 hover:text-blue-600 text-sm">Forgotten password?</a>
+                            <a href="${pageContext.request.contextPath}/forgot-password" class="text-blue-500 hover:text-blue-600 text-sm">Forgotten password?</a>
                         </div>
 
                         <div class="text-center pt-4 border-t border-gray-200">
@@ -128,6 +128,9 @@
                         let errorCode = response.errorCode;
                         let message = response.message;
                         switch (errorCode) {
+                            case 0:
+                                location.href = response.redirectUrl;
+                                break;
                             case 1:
                                 showToast(message, "error");
                                 break;

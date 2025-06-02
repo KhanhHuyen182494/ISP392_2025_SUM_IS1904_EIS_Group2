@@ -8,7 +8,6 @@ import Base.Logging;
 import DAL.DAO.IUserDAO;
 import DTO.UserDTO;
 import Model.Address;
-import Model.Image;
 import Model.Role;
 import Model.Status;
 import Model.User;
@@ -49,7 +48,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 //        
 //        System.out.println(udao.add(u));
 
-        System.out.println(udao.authenticateUser("huyennkhe182494@fpt.edu.vn", "fcfbcf9b3e76ccfb6e3639d0758e44ccf74d0c0f946f23f7cfd10da5b38cb028"));
+        System.out.println(udao.getByUidForProfile("U-35334b61da31443da5f850b5856fb4bf"));
     }
 
     @Override
@@ -80,20 +79,16 @@ public class UserDAO extends BaseDao implements IUserDAO {
                 u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
                 u.setIs_verified(rs.getBoolean("is_verified"));
                 u.setLast_verification_sent(rs.getTimestamp("last_verification_sent"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCover(rs.getString("cover"));
 
-                Image ava = new Image();
-                Image cov = new Image();
                 Role r = new Role();
                 Status s = new Status();
                 Address add = new Address();
                 r.setId(rs.getInt("role_id"));
                 s.setId(rs.getInt("status_id"));
-                ava.setId(rs.getInt("avatar"));
-                cov.setId(rs.getInt("cover"));
                 add.setId(rs.getInt("address_id"));
 
-                u.setAvatar(ava);
-                u.setCover(cov);
                 u.setRole(r);
                 u.setStatus(s);
                 u.setAddress(add);
@@ -185,7 +180,58 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User getById(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM fuhousefinder.user WHERE id = ?;";
+        User u = new User();
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, id);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                u.setId(rs.getString("id"));
+                u.setFirst_name(rs.getString("first_name"));
+                u.setLast_name(rs.getString("last_name"));
+                u.setUsername(rs.getString("username"));
+                u.setBirthdate(rs.getDate("birthdate"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setDescription(rs.getString("description"));
+                u.setPhone(rs.getString("phone"));
+                u.setCreated_at(rs.getTimestamp("created_at"));
+                u.setUpdated_at(rs.getTimestamp("updated_at"));
+                u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
+                u.setIs_verified(rs.getBoolean("is_verified"));
+                u.setLast_verification_sent(rs.getTimestamp("last_verification_sent"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCover(rs.getString("cover"));
+
+                Role r = new Role();
+                Status s = new Status();
+                Address add = new Address();
+                r.setId(rs.getInt("role_id"));
+                s.setId(rs.getInt("status_id"));
+                add.setId(rs.getInt("address_id"));
+
+                u.setRole(r);
+                u.setStatus(s);
+                u.setAddress(add);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return u;
     }
 
     @Override
@@ -368,20 +414,16 @@ public class UserDAO extends BaseDao implements IUserDAO {
                 u.setUpdated_at(rs.getTimestamp("updated_at"));
                 u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
                 u.setIs_verified(rs.getBoolean("is_verified"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCover(rs.getString("cover"));
 
-                Image ava = new Image();
-                Image cov = new Image();
                 Role r = new Role();
                 Status s = new Status();
                 Address add = new Address();
                 r.setId(rs.getInt("role_id"));
                 s.setId(rs.getInt("status_id"));
-                ava.setId(rs.getInt("avatar"));
-                cov.setId(rs.getInt("cover"));
                 add.setId(rs.getInt("address_id"));
 
-                u.setAvatar(ava);
-                u.setCover(cov);
                 u.setRole(r);
                 u.setStatus(s);
                 u.setAddress(add);
@@ -420,6 +462,92 @@ public class UserDAO extends BaseDao implements IUserDAO {
             ps.setTimestamp(2, u.getToken_created());
             ps.setTimestamp(3, u.getLast_verification_sent());
             ps.setString(4, u.getEmail());
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected == 1;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
+    @Override
+    public User getByUidForProfile(String uid) {
+        String sql = "SELECT * FROM fuhousefinder.user WHERE id = ?;";
+        User u = new User();
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, uid);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                u.setId(rs.getString("id"));
+                u.setFirst_name(rs.getString("first_name"));
+                u.setLast_name(rs.getString("last_name"));
+                u.setUsername(rs.getString("username"));
+                u.setBirthdate(rs.getDate("birthdate"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setDescription(rs.getString("description"));
+                u.setPhone(rs.getString("phone"));
+                u.setCreated_at(rs.getTimestamp("created_at"));
+                u.setUpdated_at(rs.getTimestamp("updated_at"));
+                u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
+                u.setIs_verified(rs.getBoolean("is_verified"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCover(rs.getString("cover"));
+
+                Role r = new Role();
+                Status s = new Status();
+                Address add = new Address();
+                r.setId(rs.getInt("role_id"));
+                s.setId(rs.getInt("status_id"));
+                add.setId(rs.getInt("address_id"));
+
+                u.setRole(r);
+                u.setStatus(s);
+                u.setAddress(add);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return u;
+    }
+
+    @Override
+    public boolean updatePassword(String uid, String newPass) {
+        String sql = """
+                     UPDATE `fuhousefinder`.`user`
+                     SET
+                     `password` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, newPass);
+            ps.setString(2, uid);
 
             int rowsAffected = ps.executeUpdate();
 

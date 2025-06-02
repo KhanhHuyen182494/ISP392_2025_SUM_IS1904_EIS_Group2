@@ -81,6 +81,11 @@ public class BasePaging<T> {
     public void setSearchKey(String searchKey) {
         this.searchKey = searchKey;
     }
+
+    @Override
+    public String toString() {
+        return "BasePaging{" + "current_page=" + current_page + ", page_size=" + page_size + ", total_records=" + total_records + ", total_pages=" + total_pages + ", items=" + items + ", sort_by=" + sort_by + ", searchKey=" + searchKey + '}';
+    }
     
     
 }

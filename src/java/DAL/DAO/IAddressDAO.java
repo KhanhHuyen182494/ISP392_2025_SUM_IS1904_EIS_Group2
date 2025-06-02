@@ -4,27 +4,21 @@
  */
 package DAL.DAO;
 
-import Model.House;
-import java.util.List;
+import Model.Address;
 
 /**
  *
- * @author Huyen
+ * @author Tam
  */
-public interface IHouseDAO extends IBaseUUID<House>{
+public interface IAddressDAO {
     //Get
-    public List<House> getListPaging(int limit, int offset, String searchKey, String uid);
+    public Address getAddressById(int id);
     
-    //Add
+    //Update
     
     
     //Delete
     
     
-    //Update
-    
-    
-    //Search
-    
-    
+    //Add
 }

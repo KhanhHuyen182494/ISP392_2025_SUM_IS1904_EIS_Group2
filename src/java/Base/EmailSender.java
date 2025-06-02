@@ -15,7 +15,6 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import org.eclipse.jdt.internal.compiler.batch.Main;
 
 /**
  *
@@ -33,9 +32,9 @@ public class EmailSender {
         String subject = "FUHF Verification";
         String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
                 + "Click this link to activate your account:\n" + link;
-        
+
         ok = sendEmail(u.getEmail(), subject, message);
-        
+
         return ok;
     }
 
@@ -46,11 +45,19 @@ public class EmailSender {
             String content = "Hi " + u.getFirst_name() + " " + u.getLast_name() + "\n"
                     + "Your new password: " + newPass + "\n"
                     + "To be able to log in, please enter with new password."
-                    + "Please do not share the code with anyone.";
+                    + "Please do not share the this with anyone.";
             test = sendEmail(u.getEmail(), subject, content);
         } catch (Exception e) {
         }
         return test;
+    }
+
+    public static boolean sendEmailOTP(User u, String otp) {
+        String subject = "FUHF Change Password OTP";
+        String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
+                + "This is your change password OTP:\n" + otp;
+
+        return sendEmail(u.getEmail(), subject, message);
     }
 
     public static boolean sendEmail(String toEmail, String subject, String content) {
