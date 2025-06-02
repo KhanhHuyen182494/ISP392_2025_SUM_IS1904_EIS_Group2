@@ -357,6 +357,7 @@
                                 }
                             });
                         } else {
+                            Swal.close();
                             showToast(response.message, "error");
                         }
                     },

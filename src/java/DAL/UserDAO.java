@@ -252,15 +252,13 @@ public class UserDAO extends BaseDao implements IUserDAO {
                      `username`,
                      `email`,
                      `gender`,
-                     `avatar`,
-                     `cover`,
                      `role_id`,
                      `status_id`,
                      `verification_token`,
                      `token_created`
                      )
                      VALUES
-                     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                      """;
 
         try {
@@ -276,12 +274,10 @@ public class UserDAO extends BaseDao implements IUserDAO {
             ps.setString(7, t.getUsername());
             ps.setString(8, t.getEmail());
             ps.setString(9, t.getGender());
-            ps.setString(10, "");
-            ps.setString(11, "");
-            ps.setInt(12, t.getRole().getId());
-            ps.setInt(13, t.getStatus().getId());
-            ps.setString(14, t.getVerification_token());
-            ps.setTimestamp(15, t.getToken_created());
+            ps.setInt(10, t.getRole().getId());
+            ps.setInt(11, t.getStatus().getId());
+            ps.setString(12, t.getVerification_token());
+            ps.setTimestamp(13, t.getToken_created());
 
             int rowsAffected = ps.executeUpdate();
 
