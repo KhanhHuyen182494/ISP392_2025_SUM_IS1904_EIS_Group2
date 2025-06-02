@@ -64,8 +64,9 @@
                                 class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 focus:outline-none focus:ring-4 focus:ring-orange-200">
                             Login
                         </button>
-
-                        <div class="text-center">
+                        
+                        <div class="text-center flex justify-center gap-3">
+                            <a href="${pageContext.request.contextPath}/feeds" class="text-blue-500 hover:text-blue-600 text-sm">Back to newsfeed?</a>
                             <a href="${pageContext.request.contextPath}/forgot-password" class="text-blue-500 hover:text-blue-600 text-sm">Forgotten password?</a>
                         </div>
 

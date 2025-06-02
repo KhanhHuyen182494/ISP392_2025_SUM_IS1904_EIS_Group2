@@ -165,6 +165,11 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                <a href="${pageContext.request.contextPath}/logout">
+                                    <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                        Logout
+                                    </button>
+                                </a>
                                 <div class="name">
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>

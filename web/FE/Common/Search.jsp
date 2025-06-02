@@ -156,7 +156,6 @@
                                     name="searchKey"
                                     required=""
                                     tabindex="1"
-                                    value="${requestScope.searchKey}"
                                     class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
                                     />
                                 <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
@@ -175,6 +174,11 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                <a href="${pageContext.request.contextPath}/logout">
+                                    <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                        Logout
+                                    </button>
+                                </a>
                                 <div class="name">
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
