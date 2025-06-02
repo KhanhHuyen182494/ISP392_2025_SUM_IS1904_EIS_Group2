@@ -33,15 +33,14 @@ public class ProfileController extends BaseAuthorization {
     protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         try {
             String uid = request.getParameter("uid");
-
-            if (uid == null || uid.isBlank()) {
-                request.setAttribute("message", "Oops, that user seems to be not existed!");
-                request.getRequestDispatcher("./FE/ErrorPages/404.jsp").forward(request, response);
+            User u = uDao.getByUidForProfile(uid);
+            
+            if (u == null || u.getCreated_at() == null) {
+                response.sendError(404);
                 return;
             }
 
             PostDTO posts;
-            User u = uDao.getByUidForProfile(uid);
             
             posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
             fullLoadPostInfomation(posts, user);
