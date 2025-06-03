@@ -78,7 +78,8 @@ public class AccountVerificationController extends HttpServlet {
                 long elapsed = now.getTime() - created.getTime();
 
                 if (elapsed > 5 * 60 * 1000) { // 5 phut
-                    response.getWriter().write("Activation link expired. Please request a new one.");
+                    request.setAttribute("message", "Invalid or expired activation link.");
+                    request.getRequestDispatcher("./FE/ActivatePages/ActivateStatus.jsp").forward(request, response);
                     return;
                 }
 
@@ -96,9 +97,9 @@ public class AccountVerificationController extends HttpServlet {
                 request.setAttribute("message", "Invalid or expired activation link.");
             }
 
-        } catch (IOException e) {
+        } catch (ServletException | IOException e) {
             log.error("" + e);
-            request.setAttribute("message", "Something wrong happen during activate process, please contact admin!");
+            response.sendError(500);
         }
 
         request.getRequestDispatcher("./FE/ActivatePages/ActivateStatus.jsp").forward(request, response);

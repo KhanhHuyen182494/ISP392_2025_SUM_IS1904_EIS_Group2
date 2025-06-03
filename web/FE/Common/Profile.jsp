@@ -124,6 +124,17 @@
                 color: white;
                 transform: scale(1.1);
             }
+
+            .swal2-loader {
+                border-color: #FF7700 !important;
+                border-top-color: transparent !important;
+            }
+
+            .swal2-loader {
+                width: 2.2em !important;
+                height: 2.2em !important;
+                border-width: 0.22em !important;
+            }
         </style>
     </head>
     <body>
@@ -140,12 +151,17 @@
 
                         <!-- Search -->
                         <div class="relative">
-                            <input 
-                                type="text" 
-                                placeholder="Search..." 
-                                class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
-                                />
-                            <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
+                            <form action="search" method="GET">
+                                <input 
+                                    type="text" 
+                                    placeholder="Search..." 
+                                    name="searchKey"
+                                    required=""
+                                    tabindex="1"
+                                    class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
+                                    />
+                                <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
+                            </form>
                         </div>
                     </div>
 
@@ -160,10 +176,15 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                <a href="${pageContext.request.contextPath}/logout">
+                                    <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                        Logout
+                                    </button>
+                                </a>
                                 <div class="name">
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
-                                <a href="${pageContext.request.contextPath}/profile">
+                                <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
                                         <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
                                     </div>
@@ -269,10 +290,12 @@
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
                         <c:if test="${sessionScope.user.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View your's houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/owner-house?uid=${sessionScope.user.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-home"></i>
+                                    View your's houses
+                                </button>
+                            </a>
                         </c:if>
                         <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-edit"></i>
@@ -284,22 +307,30 @@
                                 Add Post
                             </button>
                         </c:if>
+                        <!--<a href="${pageContext.request.contextPath}/change-password">-->
+                        <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >
+                            <i class="fa-solid fa-lock"></i>
+                            Change Password
+                        </button>
+                        <!--</a>-->
+                        <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            Add Post
+                        </button>
                     </c:when>
                     <c:otherwise>
                         <!-- Other User Profile Actions -->
                         <c:if test="${requestScope.profile.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View all houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/owner-house?uid=${requestScope.profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-home"></i>
+                                    View all houses
+                                </button>
+                            </a>
                         </c:if>
                         <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-user-plus"></i>
                             Follow
-                        </button>
-                        <button class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-envelope"></i>
-                            Message
                         </button>
                     </c:otherwise>
                 </c:choose>
@@ -805,7 +836,52 @@
                                                                 stopOnFocus: true
                                                             }).showToast();
                                                         }
+
+
                                                     });
+
+                                                    function showChangePassword() {
+                                                        Swal.fire({
+                                                            title: 'Caution',
+                                                            html: 'We’ll send a email with a OTP code expired in <b><span class="text-red-500">5 mins</span></b> for you to change password! Do you want to continue change password?',
+                                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                            imageWidth: 150,
+                                                            imageHeight: 150,
+                                                            imageAlt: 'Custom icon',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Yes',
+                                                            cancelButtonText: 'Cancel',
+                                                            reverseButtons: true,
+                                                            focusConfirm: false,
+                                                            focusCancel: false,
+                                                            customClass: {
+                                                                popup: 'rounded-xl shadow-lg',
+                                                                title: 'text-xl font-semibold',
+                                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                actions: 'space-x-4'
+                                                            },
+                                                            buttonsStyling: false
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                $.ajax({
+                                                                    url: '${pageContext.request.contextPath}/send-otp',
+                                                                    type: 'GET',
+                                                                    beforeSend: function (xhr) {
+                                                                        showLoading();
+                                                                    },
+                                                                    success: function (response) {
+                                                                        Swal.close();
+                                                                        if (response.ok == true) {
+                                                                            location.href = '${pageContext.request.contextPath}/get-verify-otp';
+                                                                        }
+                                                                    }
+                                                                });
+                                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                Swal.close();
+                                                            }
+                                                        });
+                                                    }
 
                                                     function showImageModal(imageSrc) {
                                                         Swal.fire({
@@ -816,6 +892,20 @@
                                                             showConfirmButton: false,
                                                             customClass: {
                                                                 image: 'rounded-lg p-5'
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function showLoading() {
+                                                        Swal.fire({
+                                                            title: 'Sending OTP ...',
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                            },
+                                                            allowOutsideClick: false,
+                                                            showConfirmButton: false,
+                                                            customClass: {
+                                                                title: 'text-xl font-semibold'
                                                             }
                                                         });
                                                     }

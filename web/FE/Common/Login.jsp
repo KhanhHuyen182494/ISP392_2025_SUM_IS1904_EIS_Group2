@@ -37,7 +37,7 @@
             <div class="flex-1 flex flex-col items-center">
                 <img src="${pageContext.request.contextPath}/Asset/FUHF Logo/1.svg" width="290" alt="FU House Finder Logo" class="mb-4"/>
             </div>
-            
+
             <!-- Login Form -->
             <div class="flex-1">
                 <div class="bg-white rounded-2xl shadow-lg border-2 border-orange-500 p-8 w-full max-w-sm mx-auto">
@@ -64,9 +64,10 @@
                                 class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 focus:outline-none focus:ring-4 focus:ring-orange-200">
                             Login
                         </button>
-
-                        <div class="text-center">
-                            <a href="#" class="text-blue-500 hover:text-blue-600 text-sm">Forgotten password?</a>
+                        
+                        <div class="text-center flex justify-center gap-3">
+                            <a href="${pageContext.request.contextPath}/feeds" class="text-blue-500 hover:text-blue-600 text-sm">Back to newsfeed?</a>
+                            <a href="${pageContext.request.contextPath}/forgot-password" class="text-blue-500 hover:text-blue-600 text-sm">Forgotten password?</a>
                         </div>
 
                         <div class="text-center pt-4 border-t border-gray-200">

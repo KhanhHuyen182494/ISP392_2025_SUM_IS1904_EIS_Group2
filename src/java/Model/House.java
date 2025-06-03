@@ -123,6 +123,11 @@ public class House {
     public void setStar(float star) {
         this.star = star;
     }
+
+    @Override
+    public String toString() {
+        return "House{" + "id=" + id + ", name=" + name + ", description=" + description + ", is_whole_house=" + is_whole_house + ", price_per_month=" + price_per_month + ", electricity_price=" + electricity_price + ", water_price=" + water_price + ", down_payment=" + down_payment + ", address=" + address + ", status=" + status + ", star=" + star + ", rooms=" + rooms + '}';
+    }
     
     
 }

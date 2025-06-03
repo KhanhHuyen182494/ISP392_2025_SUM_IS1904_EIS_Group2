@@ -6,12 +6,14 @@ import DAL.AddressDAO;
 import DAL.DAO.IAddressDAO;
 import DAL.DAO.IFeatureDao;
 import DAL.DAO.IFeedbackDAO;
+import DAL.DAO.IHouseDAO;
 import DAL.DAO.IImageDAO;
 import DAL.DAO.ILikeDAO;
 import DAL.DAO.IPostDAO;
 import DAL.DAO.IUserDAO;
 import DAL.FeatureDAO;
 import DAL.FeedbackDAO;
+import DAL.HouseDAO;
 import DAL.ImageDAO;
 import DAL.LikeDAO;
 import DAL.PostDAO;
@@ -32,6 +34,7 @@ import java.io.IOException;
  */
 public abstract class BaseAuthorization extends HttpServlet {
 
+    public IHouseDAO hDao;
     public IUserDAO uDao;
     public IPostDAO pDao;
     public IAddressDAO aDao;
@@ -53,6 +56,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         fDao = new FeedbackDAO();
         feaDao = new FeatureDAO();
         uDao = new UserDAO();
+        hDao = new HouseDAO();
     }
 
     private User getUser(HttpServletRequest request) {

@@ -39,6 +39,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     public boolean updateVerificationInfo(User u);
     
+    public boolean updatePassword(String uid, String newPass);
+    
     //Search
     
     //Validate
