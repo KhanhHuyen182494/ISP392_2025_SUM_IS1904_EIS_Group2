@@ -278,10 +278,12 @@
                             <i class="fas fa-edit"></i>
                             Edit Profile
                         </button>
-                        <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-plus"></i>
-                            Add Post
-                        </button>
+                        <c:if test="${sessionScope.user.role.id == 3}">
+                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-plus"></i>
+                                Add Post
+                            </button>
+                        </c:if>
                     </c:when>
                     <c:otherwise>
                         <!-- Other User Profile Actions -->
