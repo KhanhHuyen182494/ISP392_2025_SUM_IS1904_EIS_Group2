@@ -33,6 +33,8 @@ public class SearchController extends BaseAuthorization {
             int limit = 10;
             
             List<House> houses = hDao.getListPaging(limit, 0, searchKey.trim(), "");
+            fullLoadHouseInfomation(houses);
+            
             int total = hDao.getListPaging(Integer.MAX_VALUE, 0, searchKey.trim(), "").size();
             
             boolean hasMore = total > limit;
