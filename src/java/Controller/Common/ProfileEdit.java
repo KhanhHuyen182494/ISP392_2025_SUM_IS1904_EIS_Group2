@@ -1,0 +1,101 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+package Controller.Common;
+
+import DTO.PostDTO;
+import Model.Address;
+import Model.Feedback;
+import Model.Image;
+import Model.Like;
+import Model.Post;
+import Model.User;
+import jakarta.mail.Session;
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author nongducdai
+ */
+@WebServlet(name = "ProfileEdit", urlPatterns = {"/profile-edit"})
+public class ProfileEdit extends BaseAuthorization {
+
+    private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
+    
+    @Override
+    protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession(false);
+            
+            String uid = (String) session.getAttribute("user_id");
+            User u = uDao.getByUidForProfile(uid);
+            
+            if (u == null || u.getCreated_at() == null) {
+                response.sendError(404);
+                return;
+            }
+
+            PostDTO posts;
+            
+            posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
+            fullLoadPostInfomation(posts, user);
+            
+            int totalLikes = 0;
+            
+            for(Post p : posts.getItems()){
+                totalLikes += p.getLikes().size();
+            }
+
+            request.setAttribute("totalLikes", totalLikes);
+            request.setAttribute("profile", u);
+            request.setAttribute("posts", posts.getItems());
+            request.getRequestDispatcher("./FE/Common/ProfileEdit.jsp").forward(request, response);
+
+        } catch (ServletException | IOException e) {
+            LOGGER.log(Level.SEVERE, "Something error when trying to get user data!", e);
+        }
+    }
+    
+    private void fullLoadPostInfomation(PostDTO posts, User user) {
+        try {
+            //Load address, images, likes, feedbacks
+            for (Post p : posts.getItems()) {
+                String pid = p.getId();
+
+                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+                List<Image> images = iDao.getImagesByObjectId(p.getHouse().getId());
+                List<Like> likes = lDao.getListLikeByPostId(pid);
+                List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+
+                boolean isLikedByCurrentUser = false;
+                if (user != null && !user.getId().isBlank()) {
+                    isLikedByCurrentUser = likes.stream()
+                            .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
+                }
+
+                p.setFeedbacks(feedbacks);
+                p.getHouse().setAddress(a);
+                p.setImages(images);
+                p.setLikes(likes);
+                p.setLikedByCurrentUser(isLikedByCurrentUser);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+}
