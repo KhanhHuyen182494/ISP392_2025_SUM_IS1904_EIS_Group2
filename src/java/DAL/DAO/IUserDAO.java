@@ -5,8 +5,8 @@
 package DAL.DAO;
 
 import DTO.UserDTO;
-import Model.Image;
 import Model.User;
+import java.sql.Date;
 
 /**
  *
@@ -40,6 +40,8 @@ public interface IUserDAO extends IBaseUUID<User>{
     public boolean updateVerificationInfo(User u);
     
     public boolean updatePassword(String uid, String newPass);
+    
+    public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio);
     
     //Search
     

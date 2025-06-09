@@ -11,6 +11,7 @@ import Model.Address;
 import Model.Role;
 import Model.Status;
 import Model.User;
+import java.sql.Date;
 import java.util.List;
 import java.sql.SQLException;
 
@@ -544,6 +545,45 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
             ps.setString(1, newPass);
             ps.setString(2, uid);
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected == 1;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
+    @Override
+    public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio) {
+        String sql = """
+                     UPDATE `fuhousefinder`.`user`
+                     SET
+                     `first_name` = ?,
+                     `last_name` = ?,
+                     `birthdate` = ?,
+                     `description` = ?,
+                     `phone` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setDate(3, bod);
+            ps.setString(4, bio);
+            ps.setString(5, phone);
+            ps.setString(6, uid);
 
             int rowsAffected = ps.executeUpdate();
 
