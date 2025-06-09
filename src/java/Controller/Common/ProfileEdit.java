@@ -11,6 +11,7 @@ import Model.Image;
 import Model.Like;
 import Model.Post;
 import Model.User;
+import com.google.gson.Gson;
 import jakarta.mail.Session;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,33 +36,83 @@ import java.util.logging.Logger;
 public class ProfileEdit extends BaseAuthorization {
 
     private static final Logger LOGGER = Logger.getLogger(ProfileController.class.getName());
-    
+
     @Override
-    protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user)
+            throws ServletException, IOException {
+        // make sure we return JSON
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Map<String, Object> json = new HashMap<>();
+        Gson gson = new Gson();
+
+        try {
+            String firstName = request.getParameter("firstname");
+            String lastName = request.getParameter("lastname");
+            String birthdate = request.getParameter("date");
+            String gender = request.getParameter("gender");
+            String phone = request.getParameter("phone");
+            String bio = request.getParameter("bio");
+
+            if (phone == null || phone.isBlank()) {
+                phone = "";
+            }
+
+            if (firstName == null || firstName.isBlank()
+                    || lastName == null || lastName.isBlank()
+                    || birthdate == null || birthdate.isBlank()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                json.put("ok", false);
+                json.put("message", "First name, last name and birthdate are required.");
+            } else {
+                LocalDate birthLocalDate = LocalDate.parse(request.getParameter("date"));
+                Date sqlBirthDate = java.sql.Date.valueOf(birthLocalDate);
+
+                boolean success = uDao.updateProfile(user.getId(), firstName, lastName, sqlBirthDate, phone, bio);
+
+                if (success) {
+                    json.put("ok", true);
+                    json.put("message", "Profile updated successfully.");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    json.put("ok", false);
+                    json.put("message", "Could not save your changes. Please try again.");
+                }
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error updating user data", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            json.put("ok", false);
+            json.put("message", "Unexpected error. Please contact support.");
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            out.print(gson.toJson(json));
+        }
     }
 
     @Override
     protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         try {
             HttpSession session = request.getSession(false);
-            
+
             String uid = (String) session.getAttribute("user_id");
             User u = uDao.getByUidForProfile(uid);
-            
+
             if (u == null || u.getCreated_at() == null) {
                 response.sendError(404);
                 return;
             }
 
             PostDTO posts;
-            
+
             posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
             fullLoadPostInfomation(posts, user);
-            
+
             int totalLikes = 0;
-            
-            for(Post p : posts.getItems()){
+
+            for (Post p : posts.getItems()) {
                 totalLikes += p.getLikes().size();
             }
 
@@ -69,7 +125,7 @@ public class ProfileEdit extends BaseAuthorization {
             LOGGER.log(Level.SEVERE, "Something error when trying to get user data!", e);
         }
     }
-    
+
     private void fullLoadPostInfomation(PostDTO posts, User user) {
         try {
             //Load address, images, likes, feedbacks

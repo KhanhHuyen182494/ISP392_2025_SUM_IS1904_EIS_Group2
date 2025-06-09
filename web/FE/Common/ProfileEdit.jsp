@@ -340,43 +340,42 @@
                         <!-- Input 1 - First Name -->
                         <div class="col-span-2 space-y-2">
                             <label class="block text-sm font-medium text-gray-700">First Name</label>
-                            <input type="text" name="first_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md" placeholder="Enter first name">
+                            <input id="firstname" type="text" name="first_name" value="${profile.first_name}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md" placeholder="Enter first name">
                         </div>
 
                         <!-- Input 2 - Last Name -->
                         <div class="col-span-2 space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Last Name</label>
-                            <input type="text" name="last_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md" placeholder="Enter last name">
+                            <input id="lastname" type="text" name="last_name" value="${profile.last_name}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md" placeholder="Enter last name">
                         </div>
 
                         <!-- Input 3 - Birthdate -->
                         <div class="col-span-2 space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Birthdate</label>
-                            <input type="date" name="birthdate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md">
+                            <input id="date" type="date" value="${profile.birthdate}" name="birthdate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md">
                         </div>
 
                         <!-- Input 4 - Gender -->
                         <div class="col-span-2 space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Gender</label>
-                            <select name="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md">
-                                <option value="">Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                                <option value="prefer_not_to_say">Prefer not to say</option>
-                            </select>
-                        </div>
+                            <select id="gender" name="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md">
+                                <option value="" <c:if test="${empty profile.gender}">selected</c:if>>Select gender</option>
+                                <option value="male" <c:if test="${profile.gender == 'male'}">selected</c:if>>Male</option>
+                                <option value="female" <c:if test="${profile.gender == 'female'}">selected</c:if>>Female</option>
+                                <option value="other" <c:if test="${profile.gender == 'other'}">selected</c:if>>Other</option>
+                                </select>
+                            </div>
 
-                        <!-- Input 5 - Phone -->
-                        <div class="col-span-4 space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-                            <input type="tel" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md" placeholder="Enter phone number">
-                        </div>
+                            <!-- Input 5 - Phone -->
+                            <div class="col-span-4 space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                <input id="phone" type="tel" name="phone" value="${profile.phone}" <c:if test="${not empty profile.phone}">disabled=""</c:if> class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md" placeholder="Enter phone number">
+                            </div>
 
-                        <!-- Input 6 - Description -->
-                        <div class="col-span-8 space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Description</label>
-                            <textarea name="description" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md resize-none" placeholder="Tell us about yourself..."></textarea>
+                            <!-- Input 6 - Description -->
+                            <div class="col-span-8 space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="bio" name="description" rows="4" value="${profile.description}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md resize-none" placeholder="Tell us about yourself...">${profile.description}</textarea>
                         </div>
 
                         <!-- Spacer for alignment -->
@@ -384,7 +383,7 @@
 
                         <!-- Submit Button -->
                         <div class="col-span-8 mt-6">
-                            <button class="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl">
+                            <button id="submit" class="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl">
                                 Update Profile
                             </button>
                         </div>
@@ -396,5 +395,92 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script>
+                            $(document).ready(function () {
+                                const button = $('#submit');
+
+                                button.on('click', function () {
+                                    let firstname = $('#firstname').val().trim();
+                                    let lastname = $('#lastname').val().trim();
+                                    let date = $('#date').val();
+                                    let gender = $('#gender').val();
+                                    let phone = $('#phone').val().trim();
+                                    let bio = $('#bio').val(); 
+
+                                    if (!firstname) {
+                                        showToast('First name is required.', 'error');
+                                        return;
+                                    }
+                                    if (!lastname) {
+                                        showToast('Last name is required.', 'error');
+                                        return;
+                                    }
+                                    if (!date) {
+                                        showToast('Birthdate is required.', 'error');
+                                        return;
+                                    }
+                                    if (!gender) {
+                                        showToast('Please select a gender.', 'error');
+                                        return;
+                                    }
+
+                                    if (phone) {
+                                        const vnPhoneRegex = /^0\d{9}$/;
+                                        if (!vnPhoneRegex.test(phone)) {
+                                            showToast('Invalid Vietnamese phone number. It should be 10 digits starting with 0.', 'error');
+                                            return;
+                                        }
+                                    }
+
+                                    $.ajax({
+                                        url: '${pageContext.request.contextPath}/profile-edit',
+                                        type: 'POST',
+                                        data: {
+                                            firstname: firstname,
+                                            lastname: lastname,
+                                            date: date,
+                                            gender: gender,
+                                            phone: phone,
+                                            bio: bio
+                                        },
+                                        success: function (response) {
+                                            if (response.ok) {
+                                                showToast(response.message, 'success');
+                                            } else {
+                                                showToast(response.message, 'error');
+                                            }
+                                        },
+                                        error: function () {
+                                            showToast('An unexpected error occurred.', 'error');
+                                        }
+                                    });
+                                });
+                            });
+
+                            function showToast(message, type = 'success') {
+                                let backgroundColor;
+                                if (type === "success") {
+                                    backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
+                                } else if (type === "error") {
+                                    backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
+                                } else if (type === "warning") {
+                                    backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
+                                } else if (type === "info") {
+                                    backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
+                                } else {
+                                    backgroundColor = "#333"; // Default color (dark gray)
+                                }
+
+                                Toastify({
+                                    text: message, // Dynamically set message
+                                    duration: 2000,
+                                    close: true,
+                                    gravity: "top",
+                                    position: "right",
+                                    backgroundColor: backgroundColor, // Dynamically set background color
+                                    stopOnFocus: true
+                                }).showToast();
+                            }
+        </script>
     </body>
 </html>
