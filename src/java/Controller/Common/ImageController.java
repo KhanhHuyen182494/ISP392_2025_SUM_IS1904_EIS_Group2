@@ -109,13 +109,47 @@ public class ImageController extends BaseAuthorization {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        HttpSession session = request.getSession(false);
+        User u = (User) session.getAttribute("user");
+
         try (PrintWriter out = response.getWriter()) {
+            Part avatarPart = request.getPart("cover");
+
+            Map<String, Object> result = new HashMap<>();
+
+            if (avatarPart != null && avatarPart.getSize() > 0) {
+                String fileName = user.getId() + "_" + "cover";
+                String realPath = request.getServletContext().getRealPath("");
+                String modifiedPath = realPath.replace("\\build", "");
+
+                String avatarBuildPath = request.getServletContext().getRealPath("Asset/Common/Cover");
+                String avatarRealPath = modifiedPath + "/Asset/Common/Cover";
+
+                String avatarFileName = ImageUtil.writeImageToFile(avatarPart, avatarBuildPath, fileName);
+                ImageUtil.writeImageToFile(avatarPart, avatarRealPath, fileName);
+
+                if (uDao.updateUserImage(user.getId(), avatarFileName, "cover")) {
+                    u.setAvatar(avatarFileName);
+                    result.put("success", true);
+                    result.put("message", "Update cover successfully!");
+                } else {
+                    result.put("success", false);
+                    result.put("message", "Update cover failed!");
+                }
+
+                out.print(gson.toJson(result));
+            } else {
+                result.put("success", false);
+                result.put("message", "Update cover failed!");
+                out.print(gson.toJson(result));
+            }
+        } catch (Exception e) {
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
-            result.put("message", "Cover change not implemented yet");
-            out.print(gson.toJson(result));
-        } catch (Exception e) {
-            response.sendError(500);
+            result.put("message", "Server error: " + e.getMessage());
+            try (PrintWriter out = response.getWriter()) {
+                out.print(gson.toJson(result));
+            }
         }
     }
 

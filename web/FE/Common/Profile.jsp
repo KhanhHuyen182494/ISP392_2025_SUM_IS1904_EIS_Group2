@@ -202,7 +202,7 @@
             <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
                 <!-- Cover Image (if available) -->
                 <c:if test="${not empty requestScope.profile.cover}">
-                    <img src="${requestScope.profile.cover}" 
+                    <img src="${pageContext.request.contextPath}/Asset/Common/Cover/${requestScope.profile.cover}" 
                          alt="Cover Photo" 
                          class="w-full h-full object-cover"/>
                 </c:if>

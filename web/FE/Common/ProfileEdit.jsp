@@ -202,7 +202,7 @@
             <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
                 <!-- Cover Image (if available) -->
                 <c:if test="${not empty requestScope.profile.cover}">
-                    <img src="${requestScope.profile.cover}" 
+                    <img src="${pageContext.request.contextPath}/Asset/Common/Cover/${requestScope.profile.cover}" 
                          alt="Cover Photo" 
                          class="w-full h-full object-cover"/>
                 </c:if>
@@ -212,7 +212,8 @@
 
                 <!-- Edit Cover Button (only for own profile) -->
                 <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
+                    <input type="file" id="coverInput" accept=".png, .jpg, .jpeg, .gif, .webp" class="hidden">
+                    <button onclick="document.getElementById('coverInput').click()" class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
                         <i class="fas fa-camera"></i>
                         <span class="hidden sm:inline">Edit Cover</span>
                     </button>
@@ -521,10 +522,80 @@
                                         if (result.success === true) {
                                             showToast(result.message, 'success');
                                             setTimeout(function () {
-//                                                location.reload();
+                                                location.reload();
                                             }, 1500);
                                         } else {
                                             showToast(result.message || 'Failed to update avatar.', 'error');
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        const message = xhr.responseJSON?.message || 'An error occurred.';
+                                        showToast(message, 'error');
+                                    }
+                                });
+                            }
+
+                            document.getElementById('coverInput').addEventListener('change', function () {
+                                const file = this.files[0];
+
+                                console.log(file);
+
+                                if (file) {
+                                    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                                    if (!allowedTypes.includes(file.type)) {
+                                        showToast('Only image files (png, jpg, jpeg, gif, webp) are allowed.', 'error');
+                                        this.value = '';
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Do you want to change your cover?',
+                                            text: `Selected file: ` + file.name,
+                                            imageUrl: URL.createObjectURL(file),
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Preview',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Change Avatar',
+                                            cancelButtonText: 'Cancel',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                uploadCover(file);
+                                            } else {
+                                                this.value = '';
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                            function uploadCover(file) {
+                                const formData = new FormData();
+                                formData.append('cover', file);
+
+                                $.ajax({
+                                    url: `${pageContext.request.contextPath}/change-cover`,
+                                    type: 'POST',
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false, 
+                                    success: function (result) {
+                                        if (result.success === true) {
+                                            showToast(result.message, 'success');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 1500);
+                                        } else {
+                                            showToast(result.message || 'Failed to update cover.', 'error');
                                         }
                                     },
                                     error: function (xhr) {
