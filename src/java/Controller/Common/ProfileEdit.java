@@ -12,7 +12,6 @@ import Model.Like;
 import Model.Post;
 import Model.User;
 import com.google.gson.Gson;
-import jakarta.mail.Session;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -56,6 +55,13 @@ public class ProfileEdit extends BaseAuthorization {
 
             if (phone == null || phone.isBlank()) {
                 phone = "";
+            } else {
+                if (uDao.isValidPhone(phone)) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    json.put("ok", false);
+                    json.put("message", "That phone number is linked with another account, please enter a different phone number!");
+                    return;
+                }
             }
 
             if (firstName == null || firstName.isBlank()
@@ -68,7 +74,7 @@ public class ProfileEdit extends BaseAuthorization {
                 LocalDate birthLocalDate = LocalDate.parse(request.getParameter("date"));
                 Date sqlBirthDate = java.sql.Date.valueOf(birthLocalDate);
 
-                boolean success = uDao.updateProfile(user.getId(), firstName, lastName, sqlBirthDate, phone, bio);
+                boolean success = uDao.updateProfile(user.getId(), firstName, lastName, sqlBirthDate, phone, bio, gender);
 
                 if (success) {
                     json.put("ok", true);

@@ -186,7 +186,7 @@
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
-                                        <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
+                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -202,7 +202,7 @@
             <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
                 <!-- Cover Image (if available) -->
                 <c:if test="${not empty requestScope.profile.cover}">
-                    <img src="${requestScope.profile.cover}" 
+                    <img src="${pageContext.request.contextPath}/Asset/Common/Cover/${requestScope.profile.cover}" 
                          alt="Cover Photo" 
                          class="w-full h-full object-cover"/>
                 </c:if>
@@ -212,10 +212,10 @@
 
                 <!-- Edit Cover Button (only for own profile) -->
                 <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
+<!--                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
                         <i class="fas fa-camera"></i>
                         <span class="hidden sm:inline">Edit Cover</span>
-                    </button>
+                    </button>-->
                 </c:if>
 
                 <!-- Profile Info Overlay -->
@@ -226,7 +226,7 @@
                             <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
                                 <c:choose>
                                     <c:when test="${not empty requestScope.profile.avatar}">
-                                        <img src="${requestScope.profile.avatar}" 
+                                        <img src="${pageContext.request.contextPath}/Asset/Common/Avatar/${requestScope.profile.avatar}" 
                                              alt="Profile Avatar" 
                                              class="w-full h-full object-cover"/>
                                     </c:when>
@@ -240,9 +240,9 @@
 
                             <!-- Edit Avatar Button (only for own profile) -->
                             <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
+<!--                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
                                     <i class="fas fa-camera text-xs"></i>
-                                </button>
+                                </button>-->
                             </c:if>
                         </div>
 
@@ -362,7 +362,7 @@
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                                                 <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
-                                                    <img class="rounded-[50%]" src="${post.owner.avatar}" />
+                                                    <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
                                                 </a>
                                             </div>
                                             <div>

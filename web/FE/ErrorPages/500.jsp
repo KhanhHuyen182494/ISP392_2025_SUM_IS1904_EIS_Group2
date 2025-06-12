@@ -169,7 +169,7 @@
             }
         </style>
     </head>
-    <body class="overflow-hidden">
+    <body class="">
         <!-- Animated Sparks Background -->
         <div class="sparks" id="sparks"></div>
         

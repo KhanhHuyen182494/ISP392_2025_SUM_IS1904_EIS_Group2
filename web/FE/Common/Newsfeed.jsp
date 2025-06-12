@@ -175,7 +175,7 @@
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
-                                        <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
+                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -254,7 +254,7 @@
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                                                 <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
-                                                    <img class="rounded-[50%]" src="${post.owner.avatar}" />
+                                                    <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
                                                 </a>
                                             </div>
                                             <div>

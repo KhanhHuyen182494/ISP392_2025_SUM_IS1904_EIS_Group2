@@ -24,7 +24,7 @@ public class ImageDAO extends BaseDao implements IImageDAO {
         ImageDAO iDao = new ImageDAO();
         System.out.println(iDao.getImagesByObjectId("POST-35334b61da31443da5f850b5856fb"));
     }
-    
+
     @Override
     public List<Image> getImagesByObjectId(String id) {
         List<Image> images = new ArrayList<>();
@@ -65,6 +65,39 @@ public class ImageDAO extends BaseDao implements IImageDAO {
         }
 
         return images;
+    }
+
+    @Override
+    public boolean addImage(Image i) {
+        String sql = """
+                     INSERT INTO `fuhousefinder`.`image`
+                     (`path`, `objectId`, `status_id`, `created_at`, `created_by`)
+                     VALUES
+                     (?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, i.getPath());
+            ps.setString(2, i.getObject_id());
+            ps.setInt(3, i.getStatus().getId());
+            ps.setTimestamp(4, i.getCreated_at());
+            ps.setString(5, i.getCreated_by());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
 }

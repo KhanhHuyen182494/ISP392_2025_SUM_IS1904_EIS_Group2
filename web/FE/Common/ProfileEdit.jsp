@@ -186,7 +186,7 @@
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
-                                        <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
+                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -202,7 +202,7 @@
             <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
                 <!-- Cover Image (if available) -->
                 <c:if test="${not empty requestScope.profile.cover}">
-                    <img src="${requestScope.profile.cover}" 
+                    <img src="${pageContext.request.contextPath}/Asset/Common/Cover/${requestScope.profile.cover}" 
                          alt="Cover Photo" 
                          class="w-full h-full object-cover"/>
                 </c:if>
@@ -212,7 +212,8 @@
 
                 <!-- Edit Cover Button (only for own profile) -->
                 <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
+                    <input type="file" id="coverInput" accept=".png, .jpg, .jpeg, .gif, .webp" class="hidden">
+                    <button onclick="document.getElementById('coverInput').click()" class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
                         <i class="fas fa-camera"></i>
                         <span class="hidden sm:inline">Edit Cover</span>
                     </button>
@@ -226,7 +227,7 @@
                             <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
                                 <c:choose>
                                     <c:when test="${not empty requestScope.profile.avatar}">
-                                        <img src="${requestScope.profile.avatar}" 
+                                        <img src="${pageContext.request.contextPath}/Asset/Common/Avatar/${requestScope.profile.avatar}" 
                                              alt="Profile Avatar" 
                                              class="w-full h-full object-cover"/>
                                     </c:when>
@@ -240,7 +241,9 @@
 
                             <!-- Edit Avatar Button (only for own profile) -->
                             <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
+                                <input type="file" id="avatarInput" accept=".png, .jpg, .jpeg, .gif, .webp" class="hidden">
+                                <button onclick="document.getElementById('avatarInput').click()" 
+                                        class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
                                     <i class="fas fa-camera text-xs"></i>
                                 </button>
                             </c:if>
@@ -297,10 +300,11 @@
                                 </button>
                             </a>
                         </c:if>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-edit"></i>
-                            Edit Profile
-                        </button>
+                        <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                Back to Profile
+                            </button>
+                        </a>
                         <c:if test="${sessionScope.user.role.id == 3}">
                             <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-plus"></i>
@@ -397,6 +401,10 @@
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
                             $(document).ready(function () {
+                                const dateInput = document.getElementById('date');
+                                const today = new Date().toISOString().split('T')[0];
+                                dateInput.max = today;
+
                                 const button = $('#submit');
 
                                 button.on('click', function () {
@@ -405,7 +413,7 @@
                                     let date = $('#date').val();
                                     let gender = $('#gender').val();
                                     let phone = $('#phone').val().trim();
-                                    let bio = $('#bio').val(); 
+                                    let bio = $('#bio').val();
 
                                     if (!firstname) {
                                         showToast('First name is required.', 'error');
@@ -456,6 +464,146 @@
                                     });
                                 });
                             });
+
+                            document.getElementById('avatarInput').addEventListener('change', function () {
+                                const file = this.files[0];
+
+                                console.log(file);
+
+                                if (file) {
+                                    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                                    if (!allowedTypes.includes(file.type)) {
+                                        showToast('Only image files (png, jpg, jpeg, gif, webp) are allowed.', 'error');
+                                        this.value = '';
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Do you want to change your avatar?',
+                                            text: `Selected file: ` + file.name,
+                                            imageUrl: URL.createObjectURL(file),
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Preview',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Change Avatar',
+                                            cancelButtonText: 'Cancel',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                uploadAvatar(file);
+                                            } else {
+                                                this.value = '';
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                            function uploadAvatar(file) {
+                                const formData = new FormData();
+                                formData.append('avatar', file);
+
+                                $.ajax({
+                                    url: `${pageContext.request.contextPath}/change-avatar`,
+                                    type: 'POST',
+                                    data: formData,
+                                    processData: false, // Important: prevent jQuery from automatically transforming the data into a query string
+                                    contentType: false, // Important: tell jQuery not to set content type
+                                    success: function (result) {
+                                        if (result.success === true) {
+                                            showToast(result.message, 'success');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 1500);
+                                        } else {
+                                            showToast(result.message || 'Failed to update avatar.', 'error');
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        const message = xhr.responseJSON?.message || 'An error occurred.';
+                                        showToast(message, 'error');
+                                    }
+                                });
+                            }
+
+                            document.getElementById('coverInput').addEventListener('change', function () {
+                                const file = this.files[0];
+
+                                console.log(file);
+
+                                if (file) {
+                                    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                                    if (!allowedTypes.includes(file.type)) {
+                                        showToast('Only image files (png, jpg, jpeg, gif, webp) are allowed.', 'error');
+                                        this.value = '';
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Do you want to change your cover?',
+                                            text: `Selected file: ` + file.name,
+                                            imageUrl: URL.createObjectURL(file),
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Preview',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Change Avatar',
+                                            cancelButtonText: 'Cancel',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                uploadCover(file);
+                                            } else {
+                                                this.value = '';
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                            function uploadCover(file) {
+                                const formData = new FormData();
+                                formData.append('cover', file);
+
+                                $.ajax({
+                                    url: `${pageContext.request.contextPath}/change-cover`,
+                                    type: 'POST',
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false, 
+                                    success: function (result) {
+                                        if (result.success === true) {
+                                            showToast(result.message, 'success');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 1500);
+                                        } else {
+                                            showToast(result.message || 'Failed to update cover.', 'error');
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        const message = xhr.responseJSON?.message || 'An error occurred.';
+                                        showToast(message, 'error');
+                                    }
+                                });
+                            }
 
                             function showToast(message, type = 'success') {
                                 let backgroundColor;
