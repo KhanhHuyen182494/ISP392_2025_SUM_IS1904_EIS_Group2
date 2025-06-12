@@ -14,6 +14,8 @@ import Model.User;
 import java.sql.Date;
 import java.util.List;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -619,6 +621,52 @@ public class UserDAO extends BaseDao implements IUserDAO {
             }
 
             return true;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
+    @Override
+    public boolean updateUserImage(String uid, String path, String type) {
+        String sql = """
+                     """;
+
+        if (type.equalsIgnoreCase("avatar")) {
+            sql = """
+                     UPDATE `fuhousefinder`.`user`
+                                          SET
+                                          `avatar` = ?,
+                                          `updated_at` = ?
+                                          WHERE `id` = ?;
+                     """;
+        }
+
+        if (type.equalsIgnoreCase("cover")) {
+            sql = """
+                     UPDATE `fuhousefinder`.`user`
+                                          SET
+                                          `cover` = ?,
+                                          `updated_at` = ?
+                                          WHERE `id` = ?;
+                     """;
+        }
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, path);
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(3, uid);
+
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error("" + e);
             return false;

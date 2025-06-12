@@ -12,14 +12,12 @@ import java.util.List;
  * @author Tam
  */
 public interface IImageDAO {
+
     //Get
     public List<Image> getImagesByObjectId(String id);
-    
+
     //Update
-    
-    
     //Delete
-    
-    
     //Add
+    public boolean addImage(Image i);
 }

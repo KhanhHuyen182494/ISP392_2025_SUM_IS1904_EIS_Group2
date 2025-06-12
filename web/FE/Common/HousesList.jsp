@@ -175,7 +175,7 @@
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
-                                        <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
+                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -215,7 +215,7 @@
                             <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
                                 <c:choose>
                                     <c:when test="${not empty requestScope.profile.avatar}">
-                                        <img src="${requestScope.profile.avatar}" 
+                                        <img src="${pageContext.request.contextPath}/Asset/Common/Avatar/${requestScope.profile.avatar}" 
                                              alt="Profile Avatar" 
                                              class="w-full h-full object-cover"/>
                                     </c:when>

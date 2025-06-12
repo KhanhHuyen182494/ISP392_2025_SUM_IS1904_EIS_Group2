@@ -175,7 +175,7 @@
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
-                                        <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
+                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>

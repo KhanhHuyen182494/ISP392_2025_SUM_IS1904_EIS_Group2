@@ -186,7 +186,7 @@
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
                                     <div class="avatar">
-                                        <img class="rounded-[50%]" src="${sessionScope.user.avatar}" width="40"/>
+                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -226,7 +226,7 @@
                             <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg bg-white">
                                 <c:choose>
                                     <c:when test="${not empty requestScope.profile.avatar}">
-                                        <img src="${requestScope.profile.avatar}" 
+                                        <img src="${pageContext.request.contextPath}/Asset/Common/Avatar/${requestScope.profile.avatar}" 
                                              alt="Profile Avatar" 
                                              class="w-full h-full object-cover"/>
                                     </c:when>
@@ -511,22 +511,27 @@
                                 const formData = new FormData();
                                 formData.append('avatar', file);
 
-                                fetch(`${pageContext.request.contextPath}/change-avatar`, {
-                                    method: 'POST',
-                                    body: formData
-                                })
-                                        .then(response => response.json())
-                                        .then(result => {
-                                            if (result.success) {
-                                                showToast('Avatar updated successfully!', 'success');
-                                                location.reload(); // or update avatar img src dynamically
-                                            } else {
-                                                showToast(result.message || 'Failed to update avatar.', 'error');
-                                            }
-                                        })
-                                        .catch((response) => {
-                                            showToast((response.message), 'error');
-                                        });
+                                $.ajax({
+                                    url: `${pageContext.request.contextPath}/change-avatar`,
+                                    type: 'POST',
+                                    data: formData,
+                                    processData: false, // Important: prevent jQuery from automatically transforming the data into a query string
+                                    contentType: false, // Important: tell jQuery not to set content type
+                                    success: function (result) {
+                                        if (result.success === true) {
+                                            showToast(result.message, 'success');
+                                            setTimeout(function () {
+//                                                location.reload();
+                                            }, 1500);
+                                        } else {
+                                            showToast(result.message || 'Failed to update avatar.', 'error');
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        const message = xhr.responseJSON?.message || 'An error occurred.';
+                                        showToast(message, 'error');
+                                    }
+                                });
                             }
 
                             function showToast(message, type = 'success') {
