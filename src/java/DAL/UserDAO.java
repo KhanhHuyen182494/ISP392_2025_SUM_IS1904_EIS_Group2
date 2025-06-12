@@ -562,7 +562,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
     }
 
     @Override
-    public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio) {
+    public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio, String gender) {
         String sql = """
                      UPDATE `fuhousefinder`.`user`
                      SET
@@ -570,7 +570,8 @@ public class UserDAO extends BaseDao implements IUserDAO {
                      `last_name` = ?,
                      `birthdate` = ?,
                      `description` = ?,
-                     `phone` = ?
+                     `phone` = ?,
+                     `gender` = ?
                      WHERE `id` = ?;
                      """;
 
@@ -583,11 +584,41 @@ public class UserDAO extends BaseDao implements IUserDAO {
             ps.setDate(3, bod);
             ps.setString(4, bio);
             ps.setString(5, phone);
-            ps.setString(6, uid);
+            ps.setString(6, gender);
+            ps.setString(7, uid);
 
             int rowsAffected = ps.executeUpdate();
 
             return rowsAffected == 1;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
+    @Override
+    public boolean isValidPhone(String phone) {
+        String sql = "SELECT * FROM user where phone = ?";
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, phone);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return false;
+            }
+
+            return true;
         } catch (SQLException e) {
             logger.error("" + e);
             return false;

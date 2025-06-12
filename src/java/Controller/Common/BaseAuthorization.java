@@ -42,14 +42,13 @@ public abstract class BaseAuthorization extends HttpServlet {
     public ILikeDAO lDao;
     public IFeedbackDAO fDao;
     public IFeatureDao feaDao;
-    public Logging log;
+    public Logging log = new Logging();
     Gson gson;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         pDao = new PostDAO();
         gson = new Gson();
-        log = new Logging();
         aDao = new AddressDAO();
         iDao = new ImageDAO();
         lDao = new LikeDAO();

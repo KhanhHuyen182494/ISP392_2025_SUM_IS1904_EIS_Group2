@@ -212,10 +212,10 @@
 
                 <!-- Edit Cover Button (only for own profile) -->
                 <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
+<!--                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
                         <i class="fas fa-camera"></i>
                         <span class="hidden sm:inline">Edit Cover</span>
-                    </button>
+                    </button>-->
                 </c:if>
 
                 <!-- Profile Info Overlay -->
@@ -240,9 +240,9 @@
 
                             <!-- Edit Avatar Button (only for own profile) -->
                             <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
+<!--                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
                                     <i class="fas fa-camera text-xs"></i>
-                                </button>
+                                </button>-->
                             </c:if>
                         </div>
 

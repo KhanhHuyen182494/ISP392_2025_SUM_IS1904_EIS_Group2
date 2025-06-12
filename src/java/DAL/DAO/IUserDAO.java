@@ -41,7 +41,7 @@ public interface IUserDAO extends IBaseUUID<User>{
     
     public boolean updatePassword(String uid, String newPass);
     
-    public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio);
+    public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio, String gender);
     
     //Search
     
@@ -49,4 +49,6 @@ public interface IUserDAO extends IBaseUUID<User>{
     public boolean isValidPhoneNumber(String phone);
     
     public boolean isValidEmail(String email);
+    
+    public boolean isValidPhone(String phone);
 }

@@ -147,7 +147,7 @@
             }
         </style>
     </head>
-    <body class="overflow-hidden">
+    <body class="">
         <!-- Animated Stars Background -->
         <div class="stars" id="stars"></div>
         
