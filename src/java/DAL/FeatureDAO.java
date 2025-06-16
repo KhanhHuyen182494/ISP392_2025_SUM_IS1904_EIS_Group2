@@ -48,7 +48,7 @@ public class FeatureDAO extends BaseDao implements IFeatureDao {
                          s.id as StatusId,
                          s.name as Status
                      FROM
-                         fuhousefinder.role_feature rf
+                         role_feature rf
                              JOIN
                          role r ON r.id = rf.role_id
                              JOIN

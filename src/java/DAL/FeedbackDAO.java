@@ -37,7 +37,7 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
                          u.last_name as UserLastName,
                          u.avatar as UserAvatar
                      FROM
-                         fuhousefinder.feedback f
+                         feedback f
                      JOIN User u ON f.user_id = u.id
                      WHERE f.house_id = ?
                      ORDER BY f.created_at DESC

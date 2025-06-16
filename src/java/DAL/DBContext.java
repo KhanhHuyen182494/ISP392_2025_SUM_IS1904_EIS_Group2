@@ -38,7 +38,7 @@ public class DBContext {
     public static void main(String[] args) {
         DBContext db = new DBContext();
         if(db.getConnection() != null) {
-            System.out.println("Ok");
+            System.out.println("Ok" + db.getConnection());
             return;
         }
         

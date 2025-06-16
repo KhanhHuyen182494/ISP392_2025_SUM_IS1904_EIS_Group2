@@ -176,8 +176,8 @@
                 const monthSelect = document.getElementById('monthSelect');
                 const yearSelect = document.getElementById('yearSelect');
 
-                // Populate years (from current year back to 1900)
-                const currentYear = new Date().getFullYear();
+                const today = new Date();
+                const currentYear = today.getFullYear();
                 for (let year = currentYear; year >= 1900; year--) {
                     const option = document.createElement('option');
                     option.value = year;
@@ -185,71 +185,65 @@
                     yearSelect.appendChild(option);
                 }
 
-                // Function to get days in a month
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                monthNames.forEach((name, index) => {
+                    const option = document.createElement('option');
+                    option.value = index + 1;
+                    option.textContent = name;
+                    monthSelect.appendChild(option);
+                });
+
                 function getDaysInMonth(month, year) {
-                    // Month is 1-indexed (1 = January, 2 = February, etc.)
                     return new Date(year, month, 0).getDate();
                 }
 
-                // Function to check if a year is a leap year
-                function isLeapYear(year) {
-                    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-                }
-
-                // Function to update day options based on selected month and year
                 function updateDayOptions() {
+                    const selectedYear = parseInt(yearSelect.value, 10);
                     const selectedMonth = parseInt(monthSelect.value, 10);
-                    const selectedYear = parseInt(yearSelect.value);
-                    const selectedDay = parseInt(daySelect.value);
-
-                    // Clear existing day options except the first one
+                    const previousDay = parseInt(daySelect.value, 10);
                     daySelect.innerHTML = '<option value="">Day</option>';
 
-                    if (selectedMonth && selectedYear) {
-                        const daysInMonth = getDaysInMonth(selectedMonth, selectedYear);
+                    if (!selectedYear || !selectedMonth)
+                        return;
 
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            const option = document.createElement('option');
-                            option.value = day;
-                            option.textContent = day;
-                            daySelect.appendChild(option);
-                        }
+                    let maxDays = getDaysInMonth(selectedMonth, selectedYear);
+                    if (selectedYear === today.getFullYear() && selectedMonth === today.getMonth() + 1) {
+                        maxDays = Math.min(maxDays, today.getDate());
+                    }
 
-                        // Restore selected day if it's still valid
-                        if (selectedDay && selectedDay <= daysInMonth) {
-                            daySelect.value = selectedDay;
-                        }
-                    } else if (selectedMonth) {
-                        // If only month is selected, show days based on the maximum possible days
-                        let maxDays;
-                        if (selectedMonth === 2) {
-                            // February - assume leap year to show 29 days
-                            maxDays = 29;
-                        } else if ([4, 6, 9, 11].includes(selectedMonth)) {
-                            // April, June, September, November
-                            maxDays = 30;
-                        } else {
-                            // January, March, May, July, August, October, December
-                            maxDays = 31;
-                        }
+                    for (let d = 1; d <= maxDays; d++) {
+                        const option = document.createElement('option');
+                        option.value = d;
+                        option.textContent = d;
+                        daySelect.appendChild(option);
+                    }
 
-                        for (let day = 1; day <= maxDays; day++) {
-                            const option = document.createElement('option');
-                            option.value = day;
-                            option.textContent = day;
-                            daySelect.appendChild(option);
-                        }
-
-                        // Restore selected day if it's still valid
-                        if (selectedDay && selectedDay <= maxDays) {
-                            daySelect.value = selectedDay;
-                        }
+                    if (previousDay && previousDay <= maxDays) {
+                        daySelect.value = previousDay;
                     }
                 }
 
-                // Add event listeners to month and year selectors
+                daySelect.addEventListener('change', () => {
+                    const d = parseInt(daySelect.value, 10);
+                    const m = parseInt(monthSelect.value, 10);
+                    const y = parseInt(yearSelect.value, 10);
+                    if (y && m && d) {
+                        const selected = new Date(y, m - 1, d);
+                        if (selected > today) {
+                            showToast('Cannot select a future date. Please choose a valid date.', 'error');
+                            daySelect.value = '';
+                        }
+                    }
+                });
+
                 monthSelect.addEventListener('change', updateDayOptions);
                 yearSelect.addEventListener('change', updateDayOptions);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeDateSelectors);
+            } else {
+                initializeDateSelectors();
             }
 
             document.addEventListener('DOMContentLoaded', initializeDateSelectors);
@@ -293,7 +287,7 @@
 
                 const emailRegex = /^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
 
-                if (!data.firstName || !data.lastName || !data.contact || !data.password) {
+                if (!data.firstName.trim() || !data.lastName.trim() || !data.contact.trim() || !data.password.trim()) {
                     showToast("Please fill in all required fields", "error");
                     return;
                 }

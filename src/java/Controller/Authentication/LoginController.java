@@ -225,7 +225,7 @@ public class LoginController extends HttpServlet {
             // Validate remember token
             RememberToken tokenObj = rememberTokenDAO.findByToken(rememberToken);
 
-            if (tokenObj == null) {
+            if (tokenObj == null || tokenObj.getExpiration_date() == null || tokenObj.getId() < 1) {
                 clearRememberMeCookie(response);
                 return false;
             }

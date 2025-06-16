@@ -56,7 +56,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User getByEmail(String email) {
-        String sql = "SELECT * FROM fuhousefinder.user WHERE email = ?;";
+        String sql = "SELECT * FROM user WHERE email = ?;";
         User u = new User();
 
         try {
@@ -183,7 +183,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User getById(String id) {
-        String sql = "SELECT * FROM fuhousefinder.user WHERE id = ?;";
+        String sql = "SELECT * FROM user WHERE id = ?;";
         User u = new User();
 
         try {
@@ -245,7 +245,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
     @Override
     public boolean add(User t) {
         String sql = """
-                     INSERT INTO `fuhousefinder`.`user`
+                     INSERT INTO `user`
                      (`id`,
                      `first_name`,
                      `last_name`,
@@ -309,7 +309,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User getByToken(String token) {
-        String sql = "SELECT * FROM fuhousefinder.user WHERE verification_token = ?;";
+        String sql = "SELECT * FROM user WHERE verification_token = ?;";
         User u = new User();
 
         try {
@@ -350,7 +350,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
     @Override
     public boolean updateVerifiedStatus(User u) {
         String sql = """
-                     UPDATE `fuhousefinder`.`user`
+                     UPDATE `user`
                      SET
                      `updated_at` = current_timestamp(),
                      `is_verified` = ?,
@@ -387,7 +387,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User authenticateUser(String contact, String password) {
-        String sql = "SELECT * FROM fuhousefinder.user WHERE email = ? AND password = ?;";
+        String sql = "SELECT * FROM user WHERE email = ? AND password = ?;";
         User u = new User();
 
         try {
@@ -444,7 +444,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
     @Override
     public boolean updateVerificationInfo(User u) {
         String sql = """
-                     UPDATE `fuhousefinder`.`user`
+                     UPDATE `user`
                      SET
                      `updated_at` = current_timestamp(),
                      `verification_token` = ?,
@@ -479,7 +479,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     @Override
     public User getByUidForProfile(String uid) {
-        String sql = "SELECT * FROM fuhousefinder.user WHERE id = ?;";
+        String sql = "SELECT * FROM user WHERE id = ?;";
         User u = new User();
 
         try {
@@ -535,7 +535,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
     @Override
     public boolean updatePassword(String uid, String newPass) {
         String sql = """
-                     UPDATE `fuhousefinder`.`user`
+                     UPDATE `user`
                      SET
                      `password` = ?
                      WHERE `id` = ?;
@@ -566,7 +566,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
     @Override
     public boolean updateProfile(String uid, String firstName, String lastName, Date bod, String phone, String bio, String gender) {
         String sql = """
-                     UPDATE `fuhousefinder`.`user`
+                     UPDATE `user`
                      SET
                      `first_name` = ?,
                      `last_name` = ?,
@@ -640,7 +640,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
         if (type.equalsIgnoreCase("avatar")) {
             sql = """
-                     UPDATE `fuhousefinder`.`user`
+                     UPDATE `user`
                                           SET
                                           `avatar` = ?,
                                           `updated_at` = ?
@@ -650,7 +650,7 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
         if (type.equalsIgnoreCase("cover")) {
             sql = """
-                     UPDATE `fuhousefinder`.`user`
+                     UPDATE `user`
                                           SET
                                           `cover` = ?,
                                           `updated_at` = ?
