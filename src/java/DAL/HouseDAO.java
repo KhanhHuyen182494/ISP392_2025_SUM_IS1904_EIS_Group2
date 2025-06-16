@@ -34,7 +34,7 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                          h.*,
                          s.name as StatusName
                      FROM
-                         fuhousefinder.house h
+                         house h
                              JOIN
                          status s ON h.status_id = s.id
                      WHERE 1 = 1 

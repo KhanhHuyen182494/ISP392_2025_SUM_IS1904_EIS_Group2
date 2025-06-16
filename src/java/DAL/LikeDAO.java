@@ -67,7 +67,7 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
     @Override
     public boolean add(Like l) {
         String sql = """
-                     INSERT INTO `fuhousefinder`.`like_post`
+                     INSERT INTO `like_post`
                      (`user_id`,
                      `post_id`,
                      `isLike`,
@@ -103,7 +103,7 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
     @Override
     public boolean update(Like l) {
         String sql = """
-                     UPDATE `fuhousefinder`.`like_post`
+                     UPDATE `like_post`
                      SET
                      `liked_at` = ?,
                      `isLike` = ?,
@@ -140,7 +140,7 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
     public Like getLikeByPostAndUser(String postId, String userId) {
         Like l = new Like();
         String sql = """
-                     SELECT * FROM fuhousefinder.like_post WHERE user_id = ? AND post_id = ?;
+                     SELECT * FROM like_post WHERE user_id = ? AND post_id = ?;
                      """;
 
         try {

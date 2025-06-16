@@ -70,7 +70,7 @@ public class ImageDAO extends BaseDao implements IImageDAO {
     @Override
     public boolean addImage(Image i) {
         String sql = """
-                     INSERT INTO `fuhousefinder`.`image`
+                     INSERT INTO `image`
                      (`path`, `objectId`, `status_id`, `created_at`, `created_by`)
                      VALUES
                      (?, ?, ?, ?, ?);
