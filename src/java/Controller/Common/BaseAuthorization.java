@@ -3,7 +3,9 @@ package Controller.Common;
 import Base.Generator;
 import Base.Logging;
 import DAL.AddressDAO;
+import DAL.CommentDAO;
 import DAL.DAO.IAddressDAO;
+import DAL.DAO.ICommentDAO;
 import DAL.DAO.IFeatureDao;
 import DAL.DAO.IHouseDAO;
 import DAL.DAO.IMediaDAO;
@@ -42,6 +44,7 @@ public abstract class BaseAuthorization extends HttpServlet {
     public ILikeDAO lDao;
     public IReviewDAO rDao;
     public IFeatureDao feaDao;
+    public ICommentDAO cDao;
     public Logging log = new Logging();
     Gson gson;
 
@@ -56,6 +59,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         feaDao = new FeatureDAO();
         uDao = new UserDAO();
         hDao = new HouseDAO();
+        cDao = new CommentDAO();
     }
 
     private User getUser(HttpServletRequest request) {

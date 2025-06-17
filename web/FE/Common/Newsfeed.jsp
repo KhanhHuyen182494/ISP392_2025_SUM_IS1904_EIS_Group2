@@ -124,7 +124,7 @@
                 color: white;
                 transform: scale(1.1);
             }
-            
+
             /* Comment Form Styles */
             .comment-form {
                 background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -344,7 +344,7 @@
                                 </div>
                                 <div class="px-6 py-4 flex gap-3">
                                     <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors"
-                                            data-house-id="${post.house.id}">
+                                            data-post-id="${post.id}">
                                         <i class="fas fa-comments mr-2"></i>
                                         Comment
                                     </button>
@@ -443,9 +443,9 @@
                     <div class="bg-gradient-to-r from-green-500 to-blue-600 px-6 py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex gap-2 items-center">
-                                <h2 class="text-xl font-bold text-white">Comments</h2>
-                                <p class="text-white"> <b>-</b> </p>
-                                <p id="modalCommentHouseName" class="text-yellow-300 text-xl font-bold"></p>
+                                <h2 class="text-xl font-bold">Comments</h2>
+                                <p class=""> <b>-</b> </p>
+                                <p id="modalCommentHouseName" class="text-orange-500 text-xl font-bold"></p>
                             </div>
                             <button id="closeCommentModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
                                 <i class="fas fa-times text-lg text-white"></i>
@@ -524,19 +524,17 @@
                 </div>
             </div>
         </div>
-        
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
                                                     function toggleLike(button) {
                                                         const uid = '${sessionScope.user_id}';
-
                                                         if (uid || uid.trim()) {
                                                             const likeCount = button.querySelector('.like-count');
                                                             const currentCount = parseInt(likeCount.textContent);
                                                             const pid = $(button).data('post-id');
-
                                                             if (button.classList.contains('liked')) {
                                                                 // Unlike
                                                                 button.classList.remove('liked');
@@ -595,45 +593,39 @@
                                                     }
 
                                                     $(document).ready(function () {
-                                                        const modal = $('#reviewModal');
+                                                        const modalReview = $('#reviewModal');
                                                         const modalHouseName = $('#modalHouseName');
                                                         const reviewContainer = $('#reviewContainer');
                                                         const loadingDiv = $('#reviewLoading');
                                                         const errorDiv = $('#reviewError');
                                                         const noReviewDiv = $('#noReview');
                                                         const loadMoreDiv = $('#loadMoreReview');
-
                                                         let currentHouseId = null;
                                                         let currentReviewPage = 1;
                                                         let isLoadingReview = false;
-
                                                         $('.view-review-btn').on('click', function () {
                                                             const houseId = $(this).data('house-id');
                                                             const houseName = $(this).data('house-name');
-
                                                             currentHouseId = houseId;
                                                             currentReviewPage = 1;
-
                                                             modalHouseName.text(houseName);
-                                                            modal.addClass('active');
+                                                            modalReview.addClass('active');
                                                             $('body').addClass('overflow-hidden');
-
                                                             loadReviews(houseId, 1, true);
                                                         });
-
                                                         // Close modal
                                                         $('#closeModalBtn').on('click', function (e) {
                                                             closeModal();
 
                                                         });
 
-                                                        modal.on('click', function (e) {
+                                                        modalReview.on('click', function (e) {
                                                             if (e.target === this) {
                                                                 closeModal();
                                                             }
                                                         });
 
-                                                        modal.on('click', function (e) {
+                                                        modalReview.on('click', function (e) {
                                                             if (!$(e.target).closest('.modal-content').length) {
                                                                 closeModal();
                                                             }
@@ -655,13 +647,13 @@
 
                                                         // ESC key to close modal
                                                         $(document).on('keydown', function (e) {
-                                                            if (e.key === 'Escape' && modal.hasClass('active')) {
+                                                            if (e.key === 'Escape' && modalReview.hasClass('active')) {
                                                                 closeModal();
                                                             }
                                                         });
 
                                                         function closeModal() {
-                                                            modal.removeClass('active');
+                                                            modalReview.removeClass('active');
                                                             $('body').removeClass('overflow-hidden');
                                                             // Reset modal state after animation
                                                             setTimeout(() => {
@@ -686,7 +678,7 @@
                                                             isLoadingReview = true;
 
                                                             if (isNewLoad) {
-                                                                // Show loading for new load
+                                                                //  S how loadi n g for new load
                                                                 loadingDiv.show();
                                                                 errorDiv.addClass('hidden');
                                                                 noReviewDiv.addClass('hidden');
@@ -707,7 +699,6 @@
                                                                 },
                                                                 success: function (response) {
                                                                     loadingDiv.hide();
-
                                                                     if (isNewLoad) {
                                                                         reviewContainer.empty();
                                                                     }
@@ -715,7 +706,6 @@
                                                                     if (response.reviews && response.reviews.length > 0) {
                                                                         appendReviews(response.reviews);
                                                                         currentReviewPage = page;
-
                                                                         // Show load more if there are more reviews
                                                                         if (response.hasMore) {
                                                                             loadMoreDiv.removeClass('hidden');
@@ -735,7 +725,6 @@
                                                                 error: function (xhr, status, error) {
                                                                     console.error('Error loading reviews:', error);
                                                                     loadingDiv.hide();
-
                                                                     if (isNewLoad) {
                                                                         errorDiv.removeClass('hidden');
                                                                         noReviewDiv.addClass('hidden');
@@ -760,7 +749,6 @@
 
                                                         function createReviewHtml(review) {
                                                             const stars = generateStarRating(review.Star);
-
                                                             return `
                                                         <div class="review-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
@@ -797,6 +785,404 @@
                                                             }
                                                             return stars;
                                                         }
+
+                                                        //Comment script section
+                                                        const modalComment = $('#commentModal');
+                                                        const modalCommentHouseName = $('#modalCommentHouseName');
+                                                        const commentContainer = $('#commentContainer');
+                                                        const commentLoadingDiv = $('#commentLoading');
+                                                        const commentErrorDiv = $('#commentError');
+                                                        const noCommentDiv = $('#noComment');
+                                                        const loadMoreCommentDiv = $('#loadMoreComment');
+                                                        const commentInput = $('#commentInput');
+                                                        const submitCommentBtn = $('#submitCommentBtn');
+                                                        let currentCommentPostId = null;
+                                                        let currentCommentPage = 1;
+                                                        let isLoadingComment = false;
+                                                        let isSubmittingComment = false;
+
+                                                        $('button:contains("Comment")').each(function () {
+                                                            const postId = $(this).closest('.card-hover').find('button[data-post-id]').first().data('post-id');
+                                                            $(this).attr('data-post-id', postId);
+                                                        });
+
+                                                        // Open Comment Modal
+                                                        $(document).on('click', 'button:contains("Comment")', function () {
+                                                            const postId = $(this).data('post-id');
+                                                            const houseName = $(this).closest('.card-hover').find('h2').first().text().trim();
+                                                            if (!postId) {
+                                                                showToast('Unable to load comments', 'error');
+                                                                return;
+                                                            }
+
+                                                            currentCommentPostId = postId;
+                                                            currentCommentPage = 1;
+                                                            modalCommentHouseName.text(houseName);
+                                                            modalComment.addClass('active');
+                                                            $('body').addClass('overflow-hidden');
+                                                            loadComments(postId, 1, true);
+                                                        });
+
+                                                        // Close Comment Modal
+                                                        $('#closeCommentModalBtn').on('click', function (e) {
+                                                            closeCommentModal();
+                                                        });
+
+                                                        modalComment.on('click', function (e) {
+                                                            if (e.target === this || !$(e.target).closest('.modal-content').length) {
+                                                                closeCommentModal();
+                                                            }
+                                                        });
+
+                                                        // Submit Comment
+                                                        submitCommentBtn.on('click', function () {
+                                                            submitComment();
+                                                        });
+
+                                                        // Submit comment on Enter (Ctrl+Enter)
+                                                        commentInput.on('keydown', function (e) {
+                                                            if (e.ctrlKey && e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                submitComment();
+                                                            }
+                                                        });
+
+                                                        // Enable/disable submit button based on input
+                                                        commentInput.on('input', function () {
+                                                            const hasContent = $(this).val().trim().length > 0;
+                                                            submitCommentBtn.prop('disabled', !hasContent || isSubmittingComment);
+                                                        });
+
+                                                        // Retry loading comments
+                                                        $('#retryComment').on('click', function () {
+                                                            if (currentCommentPostId) {
+                                                                loadComments(currentCommentPostId, 1, true);
+                                                            }
+                                                        });
+
+                                                        // Load more comments
+                                                        $('#loadMoreCommentBtn').on('click', function () {
+                                                            if (currentCommentPostId && !isLoadingComment) {
+                                                                loadComments(currentCommentPostId, currentCommentPage + 1, false);
+                                                            }
+                                                        });
+
+                                                        // ESC key to close comment modal
+                                                        $(document).on('keydown', function (e) {
+                                                            if (e.key === 'Escape' && modalComment.hasClass('active')) {
+                                                                closeCommentModal();
+                                                            }
+                                                        });
+
+                                                        function closeCommentModal() {
+                                                            modalComment.removeClass('active');
+                                                            $('body').removeClass('overflow-hidden');
+                                                            // Reset modal state after animation
+                                                            setTimeout(() => {
+                                                                resetCommentModalState();
+                                                            }, 300);
+                                                        }
+
+                                                        function resetCommentModalState() {
+                                                            commentContainer.empty();
+                                                            commentLoadingDiv.show();
+                                                            commentErrorDiv.addClass('hidden');
+                                                            noCommentDiv.addClass('hidden');
+                                                            loadMoreCommentDiv.addClass('hidden');
+                                                            commentInput.val('');
+                                                            submitCommentBtn.prop('disabled', true);
+                                                            currentCommentPostId = null;
+                                                            currentCommentPage = 1;
+                                                        }
+
+                                                        function submitComment() {
+                                                            const content = commentInput.val().trim();
+                                                            const uid = '${sessionScope.user_id}';
+                                                            if (!content) {
+                                                                showToast('Please enter a comment', 'error');
+                                                                return;
+                                                            }
+
+                                                            if (!uid) {
+                                                                showToast('Please login to comment', 'error');
+                                                                return;
+                                                            }
+
+                                                            if (isSubmittingComment)
+                                                                return;
+                                                            isSubmittingComment = true;
+                                                            submitCommentBtn.prop('disabled', true);
+                                                            submitCommentBtn.html('<div class="loading-spinner inline-block mr-2"></div>Posting...');
+                                                            $.ajax({
+                                                                url: '${pageContext.request.contextPath}/comment/submit',
+                                                                method: 'POST',
+                                                                data: {
+                                                                    postId: currentCommentPostId,
+                                                                    content: content,
+                                                                    type: 'house'
+                                                                },
+                                                                success: function (response) {
+                                                                    if (response.success) {
+                                                                        showToast('Comment posted successfully!', 'success');
+                                                                        commentInput.val('');
+                                                                        // Add the new comment to the top of the list
+                                                                        if (response.comment) {
+                                                                            const newCommentHtml = createCommentHtml(response.comment);
+                                                                            commentContainer.prepend(newCommentHtml);
+                                                                            // Hide no comment message if it was showing
+                                                                            noCommentDiv.addClass('hidden');
+                                                                        } else {
+                                                                            // Reload comments to show the new one
+                                                                            loadComments(currentCommentPostId, 1, true);
+                                                                        }
+                                                                    } else {
+                                                                        showToast(response.message || 'Failed to post comment', 'error');
+                                                                    }
+                                                                },
+                                                                error: function (xhr, status, error) {
+                                                                    console.error('Error posting comment:', error);
+                                                                    showToast('Failed to post comment. Please try again.', 'error');
+                                                                },
+                                                                complete: function () {
+                                                                    isSubmittingComment = false;
+                                                                    submitCommentBtn.prop('disabled', commentInput.val().trim().length === 0);
+                                                                    submitCommentBtn.html('<i class="fas fa-paper-plane mr-2"></i>Post Comment');
+                                                                }
+                                                            });
+                                                        }
+
+                                                        function loadComments(postId, page, isNewLoad) {
+                                                            if (isLoadingComment)
+                                                                return;
+                                                            isLoadingComment = true;
+                                                            if (isNewLoad) {
+                                                                // Show loading for new load
+                                                                commentLoadingDiv.show();
+                                                                commentErrorDiv.addClass('hidden');
+                                                                noCommentDiv.addClass('hidden');
+                                                                loadMoreCommentDiv.addClass('hidden');
+                                                                commentContainer.empty();
+                                                            } else {
+                                                                // Show loading on load more button
+                                                                $('#loadMoreCommentBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                                            }
+
+                                                            $.ajax({
+                                                                url: '${pageContext.request.contextPath}/comment',
+                                                                method: 'GET',
+                                                                data: {
+                                                                    postId: postId,
+                                                                    page: page,
+                                                                    limit: 10
+                                                                },
+                                                                success: function (response) {
+                                                                    commentLoadingDiv.hide();
+                                                                    if (isNewLoad) {
+                                                                        commentContainer.empty();
+                                                                    }
+
+                                                                    if (response.comments && response.comments.length > 0) {
+                                                                        appendComments(response.comments);
+                                                                        currentCommentPage = page;
+                                                                        // Show load more if there are more comments
+                                                                        if (response.hasMore) {
+                                                                            loadMoreCommentDiv.removeClass('hidden');
+                                                                        } else {
+                                                                            loadMoreCommentDiv.addClass('hidden');
+                                                                        }
+
+                                                                        commentErrorDiv.addClass('hidden');
+                                                                        noCommentDiv.addClass('hidden');
+                                                                    } else if (isNewLoad) {
+                                                                        // No comments found
+                                                                        noCommentDiv.removeClass('hidden');
+                                                                        commentErrorDiv.addClass('hidden');
+                                                                        loadMoreCommentDiv.addClass('hidden');
+                                                                    }
+                                                                },
+                                                                error: function (xhr, status, error) {
+                                                                    console.error('Error loading comments:', error);
+                                                                    commentLoadingDiv.hide();
+                                                                    if (isNewLoad) {
+                                                                        commentErrorDiv.removeClass('hidden');
+                                                                        noCommentDiv.addClass('hidden');
+                                                                    } else {
+                                                                        // Show error toast for load more
+                                                                        showToast('Failed to load more comments', 'error');
+                                                                    }
+                                                                },
+                                                                complete: function () {
+                                                                    isLoadingComment = false;
+                                                                    $('#loadMoreCommentBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Comments');
+                                                                }
+                                                            });
+                                                        }
+
+                                                        function appendComments(comments) {
+                                                            comments.forEach(function (comment) {
+                                                                const commentHtml = createCommentHtml(comment);
+                                                                commentContainer.append(commentHtml);
+                                                            });
+                                                        }
+
+                                                        function createCommentHtml(comment) {
+                                                            const isCurrentUser = comment.owner && comment.owner.id == '${sessionScope.user_id}';
+                                                            const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
+                                                            const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
+                                                            const ownerId = comment.owner ? comment.owner.id : '';
+
+                                                            console.log(ownerAvatar);
+
+                                                            let deleteButton = '';
+                                                            if (isCurrentUser) {
+                                                                deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(' + comment.id + ')">' +
+                                                                        '<i class="fas fa-trash mr-1"></i>' +
+                                                                        'Delete' +
+                                                                        '</button>';
+                                                            }
+
+                                                            if (isCurrentUser) {
+                                                                return `
+                                                                <div class="comment-item p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" data-comment-id="` + comment.id + `">
+                                                                    <div class="flex items-start gap-3">
+                                                                        <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                                                            <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/` + ownerAvatar + `" 
+                                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                                                            <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <div class="flex items-center justify-between mb-2">
+                                                                                <div class="flex items-center gap-2">
+                                                                                    <a href="${pageContext.request.contextPath}/profile?uid=` + ownerId + `" 
+                                                                                       class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                                                                        You
+                                                                                    </a>
+                                                                                 <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">You</span>
+                                                                                </div>
+                                                                                <span class="text-xs text-gray-500" title="` + comment.created_at + `">` + comment.created_at + `</span>
+                                                                            </div>
+                                                                            <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">` + comment.content + `</p>
+
+                                                                            <div class="flex items-center gap-3 mt-3">
+//                                                                                <button class="text-xs text-gray-500 hover:text-blue-600 transition-colors">
+//                                                                                    <i class="fas fa-thumbs-up mr-1"></i>
+//                                                                                    Like
+//                                                                                </button>
+//                                                                                <button class="text-xs text-gray-500 hover:text-blue-600 transition-colors">
+//                                                                                    <i class="fas fa-reply mr-1"></i>
+//                                                                                    Reply
+//                                                                                </button>
+                                                                                ` + deleteButton + `
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+                                                            } else {
+                                                                return `
+                                                                <div class="comment-item p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" data-comment-id="` + comment.id + `">
+                                                                    <div class="flex items-start gap-3">
+                                                                        <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                                                            <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/` + ownerAvatar + `" 
+                                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                                                            <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <div class="flex items-center justify-between mb-2">
+                                                                                <div class="flex items-center gap-2">
+                                                                                    <a href="${pageContext.request.contextPath}/profile?uid=` + ownerId + `" 
+                                                                                       class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                                                                        ` + ownerName + `
+                                                                                    </a>
+                                                                                </div>
+                                                                                <span class="text-xs text-gray-500" title="` + comment.created_at + `">` + comment.created_at + `</span>
+                                                                            </div>
+                                                                            <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">` + comment.content + `</p>
+
+                                                                            <div class="flex items-center gap-3 mt-3">
+                                                                                <button class="text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                                                                                    <i class="fas fa-reply mr-1"></i>
+                                                                                    Reply
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+                                                            }
+                                                        }
+
+                                                        function formatTimeAgo(dateString) {
+                                                            try {
+                                                                const now = new Date();
+                                                                const date = new Date(dateString);
+                                                                const diffInSeconds = Math.floor((now - date) / 1000);
+
+                                                                if (diffInSeconds < 60) {
+                                                                    return 'Just now';
+                                                                } else if (diffInSeconds < 3600) {
+                                                                    const minutes = Math.floor(diffInSeconds / 60);
+                                                                    return `${minutes}m ago`;
+                                                                } else if (diffInSeconds < 86400) {
+                                                                    const hours = Math.floor(diffInSeconds / 3600);
+                                                                    return `${hours}h ago`;
+                                                                } else if (diffInSeconds < 604800) {
+                                                                    const days = Math.floor(diffInSeconds / 86400);
+                                                                    return `${days}d ago`;
+                                                                } else {
+                                                                    return date.toLocaleDateString();
+                                                                }
+                                                            } catch (error) {
+                                                                return dateString;
+                                                            }
+                                                        }
+
+                                                        // Global function for deleting comments
+                                                        window.deleteComment = function (commentId) {
+                                                            Swal.fire({
+                                                                title: 'Delete Comment?',
+                                                                text: 'This action cannot be undone.',
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#ef4444',
+                                                                cancelButtonColor: '#6b7280',
+                                                                confirmButtonText: 'Delete',
+                                                                cancelButtonText: 'Cancel',
+                                                                customClass: {
+                                                                    popup: 'rounded-xl shadow-lg',
+                                                                    confirmButton: 'rounded-lg',
+                                                                    cancelButton: 'rounded-lg'
+                                                                },
+                                                                buttonsStyling: false
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    $.ajax({
+                                                                        url: '${pageContext.request.contextPath}/comment/delete',
+                                                                        method: 'POST',
+                                                                        data: {commentId: commentId},
+                                                                        success: function (response) {
+                                                                            if (response.success) {
+                                                                                showToast('Comment deleted successfully', 'success');
+                                                                                // Remove the comment from the DOM
+                                                                                $(`[data-comment-id="${commentId}"]`).fadeOut(300, function () {
+                                                                                    $(this).remove();
+
+                                                                                    // Show no comments message if container is empty
+                                                                                    if (commentContainer.children().length === 0) {
+                                                                                        noCommentDiv.removeClass('hidden');
+                                                                                    }
+                                                                                });
+                                                                            } else {
+                                                                                showToast(response.message || 'Failed to delete comment', 'error');
+                                                                            }
+                                                                        },
+                                                                        error: function () {
+                                                                            showToast('Failed to delete comment', 'error');
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                        };
 
                                                         function showToast(message, type = 'success') {
                                                             Toastify({
