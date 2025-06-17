@@ -5,8 +5,10 @@
 package DAL;
 
 import Base.Logging;
-import DAL.DAO.IFeedbackDAO;
-import Model.Feedback;
+import DAL.DAO.IReviewDAO;
+import Model.House;
+import Model.Review;
+import Model.Room;
 import Model.Status;
 import Model.User;
 import java.sql.SQLException;
@@ -17,30 +19,31 @@ import java.util.List;
  *
  * @author Tam
  */
-public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
+public class ReviewDAO extends BaseDao implements IReviewDAO {
 
     private Logging logger = new Logging();
 
     public static void main(String[] args) {
-        FeedbackDAO fDao = new FeedbackDAO();
-        System.out.println(fDao.getFeedbacksByHouseId("HOUSE-35334b61da31443da5f850b5856f", 1, 0));
+        ReviewDAO fDao = new ReviewDAO();
+        System.out.println(fDao.getReviewsByHouseId("HOMESTAY-87fbb6d15ad548318110b60b7", 1, 0));
     }
 
     @Override
-    public List<Feedback> getFeedbacksByHouseId(String houseId, int limit, int offset) {
-        List<Feedback> feedbacks = new ArrayList<>();
+    public List<Review> getReviewsByHouseId(String homestayId, int limit, int offset) {
+        List<Review> reviews = new ArrayList<>();
         String sql = """
                      SELECT 
-                         f.*,
+                         r.*,
                          u.id as UserId,
                          u.first_name as UserFirstName,
                          u.last_name as UserLastName,
                          u.avatar as UserAvatar
                      FROM
-                         feedback f
-                     JOIN User u ON f.user_id = u.id
-                     WHERE f.house_id = ?
-                     ORDER BY f.created_at DESC
+                         review r
+                            JOIN 
+                         User u ON r.user_id = u.id
+                     WHERE r.homestay_id = ?
+                     ORDER BY r.created_at DESC
                      LIMIT ? OFFSET ?
                      """;
 
@@ -48,25 +51,24 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
 
-            ps.setString(1, houseId);
+            ps.setString(1, homestayId);
             ps.setInt(2, limit);
             ps.setInt(3, offset);
 
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                Feedback f = new Feedback();
-                f.setId(rs.getString("id"));
-                f.setPost_id(rs.getNString("post_id"));
-                f.setHouse_id(rs.getString("house_id"));
-                f.setRoom_id(rs.getString("room_id"));
-                f.setContent(rs.getString("content"));
-                f.setStar(rs.getInt("star"));
-                f.setCreated_at(rs.getTimestamp("created_at"));
-                f.setUpdated_at(rs.getTimestamp("udpated_at"));
+                Review r = new Review();
+                r.setId(rs.getString("id"));
+                r.setStar(rs.getInt("star"));
+                r.setContent(rs.getString("content"));
+                r.setCreated_at(rs.getTimestamp("created_at"));
+                r.setUpdated_at(rs.getTimestamp("updated_at"));
 
                 User u = new User();
                 Status s = new Status();
+                Room ro = new Room();
+                House h = new House();
 
                 s.setId(rs.getInt("status_id"));
 
@@ -75,9 +77,14 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
                 u.setLast_name(rs.getString("UserLastName"));
                 u.setAvatar(rs.getString("UserAvatar"));
 
-                f.setUser(u);
+                ro.setId(rs.getString("room_id"));
 
-                feedbacks.add(f);
+                h.setId(rs.getString("homestay_id"));
+
+                r.setOwner(u);
+                r.setStatus(s);
+
+                reviews.add(r);
             }
 
         } catch (SQLException e) {
@@ -90,21 +97,21 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
             }
         }
 
-        return feedbacks;
+        return reviews;
     }
 
     @Override
-    public Feedback getById(String id) {
+    public Review getById(String id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<Feedback> getAll() {
+    public List<Review> getAll() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean add(Feedback t) {
+    public boolean add(Review t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -114,7 +121,7 @@ public class FeedbackDAO extends BaseDao implements IFeedbackDAO {
     }
 
     @Override
-    public boolean update(Feedback t) {
+    public boolean update(Review t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

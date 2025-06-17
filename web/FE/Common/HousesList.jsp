@@ -50,7 +50,7 @@
                 background-color: #3b82f6;
                 color: white;
             }
-            .feedback-badge {
+            .review-badge {
                 background: linear-gradient(45deg, #ff6b6b, #feca57);
             }
             .search-focus {
@@ -84,11 +84,11 @@
                 transform: translateY(0);
             }
 
-            .feedback-item {
+            .review-item {
                 transition: all 0.2s ease;
             }
 
-            .feedback-item:hover {
+            .review-item:hover {
                 background-color: #f8fafc;
                 transform: translateX(5px);
             }
@@ -191,7 +191,7 @@
             <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
                 <!-- Cover Image (if available) -->
                 <c:if test="${not empty requestScope.profile.cover}">
-                    <img src="${requestScope.profile.cover}" 
+                    <img src="${pageContext.request.contextPath}/Asset/Common/Cover/${requestScope.profile.cover}" 
                          alt="Cover Photo" 
                          class="w-full h-full object-cover"/>
                 </c:if>
@@ -279,15 +279,19 @@
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
                         <c:if test="${sessionScope.user.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View your's houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/profile?uid=${profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-user"></i>
+                                    Profile
+                                </button>
+                            </a>
                         </c:if>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-edit"></i>
-                            Edit Profile
-                        </button>
+                        <a href="${pageContext.request.contextPath}/profile-edit">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-edit"></i>
+                                Edit Profile
+                            </button>
+                        </a>
                         <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             Add Post
@@ -296,10 +300,12 @@
                     <c:otherwise>
                         <!-- Other User Profile Actions -->
                         <c:if test="${requestScope.profile.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View all houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/profile?uid=${profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-user"></i>
+                                    Profile
+                                </button>
+                            </a>
                         </c:if>
                         <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-user-plus"></i>
@@ -334,19 +340,7 @@
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-dollar-sign text-green-500"></i>
-                                                <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / month</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-bolt text-yellow-500"></i>
-                                                <span class="text-sm"><strong>Electricity:</strong> <fmt:formatNumber value="${house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-tint text-blue-500"></i>
-                                                <span class="text-sm"><strong>Water:</strong> <fmt:formatNumber value="${house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
-                                                <span class="text-sm"><strong>Down Payment:</strong> <fmt:formatNumber value="${house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
+                                                <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / night</span>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-map-marker-alt text-red-500"></i>
@@ -361,7 +355,7 @@
                                             <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
                                                 <i class="fa-solid fa-house text-white"></i>
                                             </button>
-                                            <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
+                                            <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
                                                     data-house-id="${house.id}" 
                                                     data-house-name="${house.name}">
                                                 <i class="fas fa-comments"></i>
@@ -381,8 +375,8 @@
             </div>
         </div>
 
-        <!-- Feedback Modal -->
-        <div id="feedbackModal" class="fixed inset-0 z-50 modal-overlay">
+        <!-- Review Modal -->
+        <div id="reviewModal" class="fixed inset-0 z-50 modal-overlay">
             <div class="flex items-center justify-center min-h-screen px-4 py-8">
                 <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
 
@@ -390,7 +384,7 @@
                     <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex gap-2 items-center">
-                                <h2 class="text-xl font-bold text-[#FF7700]">Feedbacks</h2>
+                                <h2 class="text-xl font-bold text-[#FF7700]">Reviews</h2>
                                 <p> <b>-</b> </p>
                                 <p id="modalHouseName" class="text-blue-500 text-xl font-bold"></p>
                             </div>
@@ -404,37 +398,37 @@
                     <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
 
                         <!-- Loading State -->
-                        <div id="feedbackLoading" class="text-center py-8">
+                        <div id="reviewLoading" class="text-center py-8">
                             <div class="loading-spinner mx-auto mb-4"></div>
-                            <p class="text-gray-500">Loading feedbacks...</p>
+                            <p class="text-gray-500">Loading reviews...</p>
                         </div>
 
                         <!-- Error State -->
-                        <div id="feedbackError" class="text-center py-8 hidden">
+                        <div id="reviewError" class="text-center py-8 hidden">
                             <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                            <p class="text-red-500 font-medium">Failed to load feedbacks</p>
-                            <button id="retryFeedback" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <p class="text-red-500 font-medium">Failed to load reviews</p>
+                            <button id="retryReview" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i class="fas fa-redo mr-2"></i>
                                 Retry
                             </button>
                         </div>
 
-                        <!-- No Feedback State -->
-                        <div id="noFeedback" class="text-center py-8 hidden">
+                        <!-- No Review State -->
+                        <div id="noReview" class="text-center py-8 hidden">
                             <i class="fas fa-comment-slash text-gray-400 text-3xl mb-4"></i>
-                            <p class="text-gray-500">No feedbacks available for this property</p>
+                            <p class="text-gray-500">No reviews available for this property</p>
                         </div>
 
-                        <!-- Feedbacks Container -->
-                        <div id="feedbackContainer" class="space-y-4">
-                            <!-- Dynamic feedback items will be inserted here -->
+                        <!-- Reviews Container -->
+                        <div id="reviewContainer" class="space-y-4">
+                            <!-- Dynamic review items will be inserted here -->
                         </div>
 
-                        <!-- Load More Feedbacks -->
-                        <div id="loadMoreFeedback" class="text-center mt-6 hidden">
-                            <button id="loadMoreFeedbackBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
+                        <!-- Load More Reviews -->
+                        <div id="loadMoreReview" class="text-center mt-6 hidden">
+                            <button id="loadMoreReviewBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
                                 <i class="fas fa-chevron-down mr-2"></i>
-                                Load More Feedbacks
+                                Load More Reviews
                             </button>
                         </div>
                     </div>
@@ -512,19 +506,19 @@
             }
 
             $(document).ready(function () {
-                const modal = $('#feedbackModal');
+                const modal = $('#reviewModal');
                 const modalHouseName = $('#modalHouseName');
-                const feedbackContainer = $('#feedbackContainer');
-                const loadingDiv = $('#feedbackLoading');
-                const errorDiv = $('#feedbackError');
-                const noFeedbackDiv = $('#noFeedback');
-                const loadMoreDiv = $('#loadMoreFeedback');
+                const reviewContainer = $('#reviewContainer');
+                const loadingDiv = $('#reviewLoading');
+                const errorDiv = $('#reviewError');
+                const noReviewDiv = $('#noReview');
+                const loadMoreDiv = $('#loadMoreReview');
 
                 let currentHouseId = null;
                 let currentPage = 1;
                 let isLoading = false;
 
-                $('.view-feedback-btn').on('click', function () {
+                $('.view-review-btn').on('click', function () {
                     const houseId = $(this).data('house-id');
                     const houseName = $(this).data('house-name');
 
@@ -535,7 +529,7 @@
                     modal.addClass('active');
                     $('body').addClass('overflow-hidden');
 
-                    loadFeedbacks(houseId, 1, true);
+                    loadReviews(houseId, 1, true);
                 });
 
                 // Close modal
@@ -556,17 +550,17 @@
                     }
                 });
 
-                // Retry loading feedbacks
-                $('#retryFeedback').on('click', function () {
+                // Retry loading reviews
+                $('#retryReview').on('click', function () {
                     if (currentHouseId) {
-                        loadFeedbacks(currentHouseId, 1, true);
+                        loadReviews(currentHouseId, 1, true);
                     }
                 });
 
-                // Load more feedbacks
-                $('#loadMoreFeedbackBtn').on('click', function () {
+                // Load more reviews
+                $('#loadMoreReviewBtn').on('click', function () {
                     if (currentHouseId && !isLoading) {
-                        loadFeedbacks(currentHouseId, currentPage + 1, false);
+                        loadReviews(currentHouseId, currentPage + 1, false);
                     }
                 });
 
@@ -587,16 +581,16 @@
                 }
 
                 function resetModalState() {
-                    feedbackContainer.empty();
+                    reviewContainer.empty();
                     loadingDiv.show();
                     errorDiv.addClass('hidden');
-                    noFeedbackDiv.addClass('hidden');
+                    noReviewDiv.addClass('hidden');
                     loadMoreDiv.addClass('hidden');
                     currentHouseId = null;
                     currentPage = 1;
                 }
 
-                function loadFeedbacks(houseId, page, isNewLoad) {
+                function loadReviews(houseId, page, isNewLoad) {
                     if (isLoading)
                         return;
 
@@ -606,12 +600,12 @@
                         // Show loading for new load
                         loadingDiv.show();
                         errorDiv.addClass('hidden');
-                        noFeedbackDiv.addClass('hidden');
+                        noReviewDiv.addClass('hidden');
                         loadMoreDiv.addClass('hidden');
-                        feedbackContainer.empty();
+                        reviewContainer.empty();
                     } else {
                         // Show loading on load more button
-                        $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                        $('#loadMoreReviewBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
                     }
 
                     $.ajax({
@@ -626,14 +620,14 @@
                             loadingDiv.hide();
 
                             if (isNewLoad) {
-                                feedbackContainer.empty();
+                                reviewContainer.empty();
                             }
 
-                            if (response.feedbacks && response.feedbacks.length > 0) {
-                                appendFeedbacks(response.feedbacks);
+                            if (response.reviews && response.reviews.length > 0) {
+                                appendReviews(response.reviews);
                                 currentPage = page;
 
-                                // Show load more if there are more feedbacks
+                                // Show load more if there are more reviews
                                 if (response.hasMore) {
                                     loadMoreDiv.removeClass('hidden');
                                 } else {
@@ -641,62 +635,62 @@
                                 }
 
                                 errorDiv.addClass('hidden');
-                                noFeedbackDiv.addClass('hidden');
+                                noReviewDiv.addClass('hidden');
                             } else if (isNewLoad) {
-                                // No feedbacks found
-                                noFeedbackDiv.removeClass('hidden');
+                                // No reviews found
+                                noReviewDiv.removeClass('hidden');
                                 errorDiv.addClass('hidden');
                                 loadMoreDiv.addClass('hidden');
                             }
                         },
                         error: function (xhr, status, error) {
-                            console.error('Error loading feedbacks:', error);
+                            console.error('Error loading reviews:', error);
                             loadingDiv.hide();
 
                             if (isNewLoad) {
                                 errorDiv.removeClass('hidden');
-                                noFeedbackDiv.addClass('hidden');
+                                noReviewDiv.addClass('hidden');
                             } else {
                                 // Show error toast for load more
-                                showToast('Failed to load more feedbacks', 'error');
+                                showToast('Failed to load more reviews', 'error');
                             }
                         },
                         complete: function () {
                             isLoading = false;
-                            $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
+                            $('#loadMoreReviewBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Reviews');
                         }
                     });
                 }
 
-                function appendFeedbacks(feedbacks) {
-                    feedbacks.forEach(function (feedback) {
-                        const feedbackHtml = createFeedbackHtml(feedback);
-                        feedbackContainer.append(feedbackHtml);
+                function appendReviews(reviews) {
+                    reviews.forEach(function (review) {
+                        const reviewHtml = createReviewHtml(review);
+                        reviewContainer.append(reviewHtml);
                     });
                 }
 
-                function createFeedbackHtml(feedback) {
-                    const stars = generateStarRating(feedback.star);
+                function createReviewHtml(review) {
+                    const stars = generateStarRating(review.Star);
 
                     return `
-                                                        <div class="feedback-item p-4 border border-gray-200 rounded-xl bg-gray-50">
+                                                        <div class="review-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
                                                                 <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                                    <img class="w-12 h-12 rounded-full object-cover" src="` + feedback.user.avatar + `" 
+                                                                    <img class="w-12 h-12 rounded-full object-cover" src=${pageContext.request.contextPath}/Asset/Common/Avatar/` + review.owner.avatar + ` 
                                                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                                                                     <i class="fas fa-user text-white text-sm" style="display: none;"></i>
                                                                 </div>
                                                                 <div class="flex-1">
                                                                     <div class="flex items-center justify-between mb-2">
                                                                         <div class="flex items-center gap-3">
-                                                                            <a href="${pageContext.request.contextPath}/profile?id=` + feedback.user.id + `" class="font-semibold text-gray-800">` + feedback.user.first_name + ` ` + feedback.user.last_name + `</a>
+                                                                            <a href="${pageContext.request.contextPath}/profile?uid=` + review.owner.id + `" class="font-semibold text-gray-800">` + review.owner.first_name + ` ` + review.owner.last_name + `</a>
                                                                             <div class="star-rating flex">
                                                                                 ` + stars + `
                                                                             </div>
                                                                         </div>
-                                                                        <span class="text-xs text-gray-500">` + feedback.created_at + ` </span>
+                                                                        <span class="text-xs text-gray-500">` + review.created_at + ` </span>
                                                                     </div>
-                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + feedback.content + `</p>
+                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + review.content + `</p>
                                                                 </div>
                                                             </div>
                                                         </div>

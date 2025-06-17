@@ -4,15 +4,21 @@
  */
 package DAL.DAO;
 
-import Model.Feedback;
+import Model.Media;
+import Model.Status;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface IFeedbackDAO extends IBaseUUID<Feedback>{
-    
-    public List<Feedback> getFeedbacksByHouseId(String houseId, int limit, int offset);
-    
+public interface IMediaDAO {
+
+    //Get
+    public List<Media> getMediaByObjectId(String objectId, String objectType, Status s);
+
+    //Update
+    //Delete
+    //Add
+    public boolean addMedia(Media i);
 }
