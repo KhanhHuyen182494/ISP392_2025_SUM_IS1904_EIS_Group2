@@ -124,6 +124,38 @@
                 color: white;
                 transform: scale(1.1);
             }
+            
+            /* Comment Form Styles */
+            .comment-form {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            }
+
+            .comment-input {
+                transition: all 0.3s ease;
+                resize: vertical;
+                min-height: 60px;
+            }
+
+            .comment-input:focus {
+                transform: scale(1.01);
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            }
+
+            .comment-submit-btn {
+                transition: all 0.2s ease;
+            }
+
+            .comment-submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+            }
+
+            .comment-submit-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
         </style>
     </head>
     <body>
@@ -187,59 +219,17 @@
 
         <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
-            <!-- Sidebar - Top Review Section -->
-            <!--            <div class="col-span-4">
-                            <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
-                                <div class="flex items-center justify-between mb-6">
-                                    <h2 class="text-xl font-bold text-gray-800">Top House/Room</h2>
-                                    <div class="filter-top-house-room flex items-center gap-5">
-                                        <div class="filter-button">
-                                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-lg font-medium transition-colors px-2">Booking</button>
-                                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-lg font-medium transition-colors px-2">Star</button>
-                                        </div>
-                                        <i class="fas fa-star text-yellow-500"></i>
-                                    </div>
-                                </div>
-            
-                                 Top Review Items 
-                                <div class="space-y-4">
-                                     Review items 
-            <c:choose>
-                <c:when test="${not empty requestScope.topHouseRoom}">
-                    <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer items-center">
-                        <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-semibold text-sm text-gray-800">An Thu House - Phong 402</span>
-                                <div class="flex text-yellow-400">
-                                    <i class="fas fa-star text-xs"></i>
-                                    <i class="fas fa-star text-xs"></i>
-                                    <i class="fas fa-star text-xs"></i>
-                                    <i class="fas fa-star text-xs"></i>
-                                    <i class="fas fa-star text-xs"></i>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-600 line-clamp-2">104 Reviews</p>
-                            <span class="text-xs text-gray-400">2 days ago</span>
-                        </div>
+            <!-- Sidebar  -->
+            <div class="col-span-12 sticky top-20 z-50">
+                <div class="bg-white rounded-2xl shadow-md p-4 sticky top-24">
+                    <div class="group-button">
+                        <button class="flex-1 bg-yellow-500 hover:bg-yellow-600 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
+                            <i class="fa-solid fa-star"></i>
+                            Top House
+                        </button>
                     </div>
-                </c:when>
-                <c:otherwise>
-                    <div class="text-center p-2 mb-3">
-                        <p class="text-gray-500 decoration-wavy">No top house/room available!</p>
-                    </div>
-                </c:otherwise>
-            </c:choose>
-        </div>
-
-         View All Button 
-        <button class="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 rounded-lg text-sm font-medium transition-all">
-            View All Review
-        </button>
-    </div>
-</div>-->
+                </div>
+            </div>
 
             <!-- Main Feed -->
             <div class="col-span-12">
@@ -348,8 +338,15 @@
                                     <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
                                             data-house-id="${post.house.id}" 
                                             data-house-name="${post.house.name}">
-                                        <i class="fas fa-comments mr-2"></i>
+                                        <i class="fas fa-comment mr-2"></i>
                                         View Review
+                                    </button>
+                                </div>
+                                <div class="px-6 py-4 flex gap-3">
+                                    <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors"
+                                            data-house-id="${post.house.id}">
+                                        <i class="fas fa-comments mr-2"></i>
+                                        Comment
                                     </button>
                                 </div>
                             </div>
@@ -437,6 +434,97 @@
             </div>
         </div>
 
+        <!-- Comment Modal -->
+        <div id="commentModal" class="fixed inset-0 z-50 modal-overlay">
+            <div class="flex items-center justify-center min-h-screen px-4 py-8">
+                <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 to-blue-600 px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex gap-2 items-center">
+                                <h2 class="text-xl font-bold text-white">Comments</h2>
+                                <p class="text-white"> <b>-</b> </p>
+                                <p id="modalCommentHouseName" class="text-yellow-300 text-xl font-bold"></p>
+                            </div>
+                            <button id="closeCommentModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
+                                <i class="fas fa-times text-lg text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+
+                        <!-- Comment Form -->
+                        <c:if test="${not empty sessionScope.user.id}">
+                            <div class="comment-form rounded-xl p-4 mb-6 border-2 border-blue-100">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0">
+                                        <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" 
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                        <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <textarea id="commentInput" 
+                                                  class="comment-input w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                                                  placeholder="Write your comment here..." 
+                                                  rows="3"></textarea>
+                                        <div class="flex justify-between items-center mt-3">
+                                            <span class="text-xs text-gray-500">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Be respectful and constructive in your comments
+                                            </span>
+                                            <button id="submitCommentBtn" 
+                                                    class="comment-submit-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <i class="fas fa-paper-plane mr-2"></i>
+                                                Post Comment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <!-- Loading State -->
+                        <div id="commentLoading" class="text-center py-8">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            <p class="text-gray-500">Loading comments...</p>
+                        </div>
+
+                        <!-- Error State -->
+                        <div id="commentError" class="text-center py-8 hidden">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                            <p class="text-red-500 font-medium">Failed to load comments</p>
+                            <button id="retryComment" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-redo mr-2"></i>
+                                Retry
+                            </button>
+                        </div>
+
+                        <!-- No Comment State -->
+                        <div id="noComment" class="text-center py-8 hidden">
+                            <i class="fas fa-comments text-gray-400 text-3xl mb-4"></i>
+                            <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+                        </div>
+
+                        <!-- Comments Container -->
+                        <div id="commentContainer" class="space-y-4">
+                            <!-- Dynamic comment items will be inserted here -->
+                        </div>
+
+                        <!-- Load More Comments -->
+                        <div id="loadMoreComment" class="text-center mt-6 hidden">
+                            <button id="loadMoreCommentBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-chevron-down mr-2"></i>
+                                Load More Comments
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -516,15 +604,15 @@
                                                         const loadMoreDiv = $('#loadMoreReview');
 
                                                         let currentHouseId = null;
-                                                        let currentPage = 1;
-                                                        let isLoading = false;
+                                                        let currentReviewPage = 1;
+                                                        let isLoadingReview = false;
 
                                                         $('.view-review-btn').on('click', function () {
                                                             const houseId = $(this).data('house-id');
                                                             const houseName = $(this).data('house-name');
 
                                                             currentHouseId = houseId;
-                                                            currentPage = 1;
+                                                            currentReviewPage = 1;
 
                                                             modalHouseName.text(houseName);
                                                             modal.addClass('active');
@@ -560,8 +648,8 @@
 
                                                         // Load more reviews
                                                         $('#loadMoreReviewBtn').on('click', function () {
-                                                            if (currentHouseId && !isLoading) {
-                                                                loadReviews(currentHouseId, currentPage + 1, false);
+                                                            if (currentHouseId && !isLoadingReview) {
+                                                                loadReviews(currentHouseId, currentReviewPage + 1, false);
                                                             }
                                                         });
 
@@ -588,14 +676,14 @@
                                                             noReviewDiv.addClass('hidden');
                                                             loadMoreDiv.addClass('hidden');
                                                             currentHouseId = null;
-                                                            currentPage = 1;
+                                                            currentReviewPage = 1;
                                                         }
 
                                                         function loadReviews(houseId, page, isNewLoad) {
-                                                            if (isLoading)
+                                                            if (isLoadingReview)
                                                                 return;
 
-                                                            isLoading = true;
+                                                            isLoadingReview = true;
 
                                                             if (isNewLoad) {
                                                                 // Show loading for new load
@@ -626,7 +714,7 @@
 
                                                                     if (response.reviews && response.reviews.length > 0) {
                                                                         appendReviews(response.reviews);
-                                                                        currentPage = page;
+                                                                        currentReviewPage = page;
 
                                                                         // Show load more if there are more reviews
                                                                         if (response.hasMore) {
@@ -657,7 +745,7 @@
                                                                     }
                                                                 },
                                                                 complete: function () {
-                                                                    isLoading = false;
+                                                                    isLoadingReview = false;
                                                                     $('#loadMoreReviewBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Reviews');
                                                                 }
                                                             });
