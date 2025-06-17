@@ -12,23 +12,24 @@ import java.util.List;
  * @author Huyen
  */
 public class Post {
+
     private String id;
     private String content;
-    private Status status;
-    private House house;
-    private Room room;
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deleted_at;
-    private String created_by;
     private User owner;
+    private PostType post_type;
+    private Status status;
+    private House house;
+    private Room room;
 
     private List<Feedback> feedbacks;
     private List<Like> likes;
     private List<Image> images;
-    
+
     private boolean likedByCurrentUser;
-    
+
     public Post() {
     }
 
@@ -96,14 +97,6 @@ public class Post {
         this.deleted_at = deleted_at;
     }
 
-    public String getCreated_by() {
-        return created_by;
-    }
-
-    public void setCreated_by(String created_by) {
-        this.created_by = created_by;
-    }
-
     public List<Feedback> getFeedbacks() {
         return feedbacks;
     }
@@ -143,10 +136,18 @@ public class Post {
     public void setLikedByCurrentUser(boolean likedByCurrentUser) {
         this.likedByCurrentUser = likedByCurrentUser;
     }
-    
+
+    public PostType getPost_type() {
+        return post_type;
+    }
+
+    public void setPost_type(PostType post_type) {
+        this.post_type = post_type;
+    }
+
     @Override
     public String toString() {
-        return "Post{" + "id=" + id + ", content=" + content + ", status=" + status + ", house=" + house + ", room=" + room + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", created_by=" + created_by + ", feedbacks=" + feedbacks + ", likes=" + likes + ", images=" + images + '}';
+        return "Post{" + "id=" + id + ", content=" + content + ", status=" + status + ", house=" + house + ", room=" + room + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", feedbacks=" + feedbacks + ", likes=" + likes + ", images=" + images + '}';
     }
-    
+
 }

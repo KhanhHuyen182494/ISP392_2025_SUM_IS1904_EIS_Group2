@@ -28,7 +28,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
     public static void main(String[] args) {
         PostDAO pDao = new PostDAO();
-        System.out.println(pDao.getPaginatedPostsByUid(1, 2, "", "", "U-89d667bc8e6343cfa4cc55b93439ef4f"));
+        System.out.println(pDao.getPaginatedPosts(1, 1, "", "").getItems());
     }
 
     @Override
@@ -66,21 +66,18 @@ public class PostDAO extends BaseDao implements IPostDAO {
                            SELECT 
                                p.id as PostId,
                                p.content as PostContent,
-                               p.house_id as PostHouseId,
-                               p.room_id as PostRoomId,
+                               p.target_homestay_id as PostHouseId,
+                               p.target_room_id as PostRoomId,
                                p.status_id as PostStatusId,
                                p.created_at as PostCreatedAt,
-                               p.created_by as PostCreatedBy,
+                               p.user_id as PostCreatedBy,
                                p.updated_at as PostUpdatedAt,
                                p.deleted_at as PostDeletedAt,
                                h.name as HouseName,
                                h.description as HouseDescription,
                                h.star as HouseStar,
                                h.is_whole_house as WholeHouse,
-                               h.price_per_month as HousePrice,
-                               h.electricity_price as HouseElectricityPrice,
-                               h.water_price as HouseWaterPrice,
-                               h.down_payment as HouseDownPayment,
+                               h.price_per_night as HousePrice,
                                h.status_id as HouseStatusId,
                                h.address_id as HouseAddressId,
                                u.id as UserPostId,
@@ -90,9 +87,9 @@ public class PostDAO extends BaseDao implements IPostDAO {
                            FROM
                                post p
                                    JOIN
-                               house h ON p.house_id = h.id
+                               homestay h ON p.target_homestay_id = h.id
                            		JOIN
-                           	user u ON p.created_by = u.id
+                           	user u ON p.user_id = u.id
                            WHERE 1=1
                            """;
         String countQuery = "SELECT COUNT(*) FROM post p WHERE 1=1";
@@ -147,7 +144,6 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 p.setCreated_at(rs.getTimestamp("PostCreatedAt"));
                 p.setUpdated_at(rs.getTimestamp("PostUpdatedAt"));
                 p.setDeleted_at(rs.getTimestamp("PostDeletedAt"));
-                p.setCreated_by(rs.getString("PostCreatedBy"));
 
                 House h = new House();
                 Address a = new Address();
@@ -157,10 +153,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 h.setDescription(rs.getString("HouseDescription"));
                 h.setStar(rs.getFloat("HouseStar"));
                 h.setIs_whole_house(rs.getBoolean("WholeHouse"));
-                h.setPrice_per_month(rs.getDouble("HousePrice"));
-                h.setElectricity_price(rs.getDouble("HouseElectricityPrice"));
-                h.setWater_price(rs.getDouble("HouseWaterPrice"));
-                h.setDown_payment(rs.getDouble("HouseDownPayment"));
+                h.setPrice_per_night(rs.getDouble("HousePrice"));
 
                 a.setId(rs.getInt("HouseAddressId"));
                 psta.setId(rs.getInt("PostStatusId"));
@@ -206,38 +199,35 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
         String baseQuery = """
                            SELECT 
-                               p.id as PostId,
-                               p.content as PostContent,
-                               p.house_id as PostHouseId,
-                               p.room_id as PostRoomId,
-                               p.status_id as PostStatusId,
-                               p.created_at as PostCreatedAt,
-                               p.created_by as PostCreatedBy,
-                               p.updated_at as PostUpdatedAt,
-                               p.deleted_at as PostDeletedAt,
-                               h.name as HouseName,
-                               h.description as HouseDescription,
-                               h.star as HouseStar,
-                               h.is_whole_house as WholeHouse,
-                               h.price_per_month as HousePrice,
-                               h.electricity_price as HouseElectricityPrice,
-                               h.water_price as HouseWaterPrice,
-                               h.down_payment as HouseDownPayment,
-                               h.status_id as HouseStatusId,
-                               h.address_id as HouseAddressId,
-                               u.id as UserPostId,
-                               u.first_name as UserPostFirstName,
-                               u.last_name as UserPostLastName,
-                               u.avatar as UserPostAvatar
-                           FROM
-                               post p
-                                   JOIN
-                               house h ON p.house_id = h.id
-                           		JOIN
-                           	user u ON p.created_by = u.id
-                           WHERE p.created_by = ? AND 1=1
+                                p.id as PostId,
+                                p.content as PostContent,
+                                p.target_homestay_id as PostHouseId,
+                                p.target_room_id as PostRoomId,
+                                p.status_id as PostStatusId,
+                                p.created_at as PostCreatedAt,
+                                p.user_id as PostCreatedBy,
+                                p.updated_at as PostUpdatedAt,
+                                p.deleted_at as PostDeletedAt,
+                                h.name as HouseName,
+                                h.description as HouseDescription,
+                                h.star as HouseStar,
+                                h.is_whole_house as WholeHouse,
+                                h.price_per_night as HousePrice,
+                                h.status_id as HouseStatusId,
+                                h.address_id as HouseAddressId,
+                                u.id as UserPostId,
+                                u.first_name as UserPostFirstName,
+                                u.last_name as UserPostLastName,
+                                u.avatar as UserPostAvatar
+                            FROM
+                                post p
+                                    JOIN
+                                homestay h ON p.target_homestay_id = h.id
+                                    JOIN
+                                user u ON p.user_id = u.id
+                           WHERE p.user_id = ? AND 1=1
                            """;
-        String countQuery = "SELECT COUNT(*) FROM post p WHERE p.created_by = ? AND 1=1";
+        String countQuery = "SELECT COUNT(*) FROM post p WHERE p.user_id = ? AND 1=1";
 
         if (searchKey != null && !searchKey.trim().isEmpty()) {
             baseQuery += " AND p.content LIKE ?";
@@ -260,7 +250,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
             int paramIndex = 1;
 
             countPs.setString(paramIndex++, uid);
-            
+
             if (searchKey != null && !searchKey.trim().isEmpty()) {
                 countPs.setString(paramIndex, "%" + searchKey + "%");
             }
@@ -294,7 +284,6 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 p.setCreated_at(rs.getTimestamp("PostCreatedAt"));
                 p.setUpdated_at(rs.getTimestamp("PostUpdatedAt"));
                 p.setDeleted_at(rs.getTimestamp("PostDeletedAt"));
-                p.setCreated_by(rs.getString("PostCreatedBy"));
 
                 House h = new House();
                 Address a = new Address();
@@ -304,10 +293,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 h.setDescription(rs.getString("HouseDescription"));
                 h.setStar(rs.getFloat("HouseStar"));
                 h.setIs_whole_house(rs.getBoolean("WholeHouse"));
-                h.setPrice_per_month(rs.getDouble("HousePrice"));
-                h.setElectricity_price(rs.getDouble("HouseElectricityPrice"));
-                h.setWater_price(rs.getDouble("HouseWaterPrice"));
-                h.setDown_payment(rs.getDouble("HouseDownPayment"));
+                h.setPrice_per_night(rs.getDouble("HousePrice"));
 
                 a.setId(rs.getInt("HouseAddressId"));
                 psta.setId(rs.getInt("PostStatusId"));
