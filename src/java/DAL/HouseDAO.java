@@ -24,7 +24,7 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
     
     public static void main(String[] args) {
         HouseDAO hDao = new HouseDAO();
-        System.out.println(hDao.getListPaging(10, 0, "", "").size());
+        System.out.println(hDao.getListPaging(10, 0, "", "U-87fbb6d15ad548318110b60b797f84da"));
     }
     
     @Override
@@ -35,7 +35,7 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                          h.*,
                          s.name as StatusName
                      FROM
-                         house h
+                         homestay h
                              JOIN
                          status s ON h.status_id = s.id
                      WHERE 1 = 1 

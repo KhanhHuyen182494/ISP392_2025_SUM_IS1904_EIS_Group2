@@ -398,19 +398,7 @@
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-dollar-sign text-green-500"></i>
-                                            <span class="text-sm"><strong>Giá thuê:</strong> <fmt:formatNumber value="${post.house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / tháng</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-bolt text-yellow-500"></i>
-                                            <span class="text-sm"><strong>Tiền điện:</strong> <fmt:formatNumber value="${post.house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / số</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-tint text-blue-500"></i>
-                                            <span class="text-sm"><strong>Tiền nước:</strong> <fmt:formatNumber value="${post.house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / khối</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
-                                            <span class="text-sm"><strong>Tiền cọc:</strong> <fmt:formatNumber value="${post.house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
+                                            <span class="text-sm"><strong>Giá 1 đêm:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-map-marker-alt text-red-500"></i>
@@ -421,14 +409,13 @@
 
                                 <div class="px-6 pb-4">
                                     <div class="grid grid-cols-2 gap-4">
-                                        <c:forEach items="${post.images}" var="image">
+                                        <c:forEach items="${post.medias}" var="media">
                                             <div class="bg-gray-200 h-48 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                <img class="rounded-[20px] h-48 w-full object-cover" src="${image.path}" onclick="showImageModal('${image.path}')"/>
+                                                <img class="rounded-[20px] h-48 w-full object-cover" src="${media.path}" onclick="showImageModal('${media.path}')"/>
                                             </div>
                                         </c:forEach> 
                                     </div>
                                 </div>
-
 
                                 <div class="px-6 py-4 flex items-center justify-between">
                                     <div class="flex items-center gap-4">
@@ -587,7 +574,7 @@
                                                                 imageAlt: 'Custom icon',
                                                                 showCancelButton: true,
                                                                 confirmButtonText: 'Login now',
-                                                                cancelButtonText: 'Back to Newsfeed',
+                                                                cancelButtonText: 'Back to Profile',
                                                                 reverseButtons: true,
                                                                 focusConfirm: false,
                                                                 focusCancel: false,

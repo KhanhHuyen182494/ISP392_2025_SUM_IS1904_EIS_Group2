@@ -8,9 +8,10 @@ import DTO.PostDTO;
 import Model.Address;
 import Model.Feedback;
 import Model.House;
-import Model.Image;
+import Model.Media;
 import Model.Like;
 import Model.Post;
+import Model.Status;
 import Model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -79,7 +80,11 @@ public class HousesController extends BaseAuthorization {
                 String pid = p.getId();
 
                 Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-                List<Image> images = iDao.getImagesByObjectId(p.getHouse().getId());
+
+                Status s = new Status();
+                s.setId(21);
+
+                List<Media> medias = mDao.getMediaByObjectId(p.getHouse().getId(), "Post", s);
                 List<Like> likes = lDao.getListLikeByPostId(pid);
                 List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
 
@@ -91,7 +96,7 @@ public class HousesController extends BaseAuthorization {
 
                 p.setFeedbacks(feedbacks);
                 p.getHouse().setAddress(a);
-                p.setImages(images);
+                p.setMedias(medias);
                 p.setLikes(likes);
                 p.setLikedByCurrentUser(isLikedByCurrentUser);
             }

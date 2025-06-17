@@ -4,20 +4,21 @@
  */
 package DAL.DAO;
 
-import Model.Image;
+import Model.Media;
+import Model.Status;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface IImageDAO {
+public interface IMediaDAO {
 
     //Get
-    public List<Image> getImagesByObjectId(String id);
+    public List<Media> getMediaByObjectId(String objectId, String objectType, Status s);
 
     //Update
     //Delete
     //Add
-    public boolean addImage(Image i);
+    public boolean addMedia(Media i);
 }

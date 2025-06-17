@@ -191,7 +191,7 @@
             <div class="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-2xl overflow-hidden shadow-lg" style="height: 300px;">
                 <!-- Cover Image (if available) -->
                 <c:if test="${not empty requestScope.profile.cover}">
-                    <img src="${requestScope.profile.cover}" 
+                    <img src="${pageContext.request.contextPath}/Asset/Common/Cover/${requestScope.profile.cover}" 
                          alt="Cover Photo" 
                          class="w-full h-full object-cover"/>
                 </c:if>
@@ -279,15 +279,19 @@
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
                         <c:if test="${sessionScope.user.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View your's houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/profile?uid=${profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-user"></i>
+                                    Profile
+                                </button>
+                            </a>
                         </c:if>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-edit"></i>
-                            Edit Profile
-                        </button>
+                        <a href="${pageContext.request.contextPath}/profile-edit">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-edit"></i>
+                                Edit Profile
+                            </button>
+                        </a>
                         <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             Add Post
@@ -296,10 +300,12 @@
                     <c:otherwise>
                         <!-- Other User Profile Actions -->
                         <c:if test="${requestScope.profile.role.id == 3}">
-                            <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-home"></i>
-                                View all houses
-                            </button>
+                            <a href="${pageContext.request.contextPath}/profile?uid=${profile.id}">
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-user"></i>
+                                    Profile
+                                </button>
+                            </a>
                         </c:if>
                         <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-user-plus"></i>
@@ -334,19 +340,7 @@
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-dollar-sign text-green-500"></i>
-                                                <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / month</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-bolt text-yellow-500"></i>
-                                                <span class="text-sm"><strong>Electricity:</strong> <fmt:formatNumber value="${house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-tint text-blue-500"></i>
-                                                <span class="text-sm"><strong>Water:</strong> <fmt:formatNumber value="${house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
-                                                <span class="text-sm"><strong>Down Payment:</strong> <fmt:formatNumber value="${house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
+                                                <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / night</span>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-map-marker-alt text-red-500"></i>

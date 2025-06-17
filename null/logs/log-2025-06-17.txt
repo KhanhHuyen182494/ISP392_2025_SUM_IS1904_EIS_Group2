@@ -1,0 +1,1 @@
+[2025-06-17 14:19:03] [ERROR] java.sql.SQLSyntaxErrorException: Unknown column 'objectId' in 'where clause'

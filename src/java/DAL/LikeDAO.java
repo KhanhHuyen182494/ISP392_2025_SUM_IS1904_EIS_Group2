@@ -21,14 +21,14 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
 
     public static void main(String[] args) {
         LikeDAO lDao = new LikeDAO();
-        System.out.println(lDao.getLikeByPostAndUser("POST-35334b61da31443da5f13jhd7282u", "U-35334b61da31443da5f850b5856fb4bf"));
+        System.out.println(lDao.getLikeByPostAndUser("POST-87fbb6d15ad548318110b60b797f8", "U-87fbb6d15ad548318110b60b797f84da"));
     }
 
     @Override
     public List<Like> getListLikeByPostId(String postId) {
         List<Like> likes = new ArrayList<>();
         String sql = """
-                     SELECT * FROM like_post WHERE post_id = ? AND isLike = 1;
+                     SELECT * FROM like_post WHERE post_id = ? AND is_like = 1;
                      """;
 
         try {
@@ -44,8 +44,8 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
                 l.setId(rs.getInt("id"));
                 l.setUser_id(rs.getString("user_id"));
                 l.setPost_id(postId);
-                l.setIs_like(rs.getBoolean("isLike"));
-                l.setLiked_at(rs.getTimestamp("liked_at"));
+                l.setIs_like(rs.getBoolean("is_like"));
+                l.setLiked_at(rs.getTimestamp("created_at"));
                 l.setDeleted_at(rs.getTimestamp("deleted_at"));
 
                 likes.add(l);
@@ -70,8 +70,8 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
                      INSERT INTO `like_post`
                      (`user_id`,
                      `post_id`,
-                     `isLike`,
-                     `liked_at`)
+                     `is_like`,
+                     `created_at`)
                      VALUES
                      (?, ?, ?, ?);
                      """;
@@ -105,8 +105,8 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
         String sql = """
                      UPDATE `like_post`
                      SET
-                     `liked_at` = ?,
-                     `isLike` = ?,
+                     `created_at` = ?,
+                     `is_like` = ?,
                      `deleted_at` = ?
                      WHERE `user_id` = ? AND `post_id` = ?;
                      """;
@@ -156,8 +156,8 @@ public class LikeDAO extends BaseDao implements ILikeDAO {
                 l.setId(rs.getInt("id"));
                 l.setUser_id(userId);
                 l.setPost_id(postId);
-                l.setIs_like(rs.getBoolean("isLike"));
-                l.setLiked_at(rs.getTimestamp("liked_at"));
+                l.setIs_like(rs.getBoolean("is_like"));
+                l.setLiked_at(rs.getTimestamp("created_at"));
                 l.setDeleted_at(rs.getTimestamp("deleted_at"));
             }
         } catch (SQLException e) {

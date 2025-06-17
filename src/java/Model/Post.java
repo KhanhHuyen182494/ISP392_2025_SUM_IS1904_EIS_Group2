@@ -26,7 +26,7 @@ public class Post {
 
     private List<Feedback> feedbacks;
     private List<Like> likes;
-    private List<Image> images;
+    private List<Media> medias;
 
     private boolean likedByCurrentUser;
 
@@ -113,14 +113,6 @@ public class Post {
         this.likes = likes;
     }
 
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Image> images) {
-        this.images = images;
-    }
-
     public User getOwner() {
         return owner;
     }
@@ -145,9 +137,17 @@ public class Post {
         this.post_type = post_type;
     }
 
+    public List<Media> getMedias() {
+        return medias;
+    }
+
+    public void setMedias(List<Media> medias) {
+        this.medias = medias;
+    }
+
     @Override
     public String toString() {
-        return "Post{" + "id=" + id + ", content=" + content + ", status=" + status + ", house=" + house + ", room=" + room + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", feedbacks=" + feedbacks + ", likes=" + likes + ", images=" + images + '}';
+        return "Post{" + "id=" + id + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", owner=" + owner + ", post_type=" + post_type + ", status=" + status + ", house=" + house + ", room=" + room + ", feedbacks=" + feedbacks + ", likes=" + likes + ", medias=" + medias + ", likedByCurrentUser=" + likedByCurrentUser + '}';
     }
 
 }
