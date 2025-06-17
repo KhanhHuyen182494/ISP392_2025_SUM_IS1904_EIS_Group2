@@ -24,7 +24,7 @@ public class Post {
     private House house;
     private Room room;
 
-    private List<Feedback> feedbacks;
+    private List<Review> reviews;
     private List<Like> likes;
     private List<Media> medias;
 
@@ -97,12 +97,12 @@ public class Post {
         this.deleted_at = deleted_at;
     }
 
-    public List<Feedback> getFeedbacks() {
-        return feedbacks;
+    public List<Review> getReviews() {
+        return reviews;
     }
 
-    public void setFeedbacks(List<Feedback> feedbacks) {
-        this.feedbacks = feedbacks;
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 
     public List<Like> getLikes() {
@@ -147,7 +147,7 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post{" + "id=" + id + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", owner=" + owner + ", post_type=" + post_type + ", status=" + status + ", house=" + house + ", room=" + room + ", feedbacks=" + feedbacks + ", likes=" + likes + ", medias=" + medias + ", likedByCurrentUser=" + likedByCurrentUser + '}';
+        return "Post{" + "id=" + id + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", owner=" + owner + ", post_type=" + post_type + ", status=" + status + ", house=" + house + ", room=" + room + ", reviews=" + reviews + ", likes=" + likes + ", medias=" + medias + ", likedByCurrentUser=" + likedByCurrentUser + '}';
     }
 
 }

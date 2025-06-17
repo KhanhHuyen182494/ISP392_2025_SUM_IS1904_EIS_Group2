@@ -4,15 +4,15 @@
  */
 package DAL.DAO;
 
-import Model.Feedback;
+import Model.Review;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface IFeedbackDAO extends IBaseUUID<Feedback>{
+public interface IReviewDAO extends IBaseUUID<Review>{
     
-    public List<Feedback> getFeedbacksByHouseId(String houseId, int limit, int offset);
+    public List<Review> getReviewsByHouseId(String homestayId, int limit, int offset);
     
 }

@@ -6,7 +6,7 @@ package Controller.Common;
 
 import DTO.PostDTO;
 import Model.Address;
-import Model.Feedback;
+import Model.Review;
 import Model.Media;
 import Model.Like;
 import Model.Post;
@@ -146,7 +146,7 @@ public class ProfileEdit extends BaseAuthorization {
 
                 List<Media> medias = mDao.getMediaByObjectId(p.getHouse().getId(), "Post", s);
                 List<Like> likes = lDao.getListLikeByPostId(pid);
-                List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+                List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
 
                 boolean isLikedByCurrentUser = false;
                 if (user != null && !user.getId().isBlank()) {
@@ -154,7 +154,7 @@ public class ProfileEdit extends BaseAuthorization {
                             .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
                 }
 
-                p.setFeedbacks(feedbacks);
+                p.setReviews(reviews);
                 p.getHouse().setAddress(a);
                 p.setMedias(medias);
                 p.setLikes(likes);

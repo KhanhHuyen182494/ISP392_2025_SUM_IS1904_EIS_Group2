@@ -10,19 +10,18 @@ import java.sql.Timestamp;
  *
  * @author Huyen
  */
-public class Feedback {
+public class Review {
     private String id;
-    private User user;
-    private String post_id;
-    private String house_id;
-    private String room_id;
+    private User owner;
+    private House homestay;
+    private Room room;
     private Status status;
-    private int star;
+    private int Star;
     private String content;
     private Timestamp created_at;
     private Timestamp updated_at;
 
-    public Feedback() {
+    public Review() {
     }
 
     public String getId() {
@@ -33,44 +32,36 @@ public class Feedback {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
-    public String getPost_id() {
-        return post_id;
+    public House getHomestay() {
+        return homestay;
     }
 
-    public void setPost_id(String post_id) {
-        this.post_id = post_id;
+    public void setHomestay(House homestay) {
+        this.homestay = homestay;
     }
 
-    public String getHouse_id() {
-        return house_id;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setHouse_id(String house_id) {
-        this.house_id = house_id;
-    }
-
-    public String getRoom_id() {
-        return room_id;
-    }
-
-    public void setRoom_id(String room_id) {
-        this.room_id = room_id;
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public int getStar() {
-        return star;
+        return Star;
     }
 
-    public void setStar(int star) {
-        this.star = star;
+    public void setStar(int Star) {
+        this.Star = Star;
     }
 
     public String getContent() {
@@ -107,7 +98,7 @@ public class Feedback {
 
     @Override
     public String toString() {
-        return "Feedback{" + "id=" + id + ", user=" + user + ", post_id=" + post_id + ", house_id=" + house_id + ", room_id=" + room_id + ", status=" + status + ", star=" + star + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + '}';
+        return "Review{" + "id=" + id + ", owner=" + owner + ", homestay=" + homestay + ", room=" + room + ", status=" + status + ", Star=" + Star + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + '}';
     }
     
 }

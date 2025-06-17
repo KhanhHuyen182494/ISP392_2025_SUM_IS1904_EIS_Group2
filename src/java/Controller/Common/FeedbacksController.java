@@ -5,7 +5,7 @@
 package Controller.Common;
 
 import Controller.Authentication.LoginController;
-import Model.Feedback;
+import Model.Review;
 import Model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -96,15 +96,15 @@ public class FeedbacksController extends BaseAuthorization {
             }
             int offset = (page - 1) * limit;
 
-            List<Feedback> feedbacks = fDao.getFeedbacksByHouseId(houseId, limit, offset);
+            List<Review> feedbacks = rDao.getReviewsByHouseId(houseId, limit, offset);
 
-            int totalCount = fDao.getFeedbacksByHouseId(houseId, Integer.MAX_VALUE, 0).size();
+            int totalCount = rDao.getReviewsByHouseId(houseId, Integer.MAX_VALUE, 0).size();
             boolean hasMore = (offset + feedbacks.size()) < totalCount;
 
             // Create response object
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
-            responseData.put("feedbacks", feedbacks);
+            responseData.put("reviews", feedbacks);
             responseData.put("hasMore", hasMore);
             responseData.put("totalCount", totalCount);
             responseData.put("currentPage", page);
