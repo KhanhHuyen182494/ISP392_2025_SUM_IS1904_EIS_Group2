@@ -4,22 +4,15 @@
  */
 package DAL.DAO;
 
-import Model.Feature;
+import Model.PostType;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface IFeatureDAO {
+public interface IPostTypeDAO {
 
-    public Feature getFeatureById(int id);
-
-    public List<Feature> getAllFeaturesByRoleId(int role);
-
-    public List<Feature> getAllFeature();
-
-    public boolean add(Feature f);
-
-    public boolean update(Feature f);
+    //Get
+    public List<PostType> getAllPostType();
 }

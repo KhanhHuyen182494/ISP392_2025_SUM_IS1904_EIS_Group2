@@ -4,22 +4,19 @@
  */
 package DAL.DAO;
 
-import Model.Feature;
+import Model.Status;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface IFeatureDAO {
+public interface IStatusDAO {
 
-    public Feature getFeatureById(int id);
+    //Get
+    public List<Status> getAllStatusByCategory(String category);
 
-    public List<Feature> getAllFeaturesByRoleId(int role);
+    public Status getStatusById(int id);
 
-    public List<Feature> getAllFeature();
-
-    public boolean add(Feature f);
-
-    public boolean update(Feature f);
+    public Status getStatusByName(String name);
 }

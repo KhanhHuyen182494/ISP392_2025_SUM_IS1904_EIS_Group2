@@ -17,6 +17,10 @@ import java.util.List;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,7 +47,37 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
     @Override
     public boolean add(Post t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO post(id, content, created_at, user_id, post_type_id, status_id, target_room_id, target_homestay_id, parent_post_id) 
+                     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getId());
+            ps.setString(2, t.getContent());
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(4, t.getOwner().getId());
+            ps.setInt(5, t.getPost_type().getId());
+            ps.setInt(6, t.getStatus().getId());
+            ps.setString(7, t.getRoom().getId());
+            ps.setString(8, t.getHouse().getId());
+            ps.setString(9, t.getParent_post().getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override

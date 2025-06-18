@@ -304,10 +304,12 @@
                             </button>
                         </a>
                         <c:if test="${sessionScope.user.role.id == 3}">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-plus"></i>
-                                Add Post
-                            </button>
+                            <a href="${pageContext.request.contextPath}/post">
+                                <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    Add Post
+                                </button>
+                            </a>
                         </c:if>
                         <!--<a href="${pageContext.request.contextPath}/change-password">-->
                         <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >

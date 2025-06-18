@@ -6,7 +6,6 @@ import DAL.AddressDAO;
 import DAL.CommentDAO;
 import DAL.DAO.IAddressDAO;
 import DAL.DAO.ICommentDAO;
-import DAL.DAO.IFeatureDao;
 import DAL.DAO.IHouseDAO;
 import DAL.DAO.IMediaDAO;
 import DAL.DAO.ILikeDAO;
@@ -29,6 +28,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import DAL.DAO.IFeatureDAO;
+import DAL.DAO.IPostTypeDAO;
+import DAL.DAO.IStatusDAO;
+import DAL.PostTypeDAO;
+import DAL.StatusDAO;
 
 /**
  *
@@ -43,10 +47,12 @@ public abstract class BaseAuthorization extends HttpServlet {
     public IMediaDAO mDao;
     public ILikeDAO lDao;
     public IReviewDAO rDao;
-    public IFeatureDao feaDao;
+    public IFeatureDAO feaDao;
     public ICommentDAO cDao;
+    public IStatusDAO sDao;
+    public IPostTypeDAO ptDao;
     public Logging log = new Logging();
-    Gson gson;
+    public Gson gson;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -60,6 +66,8 @@ public abstract class BaseAuthorization extends HttpServlet {
         uDao = new UserDAO();
         hDao = new HouseDAO();
         cDao = new CommentDAO();
+        sDao = new StatusDAO();
+        ptDao = new PostTypeDAO();
     }
 
     private User getUser(HttpServletRequest request) {

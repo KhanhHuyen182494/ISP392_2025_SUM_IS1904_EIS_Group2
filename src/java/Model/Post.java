@@ -23,6 +23,7 @@ public class Post {
     private Status status;
     private House house;
     private Room room;
+    private Post parent_post;
 
     private List<Review> reviews;
     private List<Like> likes;
@@ -145,9 +146,17 @@ public class Post {
         this.medias = medias;
     }
 
+    public Post getParent_post() {
+        return parent_post;
+    }
+
+    public void setParent_post(Post parent_post) {
+        this.parent_post = parent_post;
+    }
+
     @Override
     public String toString() {
-        return "Post{" + "id=" + id + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", owner=" + owner + ", post_type=" + post_type + ", status=" + status + ", house=" + house + ", room=" + room + ", reviews=" + reviews + ", likes=" + likes + ", medias=" + medias + ", likedByCurrentUser=" + likedByCurrentUser + '}';
+        return "Post{" + "id=" + id + ", content=" + content + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + ", owner=" + owner + ", post_type=" + post_type + ", status=" + status + ", house=" + house + ", room=" + room + ", parent_post=" + parent_post + ", reviews=" + reviews + ", likes=" + likes + ", medias=" + medias + ", likedByCurrentUser=" + likedByCurrentUser + '}';
     }
 
 }
