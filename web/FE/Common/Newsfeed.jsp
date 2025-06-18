@@ -223,7 +223,7 @@
             <div class="col-span-12 sticky top-20 z-50">
                 <div class="bg-white rounded-2xl shadow-md p-4 sticky top-24">
                     <div class="group-button">
-                        <button class="flex-1 bg-yellow-500 hover:bg-yellow-600 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
+                        <button class="flex-1 bg-yellow-400 hover:bg-yellow-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
                             <i class="fa-solid fa-star"></i>
                             Top House
                         </button>
@@ -914,25 +914,22 @@
                                                             submitCommentBtn.prop('disabled', true);
                                                             submitCommentBtn.html('<div class="loading-spinner inline-block mr-2"></div>Posting...');
                                                             $.ajax({
-                                                                url: '${pageContext.request.contextPath}/comment/submit',
+                                                                url: '${pageContext.request.contextPath}/comment',
                                                                 method: 'POST',
                                                                 data: {
                                                                     postId: currentCommentPostId,
-                                                                    content: content,
-                                                                    type: 'house'
+                                                                    content: content
                                                                 },
                                                                 success: function (response) {
-                                                                    if (response.success) {
-                                                                        showToast('Comment posted successfully!', 'success');
+                                                                    if (response.ok) {
+                                                                        showToast(response.message ? response.message : 'Comment success!', 'success');
                                                                         commentInput.val('');
                                                                         // Add the new comment to the top of the list
                                                                         if (response.comment) {
                                                                             const newCommentHtml = createCommentHtml(response.comment);
                                                                             commentContainer.prepend(newCommentHtml);
-                                                                            // Hide no comment message if it was showing
                                                                             noCommentDiv.addClass('hidden');
                                                                         } else {
-                                                                            // Reload comments to show the new one
                                                                             loadComments(currentCommentPostId, 1, true);
                                                                         }
                                                                     } else {
@@ -1035,7 +1032,7 @@
 
                                                             let deleteButton = '';
                                                             if (isCurrentUser) {
-                                                                deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(' + comment.id + ')">' +
+                                                                deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(`' + comment.id + '`)">' +
                                                                         '<i class="fas fa-trash mr-1"></i>' +
                                                                         'Delete' +
                                                                         '</button>';
@@ -1055,7 +1052,7 @@
                                                                                 <div class="flex items-center gap-2">
                                                                                     <a href="${pageContext.request.contextPath}/profile?uid=` + ownerId + `" 
                                                                                        class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
-                                                                                        You
+                                                                                        ` + ownerName + `
                                                                                     </a>
                                                                                  <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">You</span>
                                                                                 </div>
@@ -1064,14 +1061,6 @@
                                                                             <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">` + comment.content + `</p>
 
                                                                             <div class="flex items-center gap-3 mt-3">
-//                                                                                <button class="text-xs text-gray-500 hover:text-blue-600 transition-colors">
-//                                                                                    <i class="fas fa-thumbs-up mr-1"></i>
-//                                                                                    Like
-//                                                                                </button>
-//                                                                                <button class="text-xs text-gray-500 hover:text-blue-600 transition-colors">
-//                                                                                    <i class="fas fa-reply mr-1"></i>
-//                                                                                    Reply
-//                                                                                </button>
                                                                                 ` + deleteButton + `
                                                                             </div>
                                                                         </div>
@@ -1100,40 +1089,11 @@
                                                                             <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">` + comment.content + `</p>
 
                                                                             <div class="flex items-center gap-3 mt-3">
-                                                                                <button class="text-xs text-gray-500 hover:text-blue-600 transition-colors">
-                                                                                    <i class="fas fa-reply mr-1"></i>
-                                                                                    Reply
-                                                                                </button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             `;
-                                                            }
-                                                        }
-
-                                                        function formatTimeAgo(dateString) {
-                                                            try {
-                                                                const now = new Date();
-                                                                const date = new Date(dateString);
-                                                                const diffInSeconds = Math.floor((now - date) / 1000);
-
-                                                                if (diffInSeconds < 60) {
-                                                                    return 'Just now';
-                                                                } else if (diffInSeconds < 3600) {
-                                                                    const minutes = Math.floor(diffInSeconds / 60);
-                                                                    return `${minutes}m ago`;
-                                                                } else if (diffInSeconds < 86400) {
-                                                                    const hours = Math.floor(diffInSeconds / 3600);
-                                                                    return `${hours}h ago`;
-                                                                } else if (diffInSeconds < 604800) {
-                                                                    const days = Math.floor(diffInSeconds / 86400);
-                                                                    return `${days}d ago`;
-                                                                } else {
-                                                                    return date.toLocaleDateString();
-                                                                }
-                                                            } catch (error) {
-                                                                return dateString;
                                                             }
                                                         }
 

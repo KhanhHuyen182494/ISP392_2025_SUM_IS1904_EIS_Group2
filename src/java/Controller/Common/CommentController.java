@@ -4,6 +4,7 @@
  */
 package Controller.Common;
 
+import Base.Generator;
 import Model.Comment;
 import Model.User;
 import java.io.IOException;
@@ -96,7 +97,46 @@ public class CommentController extends BaseAuthorization {
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        // Set response content type
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
+        try {
+            // Get parameters
+            String postIdStr = request.getParameter("postId");
+            String contentStr = request.getParameter("content");
+
+            // Validate parameters
+            if (postIdStr == null || postIdStr.trim().isEmpty()) {
+                sendErrorResponse(response, "Post ID is required", 400);
+                return;
+            }
+
+            Comment c = new Comment();
+            c.setId(Generator.generateCommentId());
+            c.setContent(contentStr);
+            c.setPost_id(postIdStr);
+            c.setOwner(user);
+
+            Map<String, Object> responseData = new HashMap<>();
+
+            if (cDao.add(c)) {
+                responseData.put("ok", true);
+                responseData.put("comment", c);
+                responseData.put("message", "Comment success!");
+            } else {
+                responseData.put("ok", false);
+                responseData.put("message", "Comment failed!");
+            }
+
+            // Send JSON response
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(responseData));
+            out.flush();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error", e);
+            sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
+        }
     }
 
     private void sendErrorResponse(HttpServletResponse response, String message, int statusCode)

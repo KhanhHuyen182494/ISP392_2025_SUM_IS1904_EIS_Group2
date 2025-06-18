@@ -11,6 +11,10 @@ import Model.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,7 +23,7 @@ import java.sql.SQLException;
 public class CommentDAO extends BaseDao implements ICommentDAO {
 
     private Logging logger = new Logging();
-    
+
     public static void main(String[] args) {
         CommentDAO cDao = new CommentDAO();
         System.out.println(cDao.getListCommentByPostId("POST-87fbb6d15ad548318110b60b797f8", 10, 0));
@@ -72,9 +76,9 @@ public class CommentDAO extends BaseDao implements ICommentDAO {
                 u.setFirst_name(rs.getString("UserFirstName"));
                 u.setLast_name(rs.getString("UserLastName"));
                 u.setAvatar(rs.getString("UserAvatar"));
-                
+
                 parent.setId(rs.getString("parent_comment_id"));
-                
+
                 c.setOwner(u);
                 c.setParentComment(parent);
 
@@ -106,7 +110,33 @@ public class CommentDAO extends BaseDao implements ICommentDAO {
 
     @Override
     public boolean add(Comment t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO comment(id, user_id, post_id, content, created_at) 
+                     VALUES(?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getId());
+            ps.setString(2, t.getOwner().getId());
+            ps.setString(3, t.getPost_id());
+            ps.setString(4, t.getContent());
+            ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override
