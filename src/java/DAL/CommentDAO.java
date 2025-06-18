@@ -43,7 +43,7 @@ public class CommentDAO extends BaseDao implements ICommentDAO {
                      	comment c
                      		JOIN 
                      	User u ON c.user_id = u.id
-                     WHERE c.post_id = ?
+                     WHERE c.post_id = ? AND c.deleted_at is null
                      ORDER BY c.created_at DESC
                      LIMIT ? OFFSET ?
                      """;
@@ -100,7 +100,64 @@ public class CommentDAO extends BaseDao implements ICommentDAO {
 
     @Override
     public Comment getById(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Comment c = new Comment();
+        String sql = """
+                     SELECT 
+                        c.*,
+                        u.id as UserId,
+                        u.first_name as UserFirstName,
+                        u.last_name as UserLastName,
+                        u.avatar as UserAvatar
+                     FROM
+                        comment c
+                            JOIN 
+                        User u ON c.user_id = u.id
+                     WHERE c.id = ?
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, id);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                c.setId(rs.getString("id"));
+                c.setPost_id(rs.getString("post_id"));
+                c.setContent(rs.getString("content"));
+                c.setCreated_at(rs.getTimestamp("created_at"));
+                c.setUpdated_at(rs.getTimestamp("updated_at"));
+                c.setDeleted_at(rs.getTimestamp("deleted_at"));
+
+                User u = new User();
+
+                Comment parent = new Comment();
+
+                u.setId(rs.getString("UserId"));
+                u.setFirst_name(rs.getString("UserFirstName"));
+                u.setLast_name(rs.getString("UserLastName"));
+                u.setAvatar(rs.getString("UserAvatar"));
+
+                parent.setId(rs.getString("parent_comment_id"));
+
+                c.setOwner(u);
+                c.setParentComment(parent);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return c;
     }
 
     @Override
@@ -141,12 +198,59 @@ public class CommentDAO extends BaseDao implements ICommentDAO {
 
     @Override
     public boolean deleteById(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     DELETE FROM `comment` WHERE id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override
     public boolean update(Comment t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     UPDATE `comment`
+                     SET content = ?, updated_at = ?, deleted_at = ?
+                     WHERE id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getContent());
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setTimestamp(3, t.getDeleted_at());
+            ps.setString(4, t.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
 }

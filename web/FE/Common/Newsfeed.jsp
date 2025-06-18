@@ -918,7 +918,8 @@
                                                                 method: 'POST',
                                                                 data: {
                                                                     postId: currentCommentPostId,
-                                                                    content: content
+                                                                    content: content,
+                                                                    type: "add"
                                                                 },
                                                                 success: function (response) {
                                                                     if (response.ok) {
@@ -1100,31 +1101,37 @@
                                                         // Global function for deleting comments
                                                         window.deleteComment = function (commentId) {
                                                             Swal.fire({
-                                                                title: 'Delete Comment?',
-                                                                text: 'This action cannot be undone.',
-                                                                icon: 'warning',
+                                                                title: 'Delete comment ?',
+                                                                html: 'This action can not be undo, please sure you have make decision!',
+                                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                imageWidth: 150,
+                                                                imageHeight: 150,
+                                                                imageAlt: 'Custom icon',
                                                                 showCancelButton: true,
-                                                                confirmButtonColor: '#ef4444',
-                                                                cancelButtonColor: '#6b7280',
                                                                 confirmButtonText: 'Delete',
                                                                 cancelButtonText: 'Cancel',
+                                                                reverseButtons: true,
+                                                                focusConfirm: false,
+                                                                focusCancel: false,
                                                                 customClass: {
                                                                     popup: 'rounded-xl shadow-lg',
-                                                                    confirmButton: 'rounded-lg',
-                                                                    cancelButton: 'rounded-lg'
+                                                                    title: 'text-xl font-semibold',
+                                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                    actions: 'space-x-4'
                                                                 },
                                                                 buttonsStyling: false
                                                             }).then((result) => {
                                                                 if (result.isConfirmed) {
                                                                     $.ajax({
-                                                                        url: '${pageContext.request.contextPath}/comment/delete',
+                                                                        url: '${pageContext.request.contextPath}/comment',
                                                                         method: 'POST',
-                                                                        data: {commentId: commentId},
+                                                                        data: {commentId: commentId, type: "delete"},
                                                                         success: function (response) {
-                                                                            if (response.success) {
+                                                                            if (response.ok) {
                                                                                 showToast('Comment deleted successfully', 'success');
                                                                                 // Remove the comment from the DOM
-                                                                                $(`[data-comment-id="${commentId}"]`).fadeOut(300, function () {
+                                                                                $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
                                                                                     $(this).remove();
 
                                                                                     // Show no comments message if container is empty
@@ -1140,6 +1147,8 @@
                                                                             showToast('Failed to delete comment', 'error');
                                                                         }
                                                                     });
+                                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                    Swal.close();
                                                                 }
                                                             });
                                                         };
