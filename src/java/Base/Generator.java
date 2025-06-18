@@ -91,6 +91,10 @@ public class Generator {
         return generateOTP(6);
     }
 
+    public static String generateCommentId() {
+        return generate("COMMENT", 36);
+    }
+
     public static void main(String[] args) {
         System.out.println(generatePassword(8));
     }
