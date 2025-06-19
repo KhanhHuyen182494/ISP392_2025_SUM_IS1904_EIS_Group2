@@ -180,7 +180,7 @@ public class CommentDAO extends BaseDao implements ICommentDAO {
             ps.setString(2, t.getOwner().getId());
             ps.setString(3, t.getPost_id());
             ps.setString(4, t.getContent());
-            ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setTimestamp(5, t.getCreated_at());
 
             return ps.executeUpdate() > 0;
 

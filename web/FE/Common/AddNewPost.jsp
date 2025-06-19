@@ -622,6 +622,8 @@
                         }
                     });
 
+                    formData.append("typeWork", "post");
+
                     $.ajax({
                         processData: false,
                         contentType: false,

@@ -124,6 +124,7 @@ public class CommentController extends BaseAuthorization {
                 c.setContent(contentStr);
                 c.setPost_id(postIdStr);
                 c.setOwner(user);
+                c.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
                 
                 if (cDao.add(c)) {
                     responseData.put("ok", true);

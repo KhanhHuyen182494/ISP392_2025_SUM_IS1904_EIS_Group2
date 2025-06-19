@@ -259,47 +259,56 @@
                                                 <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
                                             </div>
                                         </div>
-<!--                                        <div class="flex gap-2">
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                        </div>-->
+                                        <!--                                        <div class="flex gap-2">
+                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                </div>-->
                                     </div>
 
                                     <p class="text-lg mb-4">
                                         ${post.content}
                                     </p>
 
-                                    <!-- Property Title -->
-                                    <h2 class="text-xl font-bold text-gray-800 mb-3">${post.house.name} ${not empty post.room.id ? ' - ' + post.room.id : ''}</h2>
+                                    <c:if test="${post.post_type.id == 1}">
+                                        <!-- Property Title -->
+                                        <h2 class="text-xl font-bold text-gray-800 mb-3">${post.house.name} ${not empty post.room.id ? ' - ' + post.room.id : ''}</h2>
 
-                                    <!-- Description -->
-                                    <p class="text-gray-600 mb-4">
-                                        ${post.house.description}
-                                    </p>
+                                        <!-- Description -->
+                                        <p class="text-gray-600 mb-4">
+                                            ${post.house.description}
+                                        </p>
 
-                                    <!-- Property Details -->
-                                    <div class="space-y-2 mb-4">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-dollar-sign text-green-500"></i>
-                                            <span class="text-sm"><strong>Giá 1 đêm:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                        <!-- Property Details -->
+                                        <div class="space-y-2 mb-4">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-dollar-sign text-green-500"></i>
+                                                <span class="text-sm"><strong>Giá 1 đêm:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-map-marker-alt text-red-500"></i>
+                                                <span class="text-sm"><strong>Địa chỉ:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-map-marker-alt text-red-500"></i>
-                                            <span class="text-sm"><strong>Địa chỉ:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
-                                        </div>
-                                    </div>
+                                    </c:if>
                                 </div>
 
                                 <!-- Images -->
                                 <div class="px-6 pb-4">
                                     <div class="grid grid-cols-2 gap-4"> 
                                         <c:forEach items="${post.medias}" var="media">
-                                            <div class="bg-gray-200 h-48 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                <img class="rounded-[20px] h-48 w-full object-cover" src="${media.path}" onclick="showImageModal('${media.path}')"/>
+                                            <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
+                                                <img class="rounded-[20px] h-96 w-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}" onclick="showImageModal('${media.path}', 'Post')"/>
                                             </div>
-                                        </c:forEach> 
+                                        </c:forEach>
+                                        <c:if test="${post.post_type.id == 1}">
+                                            <c:forEach items="${post.house.medias}" var="mediaH">
+                                                <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
+                                                    <img class="rounded-[20px] h-96 w-full object-cover" src="${mediaH.path}" onclick="showImageModal('${mediaH.path}', 'House')"/>
+                                                </div>
+                                            </c:forEach>
+                                        </c:if>
                                     </div>
                                 </div>
 
@@ -318,35 +327,44 @@
 
                                     </div>
 
-                                    <div class="flex items-center gap-2">
-                                        <div class="review-badge text-white px-3 py-1 rounded-full text-xs font-medium">
-                                            ${fn:length(post.reviews)} reviews
+                                    <c:if test="${post.post_type.id == 1}">
+                                        <div class="flex items-center gap-2">
+                                            <div class="review-badge text-white px-3 py-1 rounded-full text-xs font-medium">
+                                                ${fn:length(post.reviews)} reviews
+                                            </div>
                                         </div>
-                                    </div>
+                                    </c:if>
                                 </div>
 
                                 <!-- Action Buttons -->
-                                <div class="px-6 py-4 flex gap-3">
-                                    <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
-                                        <i class="fas fa-key mr-2"></i>
-                                        Book
-                                    </button>
-                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
-                                        <i class="fa-solid fa-house text-white"></i>
-                                        View Detail
-                                    </button>
-                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
-                                            data-house-id="${post.house.id}" 
-                                            data-house-name="${post.house.name}">
-                                        <i class="fas fa-comment mr-2"></i>
-                                        View Review
-                                    </button>
-                                </div>
-                                <div class="px-6 py-4 flex gap-3">
-                                    <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors"
+                                <c:if test="${post.post_type.id == 1}"> 
+                                    <div class="px-6 py-4 flex gap-3">
+                                        <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
+                                            <i class="fas fa-key mr-2"></i>
+                                            Book
+                                        </button>
+                                        <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                            <i class="fa-solid fa-house text-white"></i>
+                                            View Detail
+                                        </button>
+                                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
+                                                data-house-id="${post.house.id}" 
+                                                data-house-name="${post.house.name}">
+                                            <i class="fas fa-comment mr-2"></i>
+                                            View Review
+                                        </button>
+                                    </div>
+                                </c:if>
+                                <div class="px-6 py-4 gap-3 grid grid-cols-9">
+                                    <button class="col-span-6 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors"
                                             data-post-id="${post.id}">
                                         <i class="fas fa-comments mr-2"></i>
                                         Comment
+                                    </button>
+                                    <button class="col-span-3 bg-white-500 hover:bg-blue-500 hover:text-white border-[1px] border-blue-600 text-blue-600 py-3 rounded-lg font-medium transition-colors"
+                                            data-post-share-id="${post.id}">
+                                        <i class="fas fa-comments mr-2"></i>
+                                        Share
                                     </button>
                                 </div>
                             </div>
@@ -928,6 +946,7 @@
                                                                         // Add the new comment to the top of the list
                                                                         if (response.comment) {
                                                                             const newCommentHtml = createCommentHtml(response.comment);
+                                                                            console.log(response.comment);
                                                                             commentContainer.prepend(newCommentHtml);
                                                                             noCommentDiv.addClass('hidden');
                                                                         } else {
@@ -1151,6 +1170,94 @@
                                                             });
                                                         };
 
+                                                        $('button:contains("Share")').each(function () {
+                                                            const postId = $(this).closest('.card-hover').find('button[data-post-share-id]').first().data('post-id');
+                                                            $(this).attr('data-post-share-id', postId);
+                                                        });
+
+                                                        $(document).on('click', 'button:contains("Share")', function () {
+                                                            let user = '${sessionScope.user_id}';
+                                                            if (user.trim() === '') {
+                                                                Swal.fire({
+                                                                    title: 'You must login to use this feature',
+                                                                    imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                    imageWidth: 150,
+                                                                    imageHeight: 150,
+                                                                    imageAlt: 'Custom icon',
+                                                                    showCancelButton: true,
+                                                                    confirmButtonText: 'Login now',
+                                                                    cancelButtonText: 'Back to Newsfeed',
+                                                                    reverseButtons: true,
+                                                                    focusConfirm: false,
+                                                                    focusCancel: false,
+                                                                    customClass: {
+                                                                        popup: 'rounded-xl shadow-lg',
+                                                                        title: 'text-xl font-semibold',
+                                                                        confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                        actions: 'space-x-4'
+                                                                    },
+                                                                    buttonsStyling: false
+                                                                }).then((result) => {
+                                                                    if (result.isConfirmed) {
+                                                                        location.href = '${pageContext.request.contextPath}/login';
+                                                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                        Swal.close();
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                let sharePost = $(this).data('post-share-id');
+
+                                                                Swal.fire({
+                                                                    title: 'Wanna share this post?',
+                                                                    html: 'Say something about this post or leave blank?',
+                                                                    input: 'text',
+                                                                    inputPlaceholder: 'Add a message...',
+                                                                    imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                    imageWidth: 150,
+                                                                    imageHeight: 150,
+                                                                    imageAlt: 'Custom icon',
+                                                                    showCancelButton: true,
+                                                                    confirmButtonText: 'Share',
+                                                                    cancelButtonText: 'Cancel',
+                                                                    reverseButtons: true,
+                                                                    focusConfirm: false,
+                                                                    focusCancel: false,
+                                                                    customClass: {
+                                                                        popup: 'rounded-xl shadow-lg',
+                                                                        title: 'text-xl font-semibold',
+                                                                        confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                        actions: 'space-x-4'
+                                                                    },
+                                                                    buttonsStyling: false
+                                                                }).then((result) => {
+                                                                    if (result.isConfirmed) {
+                                                                        const inputValue = result.value;
+
+                                                                        $.ajax({
+                                                                            url: '${pageContext.request.contextPath}/post',
+                                                                            type: 'POST',
+                                                                            data: {
+                                                                                typeWork: 'share',
+                                                                                postId: sharePost,
+                                                                                content: inputValue
+                                                                            }
+                                                                            , success: function (response) {
+                                                                                if (response.ok) {
+                                                                                    showToast(response.message);
+                                                                                } else {
+                                                                                    showToast(response.message, 'error');
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                        Swal.close();
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+
                                                         function showToast(message, type = 'success') {
                                                             Toastify({
                                                                 text: message,
@@ -1163,17 +1270,30 @@
                                                         }
                                                     });
 
-                                                    function showImageModal(imageSrc) {
-                                                        Swal.fire({
-                                                            imageUrl: imageSrc,
-                                                            imageWidth: 'auto',
-                                                            imageHeight: 'auto',
-                                                            showCloseButton: false,
-                                                            showConfirmButton: false,
-                                                            customClass: {
-                                                                image: 'rounded-lg p-5'
-                                                            }
-                                                        });
+                                                    function showImageModal(imageSrc, type) {
+                                                        if (type === 'House') {
+                                                            Swal.fire({
+                                                                imageUrl: '${pageContext.request.contextPath}/Asset/Common/House/' + imageSrc,
+                                                                imageWidth: 'auto',
+                                                                imageHeight: 'auto',
+                                                                showCloseButton: false,
+                                                                showConfirmButton: false,
+                                                                customClass: {
+                                                                    image: 'rounded-lg p-5'
+                                                                }
+                                                            });
+                                                        } else if (type === 'Post') {
+                                                            Swal.fire({
+                                                                imageUrl: '${pageContext.request.contextPath}/Asset/Common/Post/' + imageSrc,
+                                                                imageWidth: 'auto',
+                                                                imageHeight: 'auto',
+                                                                showCloseButton: false,
+                                                                showConfirmButton: false,
+                                                                customClass: {
+                                                                    image: 'rounded-lg p-5'
+                                                                }
+                                                            });
+                                                        }
                                                     }
         </script>
     </body>

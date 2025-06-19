@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -75,6 +76,14 @@ public class NewsfeedController extends BaseAuthorization {
             posts = pDao.getPaginatedPosts(1, 10, "", "");
             fullLoadPostInfomation(posts, user);
 
+            List<House> hList = new LinkedList<>();
+
+            for (Post p : posts.getItems()) {
+                hList.add(p.getHouse());
+            }
+
+            fullLoadHouseInfomation(hList);
+
             //Logic get top house room
             request.setAttribute("topfeedbacks", topHouseRoom);
             request.setAttribute("posts", posts.getItems());
@@ -83,6 +92,26 @@ public class NewsfeedController extends BaseAuthorization {
         } catch (ServletException | IOException e) {
             LOGGER.log(Level.SEVERE, "Error during get post process", e);
             log.error("Error during get post process");
+        }
+    }
+
+    private void fullLoadHouseInfomation(List<House> houses) {
+        try {
+            //Load address, images, likes, feedbacks
+            for (House h : houses) {
+                String hid = h.getId();
+
+                Address a = aDao.getAddressById(h.getAddress().getId());
+                Status mediaS = new Status();
+                mediaS.setId(21);
+                List<Media> medias = mDao.getMediaByObjectId(h.getId(), "Homestay", mediaS);
+
+                h.setMedias(medias);
+                h.setAddress(a);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
         }
     }
 
@@ -97,9 +126,14 @@ public class NewsfeedController extends BaseAuthorization {
                 Status s = new Status();
                 s.setId(21);
 
-                List<Media> medias = mDao.getMediaByObjectId(p.getHouse().getId(), "Post", s);
+                List<Media> medias = mDao.getMediaByObjectId(p.getId(), "Post", s);
                 List<Like> likes = lDao.getListLikeByPostId(pid);
                 List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+
+                if (p.getParent_post() != null && p.getParent_post().getId() != null) {
+                    Post parent = pDao.getById(p.getParent_post().getId());
+                    p.setParent_post(parent);
+                }
 
                 boolean isLikedByCurrentUser = false;
                 if (user != null && !user.getId().isBlank()) {
