@@ -70,7 +70,7 @@ public class ImageController extends BaseAuthorization {
             Map<String, Object> result = new HashMap<>();
 
             if (avatarPart != null && avatarPart.getSize() > 0) {
-                String fileName = user.getId() + "_" + "avatar";
+                String fileName = System.currentTimeMillis() + "_" + user.getId() + "_" + "avatar";
                 String realPath = request.getServletContext().getRealPath("");
                 String modifiedPath = realPath.replace("\\build", "");
 
@@ -118,7 +118,7 @@ public class ImageController extends BaseAuthorization {
             Map<String, Object> result = new HashMap<>();
 
             if (avatarPart != null && avatarPart.getSize() > 0) {
-                String fileName = user.getId() + "_" + "cover";
+                String fileName = System.currentTimeMillis() + "_" + user.getId() + "_" + "cover";
                 String realPath = request.getServletContext().getRealPath("");
                 String modifiedPath = realPath.replace("\\build", "");
 

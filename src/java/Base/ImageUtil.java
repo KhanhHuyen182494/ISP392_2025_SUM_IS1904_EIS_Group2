@@ -37,13 +37,12 @@ public class ImageUtil {
         }
 
         // Prevent overwriting: add timestamp or UUID
-        String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-        String filePath = uploadDir + File.separator + uniqueFileName;
+        String filePath = uploadDir + File.separator + fileName;
 
         // Write to file
         imagePart.write(filePath);
 
-        return uniqueFileName;
+        return fileName;
     }
 
 }

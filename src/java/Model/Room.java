@@ -5,6 +5,7 @@
 package Model;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  *
@@ -22,6 +23,8 @@ public class Room {
     private String room_position;
     private House house;
     private Status status;
+    private RoomType roomType;
+    private List<Media> medias;
 
     public Room() {
     }
@@ -106,8 +109,25 @@ public class Room {
         this.status = status;
     }
 
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public List<Media> getMedias() {
+        return medias;
+    }
+
+    public void setMedias(List<Media> medias) {
+        this.medias = medias;
+    }
+
     @Override
     public String toString() {
-        return "Room{" + "id=" + id + ", name=" + name + ", description=" + description + ", star=" + star + ", price_per_night=" + price_per_night + ", created_at=" + created_at + ", updated_at=" + updated_at + ", room_position=" + room_position + ", house=" + house + ", status=" + status + '}';
+        return "Room{" + "id=" + id + ", name=" + name + ", description=" + description + ", star=" + star + ", price_per_night=" + price_per_night + ", created_at=" + created_at + ", updated_at=" + updated_at + ", room_position=" + room_position + ", house=" + house + ", status=" + status + ", roomType=" + roomType + ", medias=" + medias + '}';
     }
+
 }

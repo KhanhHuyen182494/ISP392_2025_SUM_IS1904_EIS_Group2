@@ -62,9 +62,21 @@ public class PostDAO extends BaseDao implements IPostDAO {
             ps.setString(4, t.getOwner().getId());
             ps.setInt(5, t.getPost_type().getId());
             ps.setInt(6, t.getStatus().getId());
-            ps.setString(7, t.getRoom().getId());
-            ps.setString(8, t.getHouse().getId());
-            ps.setString(9, t.getParent_post().getId());
+            if (t.getRoom() != null && t.getRoom().getId() != null) {
+                ps.setString(7, t.getRoom().getId());
+            } else {
+                ps.setString(7, null);
+            }
+            if (t.getHouse() != null && t.getHouse().getId() != null) {
+                ps.setString(8, t.getHouse().getId());
+            } else {
+                ps.setString(8, null);
+            }
+            if (t.getParent_post() != null && t.getParent_post().getId() != null) {
+                ps.setString(9, t.getParent_post().getId());
+            } else {
+                ps.setString(9, null);
+            }
 
             return ps.executeUpdate() > 0;
 

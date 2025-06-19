@@ -95,6 +95,10 @@ public class Generator {
         return generate("COMMENT", 36);
     }
 
+    public static String generateMediaId() {
+        return generate("MEDIA", 36);
+    }
+
     public static void main(String[] args) {
         System.out.println(generatePassword(8));
     }

@@ -25,6 +25,7 @@ public class House {
     private Timestamp created_at;
     private Timestamp updated_at;
 
+    private List<Media> medias;
     private List<Room> rooms;
 
     public House() {
@@ -126,8 +127,17 @@ public class House {
         this.updated_at = updated_at;
     }
 
+    public List<Media> getMedias() {
+        return medias;
+    }
+
+    public void setMedias(List<Media> medias) {
+        this.medias = medias;
+    }
+
     @Override
     public String toString() {
-        return "House{" + "id=" + id + ", name=" + name + ", description=" + description + ", is_whole_house=" + is_whole_house + ", price_per_night=" + price_per_night + ", address=" + address + ", status=" + status + ", owner=" + owner + ", star=" + star + ", rooms=" + rooms + '}';
+        return "House{" + "id=" + id + ", name=" + name + ", description=" + description + ", is_whole_house=" + is_whole_house + ", price_per_night=" + price_per_night + ", address=" + address + ", status=" + status + ", owner=" + owner + ", star=" + star + ", created_at=" + created_at + ", updated_at=" + updated_at + ", medias=" + medias + ", rooms=" + rooms + '}';
     }
+
 }

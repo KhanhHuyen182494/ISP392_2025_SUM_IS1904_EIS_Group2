@@ -206,8 +206,8 @@
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
-                                    <div class="avatar">
-                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
+                                    <div class="avatar w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
+                                        <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -242,9 +242,9 @@
                                 <div class="p-6 pb-4">
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                                            <div class="w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
                                                 <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
-                                                    <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
+                                                    <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
                                                 </a>
                                             </div>
                                             <div>
@@ -259,12 +259,12 @@
                                                 <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
                                             </div>
                                         </div>
-                                        <div class="flex gap-2">
+<!--                                        <div class="flex gap-2">
                                             <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
                                             <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
                                             <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
                                             <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                        </div>
+                                        </div>-->
                                     </div>
 
                                     <p class="text-lg mb-4">
@@ -1028,8 +1028,6 @@
                                                             const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
                                                             const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
                                                             const ownerId = comment.owner ? comment.owner.id : '';
-
-                                                            console.log(ownerAvatar);
 
                                                             let deleteButton = '';
                                                             if (isCurrentUser) {

@@ -185,8 +185,8 @@
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
-                                    <div class="avatar">
-                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
+                                    <div class="avatar w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
+                                        <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -362,9 +362,9 @@
                                 <div class="p-6 pb-4">
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                                            <div class="w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
                                                 <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
-                                                    <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
+                                                    <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
                                                 </a>
                                             </div>
                                             <div>
@@ -380,10 +380,10 @@
                                             </div>
                                         </div>
                                         <div class="flex gap-2">
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                            <!--                                            <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                        <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                        <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
+                                                                                        <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>-->
                                         </div>
                                     </div>
 
@@ -453,6 +453,13 @@
                                             data-house-name="${post.house.name}">
                                         <i class="fas fa-comments mr-2"></i>
                                         View Review
+                                    </button>
+                                </div>
+                                <div class="px-6 py-4 flex gap-3">
+                                    <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors"
+                                            data-post-id="${post.id}">
+                                        <i class="fas fa-comments mr-2"></i>
+                                        Comment
                                     </button>
                                 </div>
                             </div>
@@ -540,6 +547,97 @@
             </div>
         </div>
 
+        <!-- Comment Modal -->
+        <div id="commentModal" class="fixed inset-0 z-50 modal-overlay">
+            <div class="flex items-center justify-center min-h-screen px-4 py-8">
+                <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 to-blue-600 px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex gap-2 items-center">
+                                <h2 class="text-xl font-bold">Comments</h2>
+                                <p class=""> <b>-</b> </p>
+                                <p id="modalCommentHouseName" class="text-orange-500 text-xl font-bold"></p>
+                            </div>
+                            <button id="closeCommentModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
+                                <i class="fas fa-times text-lg text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+
+                        <!-- Comment Form -->
+                        <c:if test="${not empty sessionScope.user.id}">
+                            <div class="comment-form rounded-xl p-4 mb-6 border-2 border-blue-100">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0">
+                                        <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" 
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                        <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <textarea id="commentInput" 
+                                                  class="comment-input w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                                                  placeholder="Write your comment here..." 
+                                                  rows="3"></textarea>
+                                        <div class="flex justify-between items-center mt-3">
+                                            <span class="text-xs text-gray-500">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Be respectful and constructive in your comments
+                                            </span>
+                                            <button id="submitCommentBtn" 
+                                                    class="comment-submit-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <i class="fas fa-paper-plane mr-2"></i>
+                                                Post Comment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <!-- Loading State -->
+                        <div id="commentLoading" class="text-center py-8">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            <p class="text-gray-500">Loading comments...</p>
+                        </div>
+
+                        <!-- Error State -->
+                        <div id="commentError" class="text-center py-8 hidden">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                            <p class="text-red-500 font-medium">Failed to load comments</p>
+                            <button id="retryComment" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-redo mr-2"></i>
+                                Retry
+                            </button>
+                        </div>
+
+                        <!-- No Comment State -->
+                        <div id="noComment" class="text-center py-8 hidden">
+                            <i class="fas fa-comments text-gray-400 text-3xl mb-4"></i>
+                            <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+                        </div>
+
+                        <!-- Comments Container -->
+                        <div id="commentContainer" class="space-y-4">
+                            <!-- Dynamic comment items will be inserted here -->
+                        </div>
+
+                        <!-- Load More Comments -->
+                        <div id="loadMoreComment" class="text-center mt-6 hidden">
+                            <button id="loadMoreCommentBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-chevron-down mr-2"></i>
+                                Load More Comments
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -610,45 +708,39 @@
                                                     }
 
                                                     $(document).ready(function () {
-                                                        const modal = $('#reviewModal');
+                                                        const modalReview = $('#reviewModal');
                                                         const modalHouseName = $('#modalHouseName');
                                                         const reviewContainer = $('#reviewContainer');
                                                         const loadingDiv = $('#reviewLoading');
                                                         const errorDiv = $('#reviewError');
                                                         const noReviewDiv = $('#noReview');
                                                         const loadMoreDiv = $('#loadMoreReview');
-
                                                         let currentHouseId = null;
-                                                        let currentPage = 1;
-                                                        let isLoading = false;
-
+                                                        let currentReviewPage = 1;
+                                                        let isLoadingReview = false;
                                                         $('.view-review-btn').on('click', function () {
                                                             const houseId = $(this).data('house-id');
                                                             const houseName = $(this).data('house-name');
-
                                                             currentHouseId = houseId;
-                                                            currentPage = 1;
-
+                                                            currentReviewPage = 1;
                                                             modalHouseName.text(houseName);
-                                                            modal.addClass('active');
+                                                            modalReview.addClass('active');
                                                             $('body').addClass('overflow-hidden');
-
                                                             loadReviews(houseId, 1, true);
                                                         });
-
                                                         // Close modal
                                                         $('#closeModalBtn').on('click', function (e) {
                                                             closeModal();
 
                                                         });
 
-                                                        modal.on('click', function (e) {
+                                                        modalReview.on('click', function (e) {
                                                             if (e.target === this) {
                                                                 closeModal();
                                                             }
                                                         });
 
-                                                        modal.on('click', function (e) {
+                                                        modalReview.on('click', function (e) {
                                                             if (!$(e.target).closest('.modal-content').length) {
                                                                 closeModal();
                                                             }
@@ -663,20 +755,20 @@
 
                                                         // Load more reviews
                                                         $('#loadMoreReviewBtn').on('click', function () {
-                                                            if (currentHouseId && !isLoading) {
-                                                                loadReviews(currentHouseId, currentPage + 1, false);
+                                                            if (currentHouseId && !isLoadingReview) {
+                                                                loadReviews(currentHouseId, currentReviewPage + 1, false);
                                                             }
                                                         });
 
                                                         // ESC key to close modal
                                                         $(document).on('keydown', function (e) {
-                                                            if (e.key === 'Escape' && modal.hasClass('active')) {
+                                                            if (e.key === 'Escape' && modalReview.hasClass('active')) {
                                                                 closeModal();
                                                             }
                                                         });
 
                                                         function closeModal() {
-                                                            modal.removeClass('active');
+                                                            modalReview.removeClass('active');
                                                             $('body').removeClass('overflow-hidden');
                                                             // Reset modal state after animation
                                                             setTimeout(() => {
@@ -691,17 +783,17 @@
                                                             noReviewDiv.addClass('hidden');
                                                             loadMoreDiv.addClass('hidden');
                                                             currentHouseId = null;
-                                                            currentPage = 1;
+                                                            currentReviewPage = 1;
                                                         }
 
                                                         function loadReviews(houseId, page, isNewLoad) {
-                                                            if (isLoading)
+                                                            if (isLoadingReview)
                                                                 return;
 
-                                                            isLoading = true;
+                                                            isLoadingReview = true;
 
                                                             if (isNewLoad) {
-                                                                // Show loading for new load
+                                                                //  S how loadi n g for new load
                                                                 loadingDiv.show();
                                                                 errorDiv.addClass('hidden');
                                                                 noReviewDiv.addClass('hidden');
@@ -722,15 +814,13 @@
                                                                 },
                                                                 success: function (response) {
                                                                     loadingDiv.hide();
-
                                                                     if (isNewLoad) {
                                                                         reviewContainer.empty();
                                                                     }
 
                                                                     if (response.reviews && response.reviews.length > 0) {
                                                                         appendReviews(response.reviews);
-                                                                        currentPage = page;
-
+                                                                        currentReviewPage = page;
                                                                         // Show load more if there are more reviews
                                                                         if (response.hasMore) {
                                                                             loadMoreDiv.removeClass('hidden');
@@ -750,7 +840,6 @@
                                                                 error: function (xhr, status, error) {
                                                                     console.error('Error loading reviews:', error);
                                                                     loadingDiv.hide();
-
                                                                     if (isNewLoad) {
                                                                         errorDiv.removeClass('hidden');
                                                                         noReviewDiv.addClass('hidden');
@@ -760,7 +849,7 @@
                                                                     }
                                                                 },
                                                                 complete: function () {
-                                                                    isLoading = false;
+                                                                    isLoadingReview = false;
                                                                     $('#loadMoreReviewBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Reviews');
                                                                 }
                                                             });
@@ -775,7 +864,6 @@
 
                                                         function createReviewHtml(review) {
                                                             const stars = generateStarRating(review.Star);
-
                                                             return `
                                                         <div class="review-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
@@ -812,6 +900,371 @@
                                                             }
                                                             return stars;
                                                         }
+
+                                                        //Comment script section
+                                                        const modalComment = $('#commentModal');
+                                                        const modalCommentHouseName = $('#modalCommentHouseName');
+                                                        const commentContainer = $('#commentContainer');
+                                                        const commentLoadingDiv = $('#commentLoading');
+                                                        const commentErrorDiv = $('#commentError');
+                                                        const noCommentDiv = $('#noComment');
+                                                        const loadMoreCommentDiv = $('#loadMoreComment');
+                                                        const commentInput = $('#commentInput');
+                                                        const submitCommentBtn = $('#submitCommentBtn');
+                                                        let currentCommentPostId = null;
+                                                        let currentCommentPage = 1;
+                                                        let isLoadingComment = false;
+                                                        let isSubmittingComment = false;
+
+                                                        $('button:contains("Comment")').each(function () {
+                                                            const postId = $(this).closest('.card-hover').find('button[data-post-id]').first().data('post-id');
+                                                            $(this).attr('data-post-id', postId);
+                                                        });
+
+                                                        // Open Comment Modal
+                                                        $(document).on('click', 'button:contains("Comment")', function () {
+                                                            const postId = $(this).data('post-id');
+                                                            const houseName = $(this).closest('.card-hover').find('h2').first().text().trim();
+                                                            if (!postId) {
+                                                                showToast('Unable to load comments', 'error');
+                                                                return;
+                                                            }
+
+                                                            currentCommentPostId = postId;
+                                                            currentCommentPage = 1;
+                                                            modalCommentHouseName.text(houseName);
+                                                            modalComment.addClass('active');
+                                                            $('body').addClass('overflow-hidden');
+                                                            loadComments(postId, 1, true);
+                                                        });
+
+                                                        // Close Comment Modal
+                                                        $('#closeCommentModalBtn').on('click', function (e) {
+                                                            closeCommentModal();
+                                                        });
+
+                                                        modalComment.on('click', function (e) {
+                                                            if (e.target === this || !$(e.target).closest('.modal-content').length) {
+                                                                closeCommentModal();
+                                                            }
+                                                        });
+
+                                                        // Submit Comment
+                                                        submitCommentBtn.on('click', function () {
+                                                            submitComment();
+                                                        });
+
+                                                        // Submit comment on Enter (Ctrl+Enter)
+                                                        commentInput.on('keydown', function (e) {
+                                                            if (e.ctrlKey && e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                submitComment();
+                                                            }
+                                                        });
+
+                                                        // Enable/disable submit button based on input
+                                                        commentInput.on('input', function () {
+                                                            const hasContent = $(this).val().trim().length > 0;
+                                                            submitCommentBtn.prop('disabled', !hasContent || isSubmittingComment);
+                                                        });
+
+                                                        // Retry loading comments
+                                                        $('#retryComment').on('click', function () {
+                                                            if (currentCommentPostId) {
+                                                                loadComments(currentCommentPostId, 1, true);
+                                                            }
+                                                        });
+
+                                                        // Load more comments
+                                                        $('#loadMoreCommentBtn').on('click', function () {
+                                                            if (currentCommentPostId && !isLoadingComment) {
+                                                                loadComments(currentCommentPostId, currentCommentPage + 1, false);
+                                                            }
+                                                        });
+
+                                                        // ESC key to close comment modal
+                                                        $(document).on('keydown', function (e) {
+                                                            if (e.key === 'Escape' && modalComment.hasClass('active')) {
+                                                                closeCommentModal();
+                                                            }
+                                                        });
+
+                                                        function closeCommentModal() {
+                                                            modalComment.removeClass('active');
+                                                            $('body').removeClass('overflow-hidden');
+                                                            // Reset modal state after animation
+                                                            setTimeout(() => {
+                                                                resetCommentModalState();
+                                                            }, 300);
+                                                        }
+
+                                                        function resetCommentModalState() {
+                                                            commentContainer.empty();
+                                                            commentLoadingDiv.show();
+                                                            commentErrorDiv.addClass('hidden');
+                                                            noCommentDiv.addClass('hidden');
+                                                            loadMoreCommentDiv.addClass('hidden');
+                                                            commentInput.val('');
+                                                            submitCommentBtn.prop('disabled', true);
+                                                            currentCommentPostId = null;
+                                                            currentCommentPage = 1;
+                                                        }
+
+                                                        function submitComment() {
+                                                            const content = commentInput.val().trim();
+                                                            const uid = '${sessionScope.user_id}';
+                                                            if (!content) {
+                                                                showToast('Please enter a comment', 'error');
+                                                                return;
+                                                            }
+
+                                                            if (!uid) {
+                                                                showToast('Please login to comment', 'error');
+                                                                return;
+                                                            }
+
+                                                            if (isSubmittingComment)
+                                                                return;
+                                                            isSubmittingComment = true;
+                                                            submitCommentBtn.prop('disabled', true);
+                                                            submitCommentBtn.html('<div class="loading-spinner inline-block mr-2"></div>Posting...');
+                                                            $.ajax({
+                                                                url: '${pageContext.request.contextPath}/comment',
+                                                                method: 'POST',
+                                                                data: {
+                                                                    postId: currentCommentPostId,
+                                                                    content: content,
+                                                                    type: "add"
+                                                                },
+                                                                success: function (response) {
+                                                                    if (response.ok) {
+                                                                        showToast(response.message ? response.message : 'Comment success!', 'success');
+                                                                        commentInput.val('');
+                                                                        // Add the new comment to the top of the list
+                                                                        if (response.comment) {
+                                                                            const newCommentHtml = createCommentHtml(response.comment);
+                                                                            commentContainer.prepend(newCommentHtml);
+                                                                            noCommentDiv.addClass('hidden');
+                                                                        } else {
+                                                                            loadComments(currentCommentPostId, 1, true);
+                                                                        }
+                                                                    } else {
+                                                                        showToast(response.message || 'Failed to post comment', 'error');
+                                                                    }
+                                                                },
+                                                                error: function (xhr, status, error) {
+                                                                    console.error('Error posting comment:', error);
+                                                                    showToast('Failed to post comment. Please try again.', 'error');
+                                                                },
+                                                                complete: function () {
+                                                                    isSubmittingComment = false;
+                                                                    submitCommentBtn.prop('disabled', commentInput.val().trim().length === 0);
+                                                                    submitCommentBtn.html('<i class="fas fa-paper-plane mr-2"></i>Post Comment');
+                                                                }
+                                                            });
+                                                        }
+
+                                                        function loadComments(postId, page, isNewLoad) {
+                                                            if (isLoadingComment)
+                                                                return;
+                                                            isLoadingComment = true;
+                                                            if (isNewLoad) {
+                                                                // Show loading for new load
+                                                                commentLoadingDiv.show();
+                                                                commentErrorDiv.addClass('hidden');
+                                                                noCommentDiv.addClass('hidden');
+                                                                loadMoreCommentDiv.addClass('hidden');
+                                                                commentContainer.empty();
+                                                            } else {
+                                                                // Show loading on load more button
+                                                                $('#loadMoreCommentBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                                            }
+
+                                                            $.ajax({
+                                                                url: '${pageContext.request.contextPath}/comment',
+                                                                method: 'GET',
+                                                                data: {
+                                                                    postId: postId,
+                                                                    page: page,
+                                                                    limit: 10
+                                                                },
+                                                                success: function (response) {
+                                                                    commentLoadingDiv.hide();
+                                                                    if (isNewLoad) {
+                                                                        commentContainer.empty();
+                                                                    }
+
+                                                                    if (response.comments && response.comments.length > 0) {
+                                                                        appendComments(response.comments);
+                                                                        currentCommentPage = page;
+                                                                        // Show load more if there are more comments
+                                                                        if (response.hasMore) {
+                                                                            loadMoreCommentDiv.removeClass('hidden');
+                                                                        } else {
+                                                                            loadMoreCommentDiv.addClass('hidden');
+                                                                        }
+
+                                                                        commentErrorDiv.addClass('hidden');
+                                                                        noCommentDiv.addClass('hidden');
+                                                                    } else if (isNewLoad) {
+                                                                        // No comments found
+                                                                        noCommentDiv.removeClass('hidden');
+                                                                        commentErrorDiv.addClass('hidden');
+                                                                        loadMoreCommentDiv.addClass('hidden');
+                                                                    }
+                                                                },
+                                                                error: function (xhr, status, error) {
+                                                                    console.error('Error loading comments:', error);
+                                                                    commentLoadingDiv.hide();
+                                                                    if (isNewLoad) {
+                                                                        commentErrorDiv.removeClass('hidden');
+                                                                        noCommentDiv.addClass('hidden');
+                                                                    } else {
+                                                                        // Show error toast for load more
+                                                                        showToast('Failed to load more comments', 'error');
+                                                                    }
+                                                                },
+                                                                complete: function () {
+                                                                    isLoadingComment = false;
+                                                                    $('#loadMoreCommentBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Comments');
+                                                                }
+                                                            });
+                                                        }
+
+                                                        function appendComments(comments) {
+                                                            comments.forEach(function (comment) {
+                                                                const commentHtml = createCommentHtml(comment);
+                                                                commentContainer.append(commentHtml);
+                                                            });
+                                                        }
+
+                                                        function createCommentHtml(comment) {
+                                                            const isCurrentUser = comment.owner && comment.owner.id == '${sessionScope.user_id}';
+                                                            const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
+                                                            const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
+                                                            const ownerId = comment.owner ? comment.owner.id : '';
+
+                                                            let deleteButton = '';
+                                                            if (isCurrentUser) {
+                                                                deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(`' + comment.id + '`)">' +
+                                                                        '<i class="fas fa-trash mr-1"></i>' +
+                                                                        'Delete' +
+                                                                        '</button>';
+                                                            }
+
+                                                            if (isCurrentUser) {
+                                                                return `
+                                                                <div class="comment-item p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" data-comment-id="` + comment.id + `">
+                                                                    <div class="flex items-start gap-3">
+                                                                        <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                                                            <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/` + ownerAvatar + `" 
+                                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                                                            <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <div class="flex items-center justify-between mb-2">
+                                                                                <div class="flex items-center gap-2">
+                                                                                    <a href="${pageContext.request.contextPath}/profile?uid=` + ownerId + `" 
+                                                                                       class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                                                                        ` + ownerName + `
+                                                                                    </a>
+                                                                                 <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">You</span>
+                                                                                </div>
+                                                                                <span class="text-xs text-gray-500" title="` + comment.created_at + `">` + comment.created_at + `</span>
+                                                                            </div>
+                                                                            <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">` + comment.content + `</p>
+
+                                                                            <div class="flex items-center gap-3 mt-3">
+                                                                                ` + deleteButton + `
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+                                                            } else {
+                                                                return `
+                                                                <div class="comment-item p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" data-comment-id="` + comment.id + `">
+                                                                    <div class="flex items-start gap-3">
+                                                                        <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                                                            <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/` + ownerAvatar + `" 
+                                                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                                                            <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <div class="flex items-center justify-between mb-2">
+                                                                                <div class="flex items-center gap-2">
+                                                                                    <a href="${pageContext.request.contextPath}/profile?uid=` + ownerId + `" 
+                                                                                       class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                                                                        ` + ownerName + `
+                                                                                    </a>
+                                                                                </div>
+                                                                                <span class="text-xs text-gray-500" title="` + comment.created_at + `">` + comment.created_at + `</span>
+                                                                            </div>
+                                                                            <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">` + comment.content + `</p>
+
+                                                                            <div class="flex items-center gap-3 mt-3">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+                                                            }
+                                                        }
+
+                                                        // Global function for deleting comments
+                                                        window.deleteComment = function (commentId) {
+                                                            Swal.fire({
+                                                                title: 'Delete comment ?',
+                                                                html: 'This action can not be undo, please sure you have make decision!',
+                                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                imageWidth: 150,
+                                                                imageHeight: 150,
+                                                                imageAlt: 'Custom icon',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Delete',
+                                                                cancelButtonText: 'Cancel',
+                                                                reverseButtons: true,
+                                                                focusConfirm: false,
+                                                                focusCancel: false,
+                                                                customClass: {
+                                                                    popup: 'rounded-xl shadow-lg',
+                                                                    title: 'text-xl font-semibold',
+                                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                    actions: 'space-x-4'
+                                                                },
+                                                                buttonsStyling: false
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    $.ajax({
+                                                                        url: '${pageContext.request.contextPath}/comment',
+                                                                        method: 'POST',
+                                                                        data: {commentId: commentId, type: "delete"},
+                                                                        success: function (response) {
+                                                                            if (response.ok) {
+                                                                                showToast('Comment deleted successfully', 'success');
+                                                                                // Remove the comment from the DOM
+                                                                                $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
+                                                                                    $(this).remove();
+
+                                                                                    // Show no comments message if container is empty
+                                                                                    if (commentContainer.children().length === 0) {
+                                                                                        noCommentDiv.removeClass('hidden');
+                                                                                    }
+                                                                                });
+                                                                            } else {
+                                                                                showToast(response.message || 'Failed to delete comment', 'error');
+                                                                            }
+                                                                        },
+                                                                        error: function () {
+                                                                            showToast('Failed to delete comment', 'error');
+                                                                        }
+                                                                    });
+                                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                    Swal.close();
+                                                                }
+                                                            });
+                                                        };
 
                                                         function showToast(message, type = 'success') {
                                                             Toastify({

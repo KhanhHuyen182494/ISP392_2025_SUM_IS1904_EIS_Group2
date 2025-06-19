@@ -6,7 +6,11 @@ package API;
 
 import Controller.Common.BaseAuthorization;
 import Controller.Common.CommentController;
+import Model.Address;
 import Model.House;
+import Model.Media;
+import Model.Room;
+import Model.Status;
 import Model.User;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,6 +18,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +30,8 @@ import java.util.logging.Logger;
  * @author Tam
  */
 @WebServlet(name = "HomestayAPI", urlPatterns = {
-    "/homestay/get"
+    "/homestay/get",
+    "/homestay/room/get"
 })
 public class HomestayAPI extends BaseAuthorization {
 
@@ -44,6 +50,8 @@ public class HomestayAPI extends BaseAuthorization {
         switch (path) {
             case BASE_PATH + "/get" ->
                 doGetHomestayLoggedInUser(request, response, user);
+            case BASE_PATH + "/room/get" ->
+                doGetRoomForHomestay(request, response, user);
         }
     }
 
@@ -57,6 +65,7 @@ public class HomestayAPI extends BaseAuthorization {
         try {
 
             List<House> hList = hDao.getListByOwnerId(u);
+            fullLoadHouseInfomation(hList);
 
             // Create response object
             Map<String, Object> responseData = new HashMap<>();
@@ -70,6 +79,58 @@ public class HomestayAPI extends BaseAuthorization {
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error", e);
             sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
+        }
+    }
+
+    private void doGetRoomForHomestay(HttpServletRequest request, HttpServletResponse response, User u)
+            throws ServletException, IOException {
+        // Set response content type
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Create response object
+        Map<String, Object> responseData = new HashMap<>();
+
+        try {
+            String homestayId = request.getParameter("homestayId");
+
+            List<House> hList = new ArrayList<>();
+            List<Room> rList = roomDao.getListRoomByHomestayId(homestayId, 26);
+            House house = hDao.getById(homestayId);
+            hList.add(house);
+            fullLoadHouseInfomation(hList);
+
+            responseData.put("success", true);
+            responseData.put("rooms", rList);
+            responseData.put("homestay", house);
+
+            // Send JSON response
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(responseData));
+            out.flush();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error", e);
+            sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
+        }
+    }
+
+    private void fullLoadHouseInfomation(List<House> houses) {
+        try {
+            //Load address, images, likes, feedbacks
+            for (House h : houses) {
+                String hid = h.getId();
+
+                Address a = aDao.getAddressById(h.getAddress().getId());
+                Status mediaS = new Status();
+                mediaS.setId(21);
+                List<Media> medias = mDao.getMediaByObjectId(h.getId(), "Homestay", mediaS);
+
+                h.setMedias(medias);
+                h.setAddress(a);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
         }
     }
 
