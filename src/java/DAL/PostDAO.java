@@ -20,22 +20,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Tam
  */
 public class PostDAO extends BaseDao implements IPostDAO {
-    
+
     private Logging logger = new Logging();
-    
+
     public static void main(String[] args) {
         PostDAO pDao = new PostDAO();
         System.out.println(pDao.getById("POST-684a9886ed8b42cd990fc621603af5c"));
     }
-    
+
     @Override
     public Post getById(String id) {
         Post p = new Post();
@@ -70,57 +68,57 @@ public class PostDAO extends BaseDao implements IPostDAO {
                          user u ON p.user_id = u.id
                       WHERE p.id = ?
                      """;
-        
+
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setString(1, id);
-            
+
             rs = ps.executeQuery();
-            
+
             if (rs.next()) {
                 Status psta = new Status();
                 Status hsta = new Status();
-                
+
                 p.setId(rs.getString("PostId"));
                 p.setContent(rs.getString("PostContent"));
                 p.setCreated_at(rs.getTimestamp("PostCreatedAt"));
                 p.setUpdated_at(rs.getTimestamp("PostUpdatedAt"));
                 p.setDeleted_at(rs.getTimestamp("PostDeletedAt"));
-                
+
                 House h = new House();
                 Address a = new Address();
                 PostType pt = new PostType();
-                
+
                 h.setId(rs.getString("PostHouseId"));
                 h.setName(rs.getString("HouseName"));
                 h.setDescription(rs.getString("HouseDescription"));
                 h.setStar(rs.getFloat("HouseStar"));
                 h.setIs_whole_house(rs.getBoolean("WholeHouse"));
                 h.setPrice_per_night(rs.getDouble("HousePrice"));
-                
+
                 a.setId(rs.getInt("HouseAddressId"));
                 psta.setId(rs.getInt("PostStatusId"));
                 hsta.setId(rs.getInt("HouseStatusId"));
-                
+
                 p.setStatus(psta);
                 p.setHouse(h);
                 h.setStatus(hsta);
                 h.setAddress(a);
-                
+
                 User owner = new User();
                 owner.setId(rs.getString("UserPostId"));
                 owner.setFirst_name(rs.getString("UserPostFirstName"));
                 owner.setLast_name(rs.getString("UserPostLastName"));
                 owner.setAvatar(rs.getString("UserPostAvatar"));
-                
+
                 pt.setId(rs.getInt("post_type_id"));
-                
+
                 p.setOwner(owner);
                 p.setPost_type(pt);
             }
-            
+
         } catch (SQLException e) {
             logger.error("" + e);
         } finally {
@@ -130,26 +128,26 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 logger.error("" + ex);
             }
         }
-        
+
         return p;
     }
-    
+
     @Override
     public List<Post> getAll() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public boolean add(Post t) {
         String sql = """
                      INSERT INTO post(id, content, created_at, user_id, post_type_id, status_id, target_room_id, target_homestay_id, parent_post_id) 
                      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
                      """;
-        
+
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setString(1, t.getId());
             ps.setString(2, t.getContent());
             ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
@@ -171,9 +169,9 @@ public class PostDAO extends BaseDao implements IPostDAO {
             } else {
                 ps.setString(9, null);
             }
-            
+
             return ps.executeUpdate() > 0;
-            
+
         } catch (SQLException e) {
             logger.error("" + e);
             return false;
@@ -185,23 +183,23 @@ public class PostDAO extends BaseDao implements IPostDAO {
             }
         }
     }
-    
+
     @Override
     public boolean deleteById(String id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public boolean update(Post t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     @Override
     public PostDTO getPaginatedPosts(int currentPage, int pageSize, String searchKey, String sortBy) {
         PostDTO dto = new PostDTO();
         List<Post> posts = new ArrayList<>();
         int totalRecords = 0;
-        
+
         String baseQuery = """
                            SELECT 
                                p.id as PostId,
@@ -235,27 +233,27 @@ public class PostDAO extends BaseDao implements IPostDAO {
                            WHERE 1=1
                            """;
         String countQuery = "SELECT COUNT(*) FROM post p WHERE 1=1";
-        
+
         if (searchKey != null && !searchKey.trim().isEmpty()) {
             baseQuery += " AND p.content LIKE ?";
             countQuery += " AND p.content LIKE ?";
         }
-        
+
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             baseQuery += " ORDER BY " + sortBy;
         } else {
             baseQuery += " ORDER BY p.created_at DESC";
         }
-        
+
         baseQuery += " LIMIT ?, ?";
-        
+
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(baseQuery);
             PreparedStatement countPs = con.prepareStatement(countQuery);
-            
+
             int paramIndex = 1;
-            
+
             if (searchKey != null && !searchKey.trim().isEmpty()) {
                 countPs.setString(paramIndex, "%" + searchKey + "%");
             }
@@ -265,59 +263,59 @@ public class PostDAO extends BaseDao implements IPostDAO {
             if (rsCount.next()) {
                 totalRecords = rsCount.getInt(1);
             }
-            
+
             paramIndex = 1;
             if (searchKey != null && !searchKey.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + searchKey + "%");
             }
-            
+
             int offset = (currentPage - 1) * pageSize;
             ps.setInt(paramIndex++, offset);
             ps.setInt(paramIndex, pageSize);
-            
+
             rs = ps.executeQuery();
             while (rs.next()) {
                 Status psta = new Status();
                 Status hsta = new Status();
-                
+
                 Post p = new Post();
                 p.setId(rs.getString("PostId"));
                 p.setContent(rs.getString("PostContent"));
                 p.setCreated_at(rs.getTimestamp("PostCreatedAt"));
                 p.setUpdated_at(rs.getTimestamp("PostUpdatedAt"));
                 p.setDeleted_at(rs.getTimestamp("PostDeletedAt"));
-                
+
                 House h = new House();
                 Address a = new Address();
                 PostType pt = new PostType();
-                
+
                 h.setId(rs.getString("PostHouseId"));
                 h.setName(rs.getString("HouseName"));
                 h.setDescription(rs.getString("HouseDescription"));
                 h.setStar(rs.getFloat("HouseStar"));
                 h.setIs_whole_house(rs.getBoolean("WholeHouse"));
                 h.setPrice_per_night(rs.getDouble("HousePrice"));
-                
+
                 a.setId(rs.getInt("HouseAddressId"));
                 psta.setId(rs.getInt("PostStatusId"));
                 hsta.setId(rs.getInt("HouseStatusId"));
-                
+
                 p.setStatus(psta);
                 p.setHouse(h);
                 h.setStatus(hsta);
                 h.setAddress(a);
-                
+
                 User owner = new User();
                 owner.setId(rs.getString("UserPostId"));
                 owner.setFirst_name(rs.getString("UserPostFirstName"));
                 owner.setLast_name(rs.getString("UserPostLastName"));
                 owner.setAvatar(rs.getString("UserPostAvatar"));
-                
+
                 pt.setId(rs.getInt("post_type_id"));
-                
+
                 Post parent = new Post();
                 parent.setId(rs.getString("parent_post_id"));
-                
+
                 p.setOwner(owner);
                 p.setPost_type(pt);
                 p.setParent_post(parent);
@@ -325,11 +323,11 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 // TODO: load Room, House, Status, etc. if needed
                 posts.add(p);
             }
-            
+
         } catch (SQLException e) {
             logger.error("" + e);
         }
-        
+
         dto.setItems(posts);
         dto.setCurrent_page(currentPage);
         dto.setPage_size(pageSize);
@@ -337,16 +335,16 @@ public class PostDAO extends BaseDao implements IPostDAO {
         dto.setTotal_pages((int) Math.ceil((double) totalRecords / pageSize));
         dto.setSearchKey(searchKey);
         dto.setSort_by(sortBy);
-        
+
         return dto;
     }
-    
+
     @Override
     public PostDTO getPaginatedPostsByUid(int currentPage, int pageSize, String searchKey, String sortBy, String uid) {
         PostDTO dto = new PostDTO();
         List<Post> posts = new ArrayList<>();
         int totalRecords = 0;
-        
+
         String baseQuery = """
                            SELECT 
                                 p.id as PostId,
@@ -358,6 +356,8 @@ public class PostDAO extends BaseDao implements IPostDAO {
                                 p.user_id as PostCreatedBy,
                                 p.updated_at as PostUpdatedAt,
                                 p.deleted_at as PostDeletedAt,
+                                p.post_type_id,
+                                p.parent_post_id,
                                 h.name as HouseName,
                                 h.description as HouseDescription,
                                 h.star as HouseStar,
@@ -369,38 +369,38 @@ public class PostDAO extends BaseDao implements IPostDAO {
                                 u.first_name as UserPostFirstName,
                                 u.last_name as UserPostLastName,
                                 u.avatar as UserPostAvatar
-                            FROM
-                                post p
+                                    FROM
+                                        post p
+                                    LEFT JOIN
+                                        homestay h ON p.target_homestay_id = h.id
                                     JOIN
-                                homestay h ON p.target_homestay_id = h.id
-                                    JOIN
-                                user u ON p.user_id = u.id
-                           WHERE p.user_id = ? AND 1=1
+                                        user u ON p.user_id = u.id
+                                WHERE p.user_id = ? AND 1=1
                            """;
         String countQuery = "SELECT COUNT(*) FROM post p WHERE p.user_id = ? AND 1=1";
-        
+
         if (searchKey != null && !searchKey.trim().isEmpty()) {
             baseQuery += " AND p.content LIKE ?";
             countQuery += " AND p.content LIKE ?";
         }
-        
+
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             baseQuery += " ORDER BY " + sortBy;
         } else {
             baseQuery += " ORDER BY p.created_at DESC";
         }
-        
+
         baseQuery += " LIMIT ?, ?";
-        
+
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(baseQuery);
             PreparedStatement countPs = con.prepareStatement(countQuery);
-            
+
             int paramIndex = 1;
-            
+
             countPs.setString(paramIndex++, uid);
-            
+
             if (searchKey != null && !searchKey.trim().isEmpty()) {
                 countPs.setString(paramIndex, "%" + searchKey + "%");
             }
@@ -410,66 +410,74 @@ public class PostDAO extends BaseDao implements IPostDAO {
             if (rsCount.next()) {
                 totalRecords = rsCount.getInt(1);
             }
-            
+
             paramIndex = 1;
-            
+
             ps.setString(paramIndex++, uid);
-            
+
             if (searchKey != null && !searchKey.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + searchKey + "%");
             }
-            
+
             int offset = (currentPage - 1) * pageSize;
             ps.setInt(paramIndex++, offset);
             ps.setInt(paramIndex, pageSize);
-            
+
             rs = ps.executeQuery();
             while (rs.next()) {
                 Status psta = new Status();
                 Status hsta = new Status();
-                
+
                 Post p = new Post();
                 p.setId(rs.getString("PostId"));
                 p.setContent(rs.getString("PostContent"));
                 p.setCreated_at(rs.getTimestamp("PostCreatedAt"));
                 p.setUpdated_at(rs.getTimestamp("PostUpdatedAt"));
                 p.setDeleted_at(rs.getTimestamp("PostDeletedAt"));
-                
+
                 House h = new House();
                 Address a = new Address();
-                
+                PostType pt = new PostType();
+
                 h.setId(rs.getString("PostHouseId"));
                 h.setName(rs.getString("HouseName"));
                 h.setDescription(rs.getString("HouseDescription"));
                 h.setStar(rs.getFloat("HouseStar"));
                 h.setIs_whole_house(rs.getBoolean("WholeHouse"));
                 h.setPrice_per_night(rs.getDouble("HousePrice"));
-                
+
                 a.setId(rs.getInt("HouseAddressId"));
                 psta.setId(rs.getInt("PostStatusId"));
                 hsta.setId(rs.getInt("HouseStatusId"));
-                
+
                 p.setStatus(psta);
                 p.setHouse(h);
                 h.setStatus(hsta);
                 h.setAddress(a);
-                
+
                 User owner = new User();
                 owner.setId(rs.getString("UserPostId"));
                 owner.setFirst_name(rs.getString("UserPostFirstName"));
                 owner.setLast_name(rs.getString("UserPostLastName"));
                 owner.setAvatar(rs.getString("UserPostAvatar"));
-                
+
+                pt.setId(rs.getInt("post_type_id"));
+
+                Post parent = new Post();
+                parent.setId(rs.getString("parent_post_id"));
+
                 p.setOwner(owner);
+                p.setPost_type(pt);
+                p.setParent_post(parent);
 
                 // TODO: load Room, House, Status, etc. if needed
                 posts.add(p);
             }
-            
+
         } catch (SQLException e) {
             logger.error("" + e);
         }
-        
+
         dto.setItems(posts);
         dto.setCurrent_page(currentPage);
         dto.setPage_size(pageSize);
@@ -477,8 +485,8 @@ public class PostDAO extends BaseDao implements IPostDAO {
         dto.setTotal_pages((int) Math.ceil((double) totalRecords / pageSize));
         dto.setSearchKey(searchKey);
         dto.setSort_by(sortBy);
-        
+
         return dto;
     }
-    
+
 }
