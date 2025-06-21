@@ -1,0 +1,9 @@
+[2025-06-19 09:31:10] [ERROR] java.sql.SQLSyntaxErrorException: Column '' not found.
+[2025-06-19 09:32:35] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:33:13] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:34:24] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:34:44] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:37:03] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:38:21] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:38:59] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.
+[2025-06-19 09:40:23] [ERROR] java.sql.SQLSyntaxErrorException: Column 'room_position' not found.

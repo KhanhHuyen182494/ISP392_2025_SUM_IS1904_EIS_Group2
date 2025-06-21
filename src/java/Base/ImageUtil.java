@@ -7,9 +7,6 @@ package Base;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -40,13 +37,12 @@ public class ImageUtil {
         }
 
         // Prevent overwriting: add timestamp or UUID
-        String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-        String filePath = uploadDir + File.separator + uniqueFileName;
+        String filePath = uploadDir + File.separator + fileName;
 
         // Write to file
         imagePart.write(filePath);
 
-        return uniqueFileName;
+        return fileName;
     }
 
 }

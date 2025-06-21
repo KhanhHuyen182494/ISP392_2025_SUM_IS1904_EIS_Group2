@@ -5,7 +5,6 @@
 package DAL;
 
 import Base.Logging;
-import DAL.DAO.IFeatureDao;
 import Model.Address;
 import Model.Feature;
 import Model.Role;
@@ -16,12 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import DAL.DAO.IFeatureDAO;
 
 /**
  *
  * @author Tam
  */
-public class FeatureDAO extends BaseDao implements IFeatureDao {
+public class FeatureDAO extends BaseDao implements IFeatureDAO {
 
     private Logging logger = new Logging();
     private static final Logger LOGGER = Logger.getLogger(FeatureDAO.class.getName());
