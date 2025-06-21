@@ -236,8 +236,8 @@
                 <!-- Feed Items -->
                 <c:choose>
                     <c:when test="${not empty requestScope.posts}">
-                        <c:forEach items="${requestScope.posts}" var="post">
-                            <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden card-hover">
+                        <c:forEach items="${requestScope.posts}" var="post" varStatus="postStatus">
+                            <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden card-hover post-container" data-post-index="${postStatus.index}">
                                 <!-- User Info -->
                                 <div class="p-6 pb-4">
                                     <div class="flex items-center justify-between mb-4">
@@ -259,17 +259,136 @@
                                                 <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
                                             </div>
                                         </div>
-                                        <!--                                        <div class="flex gap-2">
-                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                                                                    <span class="tag-hover bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs cursor-pointer">Tag</span>
-                                                                                </div>-->
                                     </div>
 
                                     <p class="text-lg mb-4">
                                         ${post.content}
                                     </p>
+
+                                    <!-- Share/Repost Section -->
+                                    <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
+                                        <div class="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
+                                            <div class="flex items-center gap-3 mb-3">
+                                                <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-white">
+                                                    <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}">
+                                                        <img class="w-full h-full object-cover" 
+                                                             src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.parent_post.owner.avatar}" 
+                                                             alt="Avatar" loading="lazy" />
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <c:choose>
+                                                        <c:when test="${sessionScope.user_id == post.parent_post.owner.id}">
+                                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
+                                                               class="font-medium text-gray-700 hover:text-blue-600">You</a>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
+                                                               class="font-medium text-gray-700 hover:text-blue-600">
+                                                                ${post.parent_post.owner.first_name} ${post.parent_post.owner.last_name}
+                                                            </a>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <p class="text-xs text-gray-500">
+                                                        <fmt:formatDate value="${post.parent_post.created_at}" pattern="HH:mm dd/MM/yyyy" />
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <c:if test="${post.parent_post.post_type.id == 1}">
+                                                <!-- Property Title -->
+                                                <h2 class="text-xl font-bold text-gray-800 mb-3">${post.parent_post.house.name}</h2>
+
+                                                <!-- Description -->
+                                                <p class="text-gray-600 mb-4">
+                                                    ${post.parent_post.house.description}
+                                                </p>
+
+                                                <!-- Property Details -->
+                                                <div class="space-y-2 mb-4">
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="fas fa-dollar-sign text-green-500"></i>
+                                                        <span class="text-sm"><strong>Giá 1 đêm:</strong> <fmt:formatNumber value="${post.parent_post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-2">
+                                                        <i class="fas fa-map-marker-alt text-red-500"></i>
+                                                        <span class="text-sm"><strong>Địa chỉ:</strong> ${post.parent_post.house.address.detail} ${post.parent_post.house.address.ward}, ${post.parent_post.house.address.district}, ${post.parent_post.house.address.province}, ${post.parent_post.house.address.country}</span>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+
+                                            <div class="px-6 pb-4">
+                                                <div class="grid grid-cols-2 gap-4">
+                                                    <!-- Calculate total images count for shared post -->
+                                                    <c:set var="sharedPostMediaCount" value="${fn:length(post.parent_post.medias)}" />
+                                                    <c:set var="sharedHouseMediaCount" value="${post.parent_post.post_type.id == 1 ? fn:length(post.parent_post.house.medias) : 0}" />
+                                                    <c:set var="sharedTotalImages" value="${sharedPostMediaCount + sharedHouseMediaCount}" />
+                                                    <c:set var="sharedMaxDisplay" value="4" />
+                                                    <c:set var="sharedRemainingCount" value="${sharedTotalImages - sharedMaxDisplay}" />
+                                                    <c:set var="sharedDisplayedCount" value="0" />
+
+                                                    <!-- Display Shared Post Media Images -->
+                                                    <c:forEach items="${post.parent_post.medias}" var="media" varStatus="status">
+                                                        <c:if test="${sharedDisplayedCount < sharedMaxDisplay}">
+                                                            <c:choose>
+                                                                <c:when test="${sharedDisplayedCount == 3 && sharedTotalImages > sharedMaxDisplay}">
+                                                                    <!-- Last image with overlay for remaining count -->
+                                                                    <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
+                                                                         onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
+                                                                        <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                             src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
+                                                                        <!-- Overlay -->
+                                                                        <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
+                                                                            <span class="text-white text-2xl font-bold">+${sharedRemainingCount}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <!-- Regular image -->
+                                                                    <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+                                                                         onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
+                                                                        <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                             src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
+                                                                    </div>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                            <c:set var="sharedDisplayedCount" value="${sharedDisplayedCount + 1}" />
+                                                        </c:if>
+                                                    </c:forEach>
+
+                                                    <!-- Display Shared House Media Images -->
+                                                    <c:if test="${post.parent_post.post_type.id == 1}">
+                                                        <c:forEach items="${post.parent_post.house.medias}" var="mediaH" varStatus="status">
+                                                            <c:if test="${sharedDisplayedCount < sharedMaxDisplay}">
+                                                                <c:choose>
+                                                                    <c:when test="${sharedDisplayedCount == 3 && sharedTotalImages > sharedMaxDisplay}">
+                                                                        <!-- Last image with overlay for remaining count -->
+                                                                        <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
+                                                                             onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
+                                                                            <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                                 src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
+                                                                            <!-- Overlay -->
+                                                                            <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
+                                                                                <span class="text-white text-2xl font-bold">+${sharedRemainingCount}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <!-- Regular image -->
+                                                                        <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+                                                                             onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
+                                                                            <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                                 src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
+                                                                        </div>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                                <c:set var="sharedDisplayedCount" value="${sharedDisplayedCount + 1}" />
+                                                            </c:if>
+                                                        </c:forEach>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:if>
 
                                     <c:if test="${post.post_type.id == 1}">
                                         <!-- Property Title -->
@@ -296,20 +415,118 @@
 
                                 <!-- Images -->
                                 <div class="px-6 pb-4">
-                                    <div class="grid grid-cols-2 gap-4"> 
-                                        <c:forEach items="${post.medias}" var="media">
-                                            <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                <img class="rounded-[20px] h-96 w-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}" onclick="showImageModal('${media.path}', 'Post')"/>
-                                            </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <!-- Calculate total images count -->
+                                        <c:set var="postMediaCount" value="${fn:length(post.medias)}" />
+                                        <c:set var="houseMediaCount" value="${post.post_type.id == 1 ? fn:length(post.house.medias) : 0}" />
+                                        <c:set var="totalImages" value="${postMediaCount + houseMediaCount}" />
+                                        <c:set var="maxDisplay" value="4" />
+                                        <c:set var="remainingCount" value="${totalImages - maxDisplay}" />
+
+                                        <!-- Create a counter for displayed images -->
+                                        <c:set var="displayedCount" value="0" />
+
+                                        <!-- Display Post Media Images -->
+                                        <c:forEach items="${post.medias}" var="media" varStatus="status">
+                                            <c:if test="${displayedCount < maxDisplay}">
+                                                <c:choose>
+                                                    <c:when test="${displayedCount == 3 && totalImages > maxDisplay}">
+                                                        <!-- Last image with overlay for remaining count -->
+                                                        <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
+                                                             onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                            <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                 src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
+                                                            <!-- Overlay -->
+                                                            <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
+                                                                <span class="text-white text-2xl font-bold">+${remainingCount}</span>
+                                                            </div>
+                                                        </div>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <!-- Regular image -->
+                                                        <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+                                                             onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                            <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                 src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
+                                                        </div>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                <c:set var="displayedCount" value="${displayedCount + 1}" />
+                                            </c:if>
                                         </c:forEach>
+
+                                        <!-- Display House Media Images (if post type is 1 and we haven't reached max display) -->
                                         <c:if test="${post.post_type.id == 1}">
-                                            <c:forEach items="${post.house.medias}" var="mediaH">
-                                                <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                                    <img class="rounded-[20px] h-96 w-full object-cover" src="${mediaH.path}" onclick="showImageModal('${mediaH.path}', 'House')"/>
-                                                </div>
+                                            <c:forEach items="${post.house.medias}" var="mediaH" varStatus="status">
+                                                <c:if test="${displayedCount < maxDisplay}">
+                                                    <c:choose>
+                                                        <c:when test="${displayedCount == 3 && totalImages > maxDisplay}">
+                                                            <!-- Last image with overlay for remaining count -->
+                                                            <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
+                                                                 onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                                <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                     src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
+                                                                <!-- Overlay -->
+                                                                <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
+                                                                    <span class="text-white text-2xl font-bold">+${remainingCount}</span>
+                                                                </div>
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <!-- Regular image -->
+                                                            <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+                                                                 onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                                <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                                     src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <c:set var="displayedCount" value="${displayedCount + 1}" />
+                                                </c:if>
                                             </c:forEach>
                                         </c:if>
                                     </div>
+                                </div>
+
+                                <!-- Hidden divs to store image data for JavaScript - UNIQUE ID per post -->
+                                <div id="imageDataContainer" style="display: none;">
+                                    <!-- Include current post's images if it has any -->
+                                    <c:forEach items="${post.medias}" var="media" varStatus="status">
+                                        <div class="image-data" 
+                                             data-path="${media.path}" 
+                                             data-type="Post" 
+                                             data-full-path="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}">
+                                        </div>
+                                    </c:forEach>
+                                    <!-- Include house images if this is a property post -->
+                                    <c:if test="${post.post_type.id == 1}">
+                                        <c:forEach items="${post.house.medias}" var="mediaH" varStatus="status">
+                                            <div class="image-data" 
+                                                 data-path="${mediaH.path}" 
+                                                 data-type="House" 
+                                                 data-full-path="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}">
+                                            </div>
+                                        </c:forEach>
+                                    </c:if>
+                                    <!-- If this is a shared post, also include the shared post's images -->
+                                    <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
+                                        <c:forEach items="${post.parent_post.medias}" var="sharedMedia" varStatus="status">
+                                            <div class="image-data" 
+                                                 data-path="${sharedMedia.path}" 
+                                                 data-type="Post" 
+                                                 data-full-path="${pageContext.request.contextPath}/Asset/Common/Post/${sharedMedia.path}">
+                                            </div>
+                                        </c:forEach>
+                                        <c:if test="${post.parent_post.post_type.id == 1}">
+                                            <c:forEach items="${post.parent_post.house.medias}" var="sharedMediaH" varStatus="status">
+                                                <div class="image-data" 
+                                                     data-path="${sharedMediaH.path}" 
+                                                     data-type="House" 
+                                                     data-full-path="${pageContext.request.contextPath}/Asset/Common/House/${sharedMediaH.path}">
+                                                </div>
+                                            </c:forEach>
+                                        </c:if>
+                                    </c:if>
                                 </div>
 
                                 <!-- Action Bar -->
@@ -322,9 +539,6 @@
                                             <i class="fas fa-thumbs-up"></i>
                                             <span class="like-count">${fn:length(post.likes)}</span>
                                         </button>
-
-                                        <!-- Maybe have a like people here, like: Khanh Huyen, TamHS, ... -->
-
                                     </div>
 
                                     <c:if test="${post.post_type.id == 1}">
@@ -634,42 +848,35 @@
                                                         // Close modal
                                                         $('#closeModalBtn').on('click', function (e) {
                                                             closeModal();
-
                                                         });
-
                                                         modalReview.on('click', function (e) {
                                                             if (e.target === this) {
                                                                 closeModal();
                                                             }
                                                         });
-
                                                         modalReview.on('click', function (e) {
                                                             if (!$(e.target).closest('.modal-content').length) {
                                                                 closeModal();
                                                             }
                                                         });
-
                                                         // Retry loading reviews
                                                         $('#retryReview').on('click', function () {
                                                             if (currentHouseId) {
                                                                 loadReviews(currentHouseId, 1, true);
                                                             }
                                                         });
-
                                                         // Load more reviews
                                                         $('#loadMoreReviewBtn').on('click', function () {
                                                             if (currentHouseId && !isLoadingReview) {
                                                                 loadReviews(currentHouseId, currentReviewPage + 1, false);
                                                             }
                                                         });
-
                                                         // ESC key to close modal
                                                         $(document).on('keydown', function (e) {
                                                             if (e.key === 'Escape' && modalReview.hasClass('active')) {
                                                                 closeModal();
                                                             }
                                                         });
-
                                                         function closeModal() {
                                                             modalReview.removeClass('active');
                                                             $('body').removeClass('overflow-hidden');
@@ -692,9 +899,7 @@
                                                         function loadReviews(houseId, page, isNewLoad) {
                                                             if (isLoadingReview)
                                                                 return;
-
                                                             isLoadingReview = true;
-
                                                             if (isNewLoad) {
                                                                 //  S how loadi n g for new load
                                                                 loadingDiv.show();
@@ -818,12 +1023,10 @@
                                                         let currentCommentPage = 1;
                                                         let isLoadingComment = false;
                                                         let isSubmittingComment = false;
-
                                                         $('button:contains("Comment")').each(function () {
                                                             const postId = $(this).closest('.card-hover').find('button[data-post-id]').first().data('post-id');
                                                             $(this).attr('data-post-id', postId);
                                                         });
-
                                                         // Open Comment Modal
                                                         $(document).on('click', 'button:contains("Comment")', function () {
                                                             const postId = $(this).data('post-id');
@@ -840,23 +1043,19 @@
                                                             $('body').addClass('overflow-hidden');
                                                             loadComments(postId, 1, true);
                                                         });
-
                                                         // Close Comment Modal
                                                         $('#closeCommentModalBtn').on('click', function (e) {
                                                             closeCommentModal();
                                                         });
-
                                                         modalComment.on('click', function (e) {
                                                             if (e.target === this || !$(e.target).closest('.modal-content').length) {
                                                                 closeCommentModal();
                                                             }
                                                         });
-
                                                         // Submit Comment
                                                         submitCommentBtn.on('click', function () {
                                                             submitComment();
                                                         });
-
                                                         // Submit comment on Enter (Ctrl+Enter)
                                                         commentInput.on('keydown', function (e) {
                                                             if (e.ctrlKey && e.key === 'Enter') {
@@ -864,34 +1063,29 @@
                                                                 submitComment();
                                                             }
                                                         });
-
                                                         // Enable/disable submit button based on input
                                                         commentInput.on('input', function () {
                                                             const hasContent = $(this).val().trim().length > 0;
                                                             submitCommentBtn.prop('disabled', !hasContent || isSubmittingComment);
                                                         });
-
                                                         // Retry loading comments
                                                         $('#retryComment').on('click', function () {
                                                             if (currentCommentPostId) {
                                                                 loadComments(currentCommentPostId, 1, true);
                                                             }
                                                         });
-
                                                         // Load more comments
                                                         $('#loadMoreCommentBtn').on('click', function () {
                                                             if (currentCommentPostId && !isLoadingComment) {
                                                                 loadComments(currentCommentPostId, currentCommentPage + 1, false);
                                                             }
                                                         });
-
                                                         // ESC key to close comment modal
                                                         $(document).on('keydown', function (e) {
                                                             if (e.key === 'Escape' && modalComment.hasClass('active')) {
                                                                 closeCommentModal();
                                                             }
                                                         });
-
                                                         function closeCommentModal() {
                                                             modalComment.removeClass('active');
                                                             $('body').removeClass('overflow-hidden');
@@ -1047,7 +1241,6 @@
                                                             const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
                                                             const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
                                                             const ownerId = comment.owner ? comment.owner.id : '';
-
                                                             let deleteButton = '';
                                                             if (isCurrentUser) {
                                                                 deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(`' + comment.id + '`)">' +
@@ -1150,7 +1343,6 @@
                                                                                 // Remove the comment from the DOM
                                                                                 $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
                                                                                     $(this).remove();
-
                                                                                     // Show no comments message if container is empty
                                                                                     if (commentContainer.children().length === 0) {
                                                                                         noCommentDiv.removeClass('hidden');
@@ -1169,12 +1361,10 @@
                                                                 }
                                                             });
                                                         };
-
                                                         $('button:contains("Share")').each(function () {
                                                             const postId = $(this).closest('.card-hover').find('button[data-post-share-id]').first().data('post-id');
                                                             $(this).attr('data-post-share-id', postId);
                                                         });
-
                                                         $(document).on('click', 'button:contains("Share")', function () {
                                                             let user = '${sessionScope.user_id}';
                                                             if (user.trim() === '') {
@@ -1207,7 +1397,6 @@
                                                                 });
                                                             } else {
                                                                 let sharePost = $(this).data('post-share-id');
-
                                                                 Swal.fire({
                                                                     title: 'Wanna share this post?',
                                                                     html: 'Say something about this post or leave blank?',
@@ -1234,7 +1423,6 @@
                                                                 }).then((result) => {
                                                                     if (result.isConfirmed) {
                                                                         const inputValue = result.value;
-
                                                                         $.ajax({
                                                                             url: '${pageContext.request.contextPath}/post',
                                                                             type: 'POST',
@@ -1257,7 +1445,6 @@
                                                                 });
                                                             }
                                                         });
-
                                                         function showToast(message, type = 'success') {
                                                             Toastify({
                                                                 text: message,
@@ -1270,29 +1457,173 @@
                                                         }
                                                     });
 
-                                                    function showImageModal(imageSrc, type) {
-                                                        if (type === 'House') {
-                                                            Swal.fire({
-                                                                imageUrl: '${pageContext.request.contextPath}/Asset/Common/House/' + imageSrc,
-                                                                imageWidth: 'auto',
-                                                                imageHeight: 'auto',
-                                                                showCloseButton: false,
-                                                                showConfirmButton: false,
-                                                                customClass: {
-                                                                    image: 'rounded-lg p-5'
-                                                                }
+                                                    // Store current post's images and slide index
+                                                    let currentPostImages = [];
+                                                    let currentSlideIndex = 0;
+
+                                                    function getPostImagesData(postElement) {
+                                                        const imageDataContainer = postElement.querySelector('#imageDataContainer');
+                                                        if (!imageDataContainer)
+                                                            return [];
+
+                                                        const imageElements = imageDataContainer.querySelectorAll('.image-data');
+                                                        const imagesData = [];
+
+                                                        imageElements.forEach(element => {
+                                                            imagesData.push({
+                                                                path: element.getAttribute('data-path'),
+                                                                type: element.getAttribute('data-type'),
+                                                                fullPath: element.getAttribute('data-full-path')
                                                             });
-                                                        } else if (type === 'Post') {
-                                                            Swal.fire({
-                                                                imageUrl: '${pageContext.request.contextPath}/Asset/Common/Post/' + imageSrc,
-                                                                imageWidth: 'auto',
-                                                                imageHeight: 'auto',
-                                                                showCloseButton: false,
-                                                                showConfirmButton: false,
-                                                                customClass: {
-                                                                    image: 'rounded-lg p-5'
-                                                                }
-                                                            });
+                                                        });
+
+                                                        return imagesData;
+                                                    }
+
+                                                    function openImageCarousel(clickedIndex, postElement) {
+                                                        // Get images for this specific post
+                                                        currentPostImages = getPostImagesData(postElement);
+
+                                                        if (currentPostImages.length === 0)
+                                                            return;
+
+                                                        currentSlideIndex = clickedIndex;
+
+                                                        // Create HTML for carousel
+                                                        let carouselHtml = `
+        <div class="image-carousel-container">
+            <div class="carousel-wrapper">
+                <button class="carousel-nav prev-btn" onclick="changeSlide(-1)" ` + (currentPostImages.length <= 1 ? 'style="display: none;"' : '') + `>‹</button>
+                <div class="carousel-content">
+                    <img id="carousel-image" src="` + currentPostImages[currentSlideIndex].fullPath + `" alt="Image">
+                </div>
+                <button class="carousel-nav next-btn" onclick="changeSlide(1)" ` + (currentPostImages.length <= 1 ? 'style="display: none;"' : '') + `>›</button>
+            </div>
+            <div class="carousel-indicators">
+                <span id="image-counter">` + currentSlideIndex + 1 + ` / ` + currentPostImages.length + `</span>
+            </div>
+        </div>
+    `;
+
+                                                        Swal.fire({
+                                                            html: carouselHtml,
+                                                            showCloseButton: true,
+                                                            showConfirmButton: false,
+                                                            width: '90%',
+                                                            padding: '20px',
+                                                            customClass: {
+                                                                popup: 'carousel-popup'
+                                                            },
+                                                            didOpen: () => {
+                                                                // Add CSS styles
+                                                                const style = document.createElement('style');
+                                                                style.textContent = `
+                .carousel-popup {
+                    background: rgba(0, 0, 0, 0.9) !important;
+                }
+                .image-carousel-container {
+                    position: relative;
+                    width: 100%;
+                    height: 80vh;
+                }
+                .carousel-wrapper {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .carousel-content {
+                    flex-grow: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                }
+                .carousel-content img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: contain;
+                    border-radius: 10px;
+                }
+                .carousel-nav {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: rgba(255, 255, 255, 0.8);
+                    border: none;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    font-size: 24px;
+                    cursor: pointer;
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: background 0.3s;
+                }
+                .carousel-nav:hover {
+                    background: rgba(255, 255, 255, 1);
+                }
+                .prev-btn {
+                    left: 20px;
+                }
+                .next-btn {
+                    right: 20px;
+                }
+                .carousel-indicators {
+                    position: absolute;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                }
+            `;
+                                                                document.head.appendChild(style);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function changeSlide(direction) {
+                                                        if (currentPostImages.length <= 1)
+                                                            return;
+
+                                                        currentSlideIndex += direction;
+
+                                                        // Loop around
+                                                        if (currentSlideIndex >= currentPostImages.length) {
+                                                            currentSlideIndex = 0;
+                                                        } else if (currentSlideIndex < 0) {
+                                                            currentSlideIndex = currentPostImages.length - 1;
+                                                        }
+
+                                                        // Update image and counter
+                                                        const carouselImage = document.getElementById('carousel-image');
+                                                        const imageCounter = document.getElementById('image-counter');
+
+                                                        if (carouselImage && imageCounter) {
+                                                            carouselImage.src = currentPostImages[currentSlideIndex].fullPath;
+                                                            imageCounter.textContent = currentSlideIndex + 1 + ` / ` + currentPostImages.length;
+                                                        }
+                                                    }
+
+                                                    function showImageModal(imageSrc, type, postElement) {
+                                                        // Get images for this specific post
+                                                        const postImages = getPostImagesData(postElement);
+
+                                                        // Find the index of the clicked image
+                                                        const clickedIndex = postImages.findIndex(img =>
+                                                            img.path === imageSrc && img.type === type
+                                                        );
+
+                                                        if (clickedIndex !== -1) {
+                                                            openImageCarousel(clickedIndex, postElement);
                                                         }
                                                     }
         </script>
