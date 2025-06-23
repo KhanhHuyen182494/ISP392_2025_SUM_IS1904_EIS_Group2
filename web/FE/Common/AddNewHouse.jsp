@@ -100,7 +100,7 @@
         <div class="container mx-auto px-4 py-8 max-w-6xl">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                <h1 class="text-4xl font-bold    mb-2">
                     Create New Homestay
                 </h1>
                 <p class="text-gray-600 text-lg">Share your beautiful space with travelers from around the world</p>
@@ -109,7 +109,7 @@
             <!-- Main Form Card -->
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
-                    <div class="flex items-center text-white">
+                    <div class="flex items-center">
                         <i class="fas fa-home text-2xl mr-3"></i>
                         <h2 class="text-2xl font-semibold">Homestay Details</h2>
                     </div>
@@ -203,9 +203,9 @@
                                         <option value="active">✅ Available for Booking</option>
                                         <option value="inactive">🚫 Not Available</option>
                                     </select>
-                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                        <i class="fas fa-chevron-down text-gray-400"></i>
-                                    </div>
+                                    <!--                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                                                            <i class="fas fa-chevron-down text-gray-400"></i>
+                                                                        </div>-->
                                 </div>
                             </div>
                         </div>
@@ -226,7 +226,7 @@
                                             class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-300 appearance-none">
                                         <option value="">Select Province</option>
                                     </select>
-                                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    <!--<i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>-->
                                 </div>
                             </div>
 
@@ -237,7 +237,7 @@
                                             class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-300 appearance-none">
                                         <option value="">Select District</option>
                                     </select>
-                                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    <!--<i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>-->
                                 </div>
                             </div>
 
@@ -248,7 +248,7 @@
                                             class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-300 appearance-none">
                                         <option value="">Select Ward</option>
                                     </select>
-                                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    <!--<i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>-->
                                 </div>
                             </div>
 
@@ -299,7 +299,7 @@
                                 Room Management
                             </h3>
                             <button type="button" id="addRoomBtn" 
-                                    class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                    class="bg-orange-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                 <i class="fas fa-plus"></i>
                                 Add New Room
                             </button>
@@ -313,9 +313,9 @@
                     <!-- Submit Button -->
                     <div class="text-center pt-8 border-t border-gray-200">
                         <button id="addBtn" type="button" 
-                                class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                                class="bg-orange-500 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             <i class="fas fa-rocket"></i>
-                            Create My Homestay
+                            Add My Homestay
                             <i class="fas fa-arrow-right"></i>
                         </button>
                         <p class="text-sm text-gray-500 mt-3">Ready to welcome your first guests?</p>
@@ -478,7 +478,7 @@
                             reader.onload = function (e) {
                                 $(previewContainer).append(
                                         `<div class="relative">
-                            <img src="${e.target.result}" class="w-full h-20 object-cover rounded-lg border-2 border-gray-200">
+                            <img src="` + e.target.result + `" class="w-full h-full object-cover rounded-lg border-2 border-gray-200">
                             <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600" onclick="$(this).parent().remove()">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -514,6 +514,9 @@
                     const homestayName = $('#homestayName').val().trim();
                     const homestayDescription = $('#homestayDescription').val().trim();
                     const isWholeHouse = $('input[name="wholeHouse"]:checked').val();
+                    const tinh = $('#tinh').val().trim();
+                    const quan = $('#quan').val().trim();
+                    const phuong = $('#phuong').val().trim();
 
                     if (!homestayName) {
                         showToast('Homestay name is required!', 'error');
@@ -558,6 +561,21 @@
                             showToast('Please fill in all room information correctly!', 'error');
                             return;
                         }
+                    }
+
+                    if(!tinh){
+                        showToast('Please choose Provinces', 'error');
+                        return;
+                    }
+                    
+                    if(!quan){
+                        showToast('Please choose Districts!', 'error');
+                        return;
+                    }
+                    
+                    if(!phuong){
+                        showToast('Please choose Ward!', 'error');
+                        return;
                     }
 
                     let formData = new FormData($('#postForm')[0]);
