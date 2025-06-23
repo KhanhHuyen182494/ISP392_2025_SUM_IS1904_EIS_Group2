@@ -31,9 +31,11 @@ import java.io.IOException;
 import DAL.DAO.IFeatureDAO;
 import DAL.DAO.IPostTypeDAO;
 import DAL.DAO.IRoomDAO;
+import DAL.DAO.IRoomTypeDAO;
 import DAL.DAO.IStatusDAO;
 import DAL.PostTypeDAO;
 import DAL.RoomDAO;
+import DAL.RoomTypeDAO;
 import DAL.StatusDAO;
 
 /**
@@ -54,6 +56,7 @@ public abstract class BaseAuthorization extends HttpServlet {
     public IStatusDAO sDao;
     public IPostTypeDAO ptDao;
     public IRoomDAO roomDao;
+    public IRoomTypeDAO rtDao;
     public Logging log = new Logging();
     public Gson gson;
 
@@ -72,6 +75,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         sDao = new StatusDAO();
         ptDao = new PostTypeDAO();
         roomDao = new RoomDAO();
+        rtDao = new RoomTypeDAO();
     }
 
     private User getUser(HttpServletRequest request) {

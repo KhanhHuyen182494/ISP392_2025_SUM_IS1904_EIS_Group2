@@ -168,7 +168,40 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
     @Override
     public boolean add(House t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO `fuhousefinder_homestay`.`homestay`
+                     (`id`, `name`, `description`, `star`, `is_whole_house`, `price_per_night`, `owner_id`, `status_id`, `address_id`, `created_at`)
+                     VALUES
+                     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getId());
+            ps.setString(2, t.getName());
+            ps.setString(3, t.getDescription());
+            ps.setFloat(4, t.getStar());
+            ps.setBoolean(5, t.isIs_whole_house());
+            ps.setDouble(6, t.getPrice_per_night());
+            ps.setString(7, t.getOwner().getId());
+            ps.setInt(8, t.getStatus().getId());
+            ps.setInt(9, t.getAddress().getId());
+            ps.setTimestamp(10, t.getCreated_at());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override

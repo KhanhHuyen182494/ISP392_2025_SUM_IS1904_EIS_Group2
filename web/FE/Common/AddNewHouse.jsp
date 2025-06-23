@@ -200,8 +200,9 @@
                                 <div class="relative">
                                     <select name="status" id="status" 
                                             class="w-full px-4 py-4 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 appearance-none">
-                                        <option value="active">✅ Available for Booking</option>
-                                        <option value="inactive">🚫 Not Available</option>
+                                        <c:forEach items="${statuses}" var="s">
+                                            <option value="${s.id}">${s.name}</option>
+                                        </c:forEach>
                                     </select>
                                     <!--                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                                                             <i class="fas fa-chevron-down text-gray-400"></i>
@@ -390,6 +391,31 @@
                 // Add room functionality
                 $('#addRoomBtn').click(function () {
                     roomCounter++;
+
+                    let rtsString = '${rts}';
+
+                    let roomTypes = [];
+                    const matches = rtsString.match(/RoomType\{id=(\d+), name=([^}]+)\}/g);
+
+                    if (matches) {
+                        matches.forEach(match => {
+                            const idMatch = match.match(/id=(\d+)/);
+                            const nameMatch = match.match(/name=([^}]+)/);
+
+                            if (idMatch && nameMatch) {
+                                roomTypes.push({
+                                    id: parseInt(idMatch[1]),
+                                    name: nameMatch[1]
+                                });
+                            }
+                        });
+                    }
+
+                    let roomTypeOptions = '<option value="">Select Room Type</option>';
+                    roomTypes.forEach(type => {
+                        roomTypeOptions += `<option value="` + type.id + `">` + type.name + `</option>`;
+                    });
+
                     const roomHtml = `
             <div class="room-item border border-gray-300 rounded-lg p-4 mb-4" data-room="` + roomCounter + `">
                 <div class="flex justify-between items-center mb-3">
@@ -402,14 +428,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Room Type</label>
                         <select name="rooms[` + roomCounter + `][type]" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Select Room Type</option>
-                            <option value="single">Single Room</option>
-                            <option value="double">Double Room</option>
-                            <option value="twin">Twin Room</option>
-                            <option value="triple">Triple Room</option>
-                            <option value="family">Family Room</option>
-                            <option value="suite">Suite</option>
-                            <option value="dormitory">Dormitory</option>
+                            ` + roomTypeOptions + `
                         </select>
                     </div>
                     <div>

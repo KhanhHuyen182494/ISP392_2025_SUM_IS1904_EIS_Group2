@@ -4,22 +4,14 @@
  */
 package DAL.DAO;
 
-import Model.Address;
+import Model.RoomType;
+import java.util.List;
 
 /**
  *
- * @author Tam
+ * @author Ha
  */
-public interface IAddressDAO {
+public interface IRoomTypeDAO {
     //Get
-    public Address getAddressById(int id);
-    
-    //Update
-    
-    
-    //Delete
-    
-    
-    //Add
-    public int addAddress(Address a);
+    public List<RoomType> getAllRoomType();
 }
