@@ -335,26 +335,32 @@
                 $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm', function (data_tinh) {
                     if (data_tinh.error == 0) {
                         $.each(data_tinh.data, function (key_tinh, val_tinh) {
-                            $("#tinh").append('<option value="' + val_tinh.id + '">' + val_tinh.full_name + '</option>');
+                            $("#tinh").append('<option data-id="' + val_tinh.id + '" value="' + val_tinh.full_name + '">' + val_tinh.full_name + '</option>');
                         });
 
                         $("#tinh").change(function () {
-                            var idtinh = $(this).val();
+                            var tentinh = $(this).val(); // name
+                            var idtinh = $(this).find(':selected').data('id'); // id (optional)
+
                             $.getJSON('https://esgoo.net/api-tinhthanh/2/' + idtinh + '.htm', function (data_quan) {
                                 if (data_quan.error == 0) {
                                     $("#quan").html('<option value="">Select District</option>');
                                     $("#phuong").html('<option value="">Select Ward</option>');
+
                                     $.each(data_quan.data, function (key_quan, val_quan) {
-                                        $("#quan").append('<option value="' + val_quan.id + '">' + val_quan.full_name + '</option>');
+                                        $("#quan").append('<option data-id="' + val_quan.id + '" value="' + val_quan.full_name + '">' + val_quan.full_name + '</option>');
                                     });
 
-                                    $("#quan").change(function () {
-                                        var idquan = $(this).val();
+                                    $("#quan").off('change').on('change', function () {
+                                        var tenquan = $(this).val(); // name
+                                        var idquan = $(this).find(':selected').data('id'); // id
+
                                         $.getJSON('https://esgoo.net/api-tinhthanh/3/' + idquan + '.htm', function (data_phuong) {
                                             if (data_phuong.error == 0) {
                                                 $("#phuong").html('<option value="">Select Ward</option>');
+
                                                 $.each(data_phuong.data, function (key_phuong, val_phuong) {
-                                                    $("#phuong").append('<option value="' + val_phuong.id + '">' + val_phuong.full_name + '</option>');
+                                                    $("#phuong").append('<option data-id="' + val_phuong.id + '" value="' + val_phuong.full_name + '">' + val_phuong.full_name + '</option>');
                                                 });
                                             }
                                         });
@@ -364,6 +370,7 @@
                         });
                     }
                 });
+
 
                 // Handle rental type change
                 $('input[name="wholeHouse"]').change(function () {
@@ -427,8 +434,8 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Room Images</label>
                     <div class="relative">
-                        <input type="file" name="rooms[` + roomCounter + `][images]" multiple accept="image/*" class="hidden room-image-input" data-room="` + roomCounter + `">
-                        <div class="room-upload-box w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200" data-room="${roomCounter}">
+                        <input type="file" name="rooms[` + roomCounter + `][images]" multiple accept="image/*" class="hidden" id="roomImageInput` + roomCounter + `">
+                        <div class="room-upload-box w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200" data-room="` + roomCounter + `">
                             <div class="text-center">
                                 <i class="fas fa-camera text-xl text-gray-400 mb-1"></i>
                                 <p class="text-xs text-gray-500">Upload room images</p>
@@ -459,15 +466,20 @@
                 // Room image upload
                 $(document).on('click', '.room-upload-box', function () {
                     const roomNumber = $(this).data('room');
-                    $(`.room-image-input[data-room="${roomNumber}"]`).click();
+                    $('#roomImageInput' + roomNumber).click();
                 });
 
-                $(document).on('change', '.room-image-input', function () {
-                    const roomNumber = $(this).data('room');
-                    handleImagePreview(this, `.room-image-preview[data-room="${roomNumber}"]`);
+                $(document).on('change', 'input[name*="[images]"]', function () {
+                    const roomNumber = $(this).closest('.room-item').data('room');
+                    handleImagePreview(this, `.room-image-preview[data-room="` + roomNumber + `"]`);
                 });
 
                 function handleImagePreview(input, previewContainer) {
+                    if (!validateImages(input)) {
+                        input.value = ''; // Clear the input if validation fails
+                        return;
+                    }
+
                     const files = input.files;
                     $(previewContainer).empty();
 
@@ -498,11 +510,11 @@
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
                         if (file.size > maxSize) {
-                            showToast(`File "${file.name}" is too large. Maximum size is 10MB.`, 'error');
+                            showToast(`File "` + file.name + `" is too large. Maximum size is 10MB.`, 'error');
                             return false;
                         }
                         if (!allowedTypes.includes(file.type)) {
-                            showToast(`File "${file.name}" is not a valid image format.`, 'error');
+                            showToast(`File "` + file.name + `" is not a valid image format.`, 'error');
                             return false;
                         }
                     }
@@ -517,7 +529,10 @@
                     const tinh = $('#tinh').val().trim();
                     const quan = $('#quan').val().trim();
                     const phuong = $('#phuong').val().trim();
+                    const detailAddress = $('#detailAddress').val().trim();
+                    const status = $('#status').val();
 
+                    // Basic validations
                     if (!homestayName) {
                         showToast('Homestay name is required!', 'error');
                         return;
@@ -533,13 +548,57 @@
                         return;
                     }
 
+                    if (!tinh) {
+                        showToast('Please choose Province!', 'error');
+                        return;
+                    }
+
+                    if (!quan) {
+                        showToast('Please choose District!', 'error');
+                        return;
+                    }
+
+                    if (!phuong) {
+                        showToast('Please choose Ward!', 'error');
+                        return;
+                    }
+
+                    // Validate homestay images
+                    const homestayImages = $('#homestayImageInput')[0].files;
+                    if (!homestayImages || homestayImages.length === 0) {
+                        showToast('Please upload at least one homestay image!', 'error');
+                        return;
+                    }
+
+                    // Collect data based on rental type
+                    let formData = new FormData();
+
+                    // Basic homestay data
+                    formData.append('homestayName', homestayName);
+                    formData.append('homestayDescription', homestayDescription);
+                    formData.append('wholeHouse', isWholeHouse);
+                    formData.append('province', tinh);
+                    formData.append('district', quan);
+                    formData.append('ward', phuong);
+                    formData.append('detailAddress', detailAddress);
+                    formData.append('status', status);
+
+                    // Add homestay images
+                    for (let i = 0; i < homestayImages.length; i++) {
+                        formData.append('homestayImages', homestayImages[i]);
+                    }
+
                     if (isWholeHouse === 'yes') {
+                        // Whole house rental
                         const price = $('#homestayPrice').val();
                         if (!price || price <= 0) {
                             showToast('Please enter a valid price for the whole house!', 'error');
                             return;
                         }
+                        formData.append('homestayPrice', price);
+
                     } else {
+                        // Room rental
                         const rooms = $('.room-item');
                         if (rooms.length === 0) {
                             showToast('Please add at least one room!', 'error');
@@ -547,39 +606,63 @@
                         }
 
                         let roomValid = true;
-                        rooms.each(function () {
+                        let roomData = [];
+
+                        rooms.each(function (index) {
+                            const roomNumber = $(this).data('room');
                             const roomType = $(this).find('select[name*="[type]"]').val();
                             const roomPrice = $(this).find('input[name*="[price]"]').val();
                             const maxGuests = $(this).find('input[name*="[maxGuests]"]').val();
+                            const roomDescription = $(this).find('textarea[name*="[description]"]').val();
+                            const roomImages = $(this).find('input[name*="[images]"]')[0].files;
+
+                            // Validate room data
                             if (!roomType || !roomPrice || !maxGuests || roomPrice <= 0 || maxGuests <= 0) {
+                                showToast('Please fill in all required room information for Room ' + roomNumber + '!', 'error');
                                 roomValid = false;
                                 return false;
+                            }
+
+                            // Validate room images
+                            if (!roomImages || roomImages.length === 0) {
+                                showToast('Please upload at least one image for Room ' + roomNumber + '!', 'error');
+                                roomValid = false;
+                                return false;
+                            }
+
+                            // Collect room data
+                            const room = {
+                                roomNumber: roomNumber,
+                                type: roomType,
+                                price: roomPrice,
+                                maxGuests: maxGuests,
+                                description: roomDescription || ''
+                            };
+
+                            roomData.push(room);
+
+                            // Add room data to formData
+                            formData.append('rooms[' + index + '][roomNumber]', roomNumber);
+                            formData.append('rooms[' + index + '][type]', roomType);
+                            formData.append('rooms[' + index + '][price]', roomPrice);
+                            formData.append('rooms[' + index + '][maxGuests]', maxGuests);
+                            formData.append('rooms[' + index + '][description]', roomDescription || '');
+
+                            // Add room images
+                            for (let i = 0; i < roomImages.length; i++) {
+                                formData.append('rooms[' + index + '][images]', roomImages[i]);
                             }
                         });
 
                         if (!roomValid) {
-                            showToast('Please fill in all room information correctly!', 'error');
                             return;
                         }
+
+                        // Add total room count
+                        formData.append('totalRooms', rooms.length);
                     }
 
-                    if(!tinh){
-                        showToast('Please choose Provinces', 'error');
-                        return;
-                    }
-                    
-                    if(!quan){
-                        showToast('Please choose Districts!', 'error');
-                        return;
-                    }
-                    
-                    if(!phuong){
-                        showToast('Please choose Ward!', 'error');
-                        return;
-                    }
-
-                    let formData = new FormData($('#postForm')[0]);
-
+                    // Show loading and submit
                     Swal.fire({
                         title: 'Creating Homestay...',
                         text: 'Please wait while we create your homestay.',
@@ -589,26 +672,33 @@
                         }
                     });
 
-                    $.ajax({
-                        processData: false,
-                        contentType: false,
-                        url: '${pageContext.request.contextPath}/post',
-                        type: 'POST',
-                        data: formData,
-                        success: function (response) {
-                            Swal.close();
-                            if (response.ok) {
-                                showToast(response.message, 'success');
-                                // Optionally reset form or redirect
-                            } else {
-                                showToast(response.message, 'error');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.close();
-                            showToast(xhr.responseText || 'Something went wrong.', 'error');
-                        }
+                    formData.forEach((value, key) => {
+                        console.log(key, value);
                     });
+
+//                    $.ajax({
+//                        processData: false,
+//                        contentType: false,
+//                        url: '${pageContext.request.contextPath}/post',
+//                        type: 'POST',
+//                        data: formData,
+//                        success: function (response) {
+//                            Swal.close();
+//                            if (response.ok) {
+//                                showToast(response.message, 'success');
+//                                // Optionally reset form or redirect
+//                                setTimeout(() => {
+//                                    window.location.href = '${pageContext.request.contextPath}/feeds';
+//                                }, 2000);
+//                            } else {
+//                                showToast(response.message, 'error');
+//                            }
+//                        },
+//                        error: function (xhr, status, error) {
+//                            Swal.close();
+//                            showToast(xhr.responseText || 'Something went wrong.', 'error');
+//                        }
+//                    });
                 });
 
                 function showToast(message, type = 'success') {
