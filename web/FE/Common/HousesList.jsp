@@ -199,14 +199,6 @@
                 <!-- Gradient Overlay -->
                 <div class="absolute inset-0 bg-black bg-opacity-20"></div>
 
-                <!-- Edit Cover Button (only for own profile) -->
-                <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                    <button class="absolute top-4 right-4 bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2">
-                        <i class="fas fa-camera"></i>
-                        <span class="hidden sm:inline">Edit Cover</span>
-                    </button>
-                </c:if>
-
                 <!-- Profile Info Overlay -->
                 <div class="absolute bottom-0 left-0 right-0 p-6">
                     <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4">
@@ -226,13 +218,6 @@
                                     </c:otherwise>
                                 </c:choose>
                             </div>
-
-                            <!-- Edit Avatar Button (only for own profile) -->
-                            <c:if test="${sessionScope.user.id == requestScope.profile.id}">
-                                <button class="absolute bottom-2 right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg">
-                                    <i class="fas fa-camera text-xs"></i>
-                                </button>
-                            </c:if>
                         </div>
 
                         <!-- User Info -->
@@ -283,6 +268,12 @@
                                 <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                     <i class="fas fa-user"></i>
                                     Profile
+                                </button>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/owner-house/add">
+                                <button class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    Add House
                                 </button>
                             </a>
                         </c:if>

@@ -6,6 +6,7 @@ package Controller.Common;
 
 import DTO.PostDTO;
 import Model.Address;
+import Model.House;
 import Model.Review;
 import Model.Like;
 import Model.Media;
@@ -17,6 +18,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,11 +49,15 @@ public class ProfileController extends BaseAuthorization {
             fullLoadPostInfomation(posts, user);
             
             int totalLikes = 0;
+            List<House> hList = new LinkedList<>();
             
             for(Post p : posts.getItems()){
                 totalLikes += p.getLikes().size();
+                hList.add(p.getHouse());
             }
 
+            fullLoadHouseInfomation(hList);
+            
             request.setAttribute("totalLikes", totalLikes);
             request.setAttribute("profile", u);
             request.setAttribute("posts", posts.getItems());
@@ -64,35 +70,22 @@ public class ProfileController extends BaseAuthorization {
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-
+        
     }
 
-    private void fullLoadPostInfomation(PostDTO posts, User user) {
+    private void fullLoadHouseInfomation(List<House> houses) {
         try {
             //Load address, images, likes, feedbacks
-            for (Post p : posts.getItems()) {
-                String pid = p.getId();
-
-                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-
-                Status s = new Status();
-                s.setId(21);
-
-                List<Media> medias = mDao.getMediaByObjectId(p.getHouse().getId(), "Post", s);
-                List<Like> likes = lDao.getListLikeByPostId(pid);
-                List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
-
-                boolean isLikedByCurrentUser = false;
-                if (user != null && !user.getId().isBlank()) {
-                    isLikedByCurrentUser = likes.stream()
-                            .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
-                }
-
-                p.setReviews(reviews);
-                p.getHouse().setAddress(a);
-                p.setMedias(medias);
-                p.setLikes(likes);
-                p.setLikedByCurrentUser(isLikedByCurrentUser);
+            for (House h : houses) {
+                String hid = h.getId();
+                
+                Address a = aDao.getAddressById(h.getAddress().getId());
+                Status mediaS = new Status();
+                mediaS.setId(21);
+                List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+                
+                h.setMedias(medias);
+                h.setAddress(a);
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
@@ -100,4 +93,85 @@ public class ProfileController extends BaseAuthorization {
         }
     }
     
+    private void fullLoadHouseParentPostInfomation(House h) {
+        try {
+            //Load address, images, likes, feedbacks
+            String hid = h.getId();
+            
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+            
+            h.setMedias(medias);
+            h.setAddress(a);
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+    
+    private void fullLoadPostInfomation(PostDTO posts, User user) {
+        try {
+            //Load address, images, likes, feedbacks
+            for (Post p : posts.getItems()) {
+                String pid = p.getId();
+                
+                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+                
+                Status s = new Status();
+                s.setId(21);
+                
+                List<Media> medias = mDao.getMediaByObjectId(p.getId(), "Post", s);
+                List<Like> likes = lDao.getListLikeByPostId(pid);
+                List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+                
+                Post parent = null;
+                
+                if (p.getParent_post() != null && p.getParent_post().getId() != null) {
+                    parent = pDao.getById(p.getParent_post().getId());
+                    fullLoadParentPost(parent);
+                }
+                
+                boolean isLikedByCurrentUser = false;
+                if (user != null && !user.getId().isBlank()) {
+                    isLikedByCurrentUser = likes.stream()
+                            .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
+                }
+                
+                p.setReviews(reviews);
+                p.getHouse().setAddress(a);
+                p.setMedias(medias);
+                p.setLikes(likes);
+                p.setLikedByCurrentUser(isLikedByCurrentUser);
+                p.setParent_post(parent);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+    
+    private void fullLoadParentPost(Post p) {
+        try {
+            //Load address, images, likes, feedbacks
+            String pid = p.getId();
+            
+            Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+            
+            Status s = new Status();
+            s.setId(21);
+            
+            List<Media> medias = mDao.getMediaByObjectId(pid, "Post", s);
+            
+            p.getHouse().setAddress(a);
+            p.setMedias(medias);
+            
+            fullLoadHouseParentPostInfomation(p.getHouse());
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
 }

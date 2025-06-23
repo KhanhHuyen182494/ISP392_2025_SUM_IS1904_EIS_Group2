@@ -1500,7 +1500,7 @@
                 <button class="carousel-nav next-btn" onclick="changeSlide(1)" ` + (currentPostImages.length <= 1 ? 'style="display: none;"' : '') + `>›</button>
             </div>
             <div class="carousel-indicators">
-                <span id="image-counter">` + currentSlideIndex + 1 + ` / ` + currentPostImages.length + `</span>
+                <span id="image-counter">` + (currentSlideIndex + 1) + ` / ` + currentPostImages.length + `</span>
             </div>
         </div>
     `;
