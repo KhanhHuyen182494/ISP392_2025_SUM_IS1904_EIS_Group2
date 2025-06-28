@@ -18,13 +18,14 @@ import Model.RoomType;
 import Model.Status;
 import Model.User;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,8 +42,14 @@ import java.util.logging.Logger;
  */
 @WebServlet(name = "HousesController", urlPatterns = {
     "/owner-house",
-    "/owner-house/add"
+    "/owner-house/add",
+    "/owner-house/edit"
 })
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024, // 1 MB
+        maxFileSize = 1024 * 1024 * 10, // 10 MB
+        maxRequestSize = 1024 * 1024 * 50 // 50 MB
+)
 public class HousesController extends BaseAuthorization {
 
     private static final Logger LOGGER = Logger.getLogger(HousesController.class.getName());
@@ -52,52 +59,14 @@ public class HousesController extends BaseAuthorization {
         String path = request.getServletPath();
 
         switch (path) {
-            case "/owner-house" -> {
-                try {
-                    String uid = request.getParameter("uid");
-
-                    if (uid == null || uid.isBlank()) {
-                        request.setAttribute("message", "Oops, that user seems to be not existed!");
-                        request.getRequestDispatcher("./FE/ErrorPages/404.jsp").forward(request, response);
-                        return;
-                    }
-
-                    PostDTO posts;
-                    List<House> houses;
-                    User u = uDao.getByUidForProfile(uid);
-
-                    posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
-                    fullLoadPostInfomation(posts, user);
-
-                    houses = hDao.getListPaging(10, 0, "", uid);
-                    fullLoadHouseInfomation(houses);
-
-                    int totalLikes = 0;
-                    List<House> hList = new LinkedList<>();
-
-                    for (Post p : posts.getItems()) {
-                        totalLikes += p.getLikes().size();
-                        hList.add(p.getHouse());
-                    }
-
-                    request.setAttribute("posts", posts.getItems());
-                    request.setAttribute("totalLikes", totalLikes);
-                    request.setAttribute("houses", houses);
-                    request.setAttribute("profile", u);
-                    request.getRequestDispatcher("./FE/Common/HousesList.jsp").forward(request, response);
-                } catch (ServletException | IOException e) {
-                    LOGGER.log(Level.SEVERE, "Something error when trying to get list house data!", e);
-                }
-            }
-            case "/owner-house/add" -> {
-
-                List<Status> statuses = sDao.getAllStatusByCategory("homestay");
-                List<RoomType> rts = rtDao.getAllRoomType();
-
-                request.setAttribute("statuses", statuses);
-                request.setAttribute("rts", rts);
-                request.getRequestDispatcher("/FE/Common/AddNewHouse.jsp").forward(request, response);
-            }
+            case "/owner-house" ->
+                doGetListHouseOfOwner(request, response, user);
+            case "/owner-house/add" ->
+                doGetAddHouse(request, response, user);
+            case "/owner-house/edit" ->
+                doGetEditHouse(request, response, user);
+            case "/owner-house/detail" ->
+                doGetDetailHouse(request, response, user);
         }
 
     }
@@ -115,20 +84,68 @@ public class HousesController extends BaseAuthorization {
         }
     }
 
+    private void doGetAddHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        List<Status> statuses = sDao.getAllStatusByCategory("homestay");
+        List<RoomType> rts = rtDao.getAllRoomType();
+        List<Status> roomStatuses = sDao.getAllStatusByCategory("room");
+
+        request.setAttribute("roomStatuses", roomStatuses);
+        request.setAttribute("statuses", statuses);
+        request.setAttribute("rts", rts);
+        request.getRequestDispatcher("/FE/Common/AddNewHouse.jsp").forward(request, response);
+    }
+
+    private void doGetEditHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        request.getRequestDispatcher("/FE/Common/EditHouse.jsp").forward(request, response);
+    }
+
+    private void doGetDetailHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        request.getRequestDispatcher("/FE/Common/DetailHouse.jsp").forward(request, response);
+    }
+
+    private void doGetListHouseOfOwner(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        try {
+            String uid = request.getParameter("uid");
+
+            if (uid == null || uid.isBlank()) {
+                request.setAttribute("message", "Oops, that user seems to be not existed!");
+                request.getRequestDispatcher("./FE/ErrorPages/404.jsp").forward(request, response);
+                return;
+            }
+
+            PostDTO posts;
+            List<House> houses;
+            User u = uDao.getByUidForProfile(uid);
+
+            posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
+            fullLoadPostInfomation(posts, user);
+
+            houses = hDao.getListPaging(10, 0, "", uid);
+            fullLoadHouseInfomation(houses);
+
+            int totalLikes = 0;
+            List<House> hList = new LinkedList<>();
+
+            for (Post p : posts.getItems()) {
+                totalLikes += p.getLikes().size();
+                hList.add(p.getHouse());
+            }
+
+            request.setAttribute("posts", posts.getItems());
+            request.setAttribute("totalLikes", totalLikes);
+            request.setAttribute("houses", houses);
+            request.setAttribute("profile", u);
+            request.getRequestDispatcher("./FE/Common/HousesList.jsp").forward(request, response);
+        } catch (ServletException | IOException e) {
+            LOGGER.log(Level.SEVERE, "Something error when trying to get list house data!", e);
+        }
+    }
+
     private void addHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
         Map<String, Object> jsonResponse = new HashMap<>();
-
-        String realPath = request.getServletContext().getRealPath("");
-        String modifiedPath = realPath.replace("\\build", "");
-
-        String homestayMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/House");
-        String homestayMediaRootPat = modifiedPath + "/Asset/Common/House";
-
-        String roomMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/Room");
-        String roomMediaRootPat = modifiedPath + "/Asset/Common/Room";
 
         try {
             String homestayName = request.getParameter("homestayName");
@@ -139,21 +156,24 @@ public class HousesController extends BaseAuthorization {
             String ward = request.getParameter("ward");
             String detailAddress = request.getParameter("detailAddress");
             String status = request.getParameter("status");
-            int statusId = Integer.parseInt(status);
 
-            Collection<Part> homestayImageParts = request.getParts();
-            List<String> homestayImagePaths = new ArrayList<>();
-
-            for (Part part : homestayImageParts) {
-                if ("homestayImages".equals(part.getName()) && part.getSize() > 0) {
-                    String fileName = Generator.generateMediaId();
-
-                    ImageUtil.writeImageToFile(part, homestayMediaBuildPath, fileName);
-                    ImageUtil.writeImageToFile(part, homestayMediaRootPat, fileName);
-
-                    homestayImagePaths.add(fileName);
-                }
+            if (homestayName == null || homestayDescription == null || wholeHouse == null
+                    || province == null || district == null || ward == null || status == null || status.isEmpty()) {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "Missing required fields.");
+                out.print(gson.toJson(jsonResponse));
+                return;
             }
+
+            int statusId = Integer.parseInt(status);
+            String houseId = Generator.generateHouseId();
+
+            String realPath = request.getServletContext().getRealPath("");
+            String basePath = realPath.replace("\\build", "");
+            String homestayMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/House");
+            String homestayMediaRootPath = basePath + "/Asset/Common/House";
+
+            List<String> homestayImagePaths = saveImages(request.getParts(), "homestayImages", homestayMediaBuildPath, homestayMediaRootPath);
 
             if (homestayImagePaths.isEmpty()) {
                 jsonResponse.put("ok", false);
@@ -162,158 +182,194 @@ public class HousesController extends BaseAuthorization {
                 return;
             }
 
-            String houseId = Generator.generateHouseId();
+            for (String fileName : homestayImagePaths) {
+                if (!saveMedia(fileName, "Homestay", houseId, user)) {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Failed to save homestay image.");
+                    out.print(gson.toJson(jsonResponse));
+                    return;
+                }
+            }
 
-            Address a = new Address();
-            a.setCountry("Việt Nam");
-            a.setProvince(province);
-            a.setWard(ward);
-            a.setDistrict(district);
-            a.setDetail(detailAddress);
-            a.setCreated_at(java.sql.Timestamp.valueOf(LocalDateTime.now()));
-            a.setCreated_by(user.getId());
+            // Save address
+            Address address = new Address();
+            address.setCountry("Việt Nam");
+            address.setProvince(province);
+            address.setDistrict(district);
+            address.setWard(ward);
+            address.setDetail(detailAddress);
+            address.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+            address.setCreated_by(user.getId());
 
-            int aid = aDao.addAddress(a);
-
-            if (aid == -1) {
+            int addressId = aDao.addAddress(address);
+            if (addressId == -1) {
                 jsonResponse.put("ok", false);
-                jsonResponse.put("message", "Failed to add address!");
+                jsonResponse.put("message", "Failed to save address.");
                 out.print(gson.toJson(jsonResponse));
                 return;
             }
+            address.setId(addressId);
 
-            a.setId(aid);
+            // Save homestay
+            Status homestayStatus = new Status();
+            homestayStatus.setId(statusId);
 
-            Status s = new Status();
-            s.setId(statusId);
+            House house = new House();
+            house.setId(houseId);
+            house.setName(homestayName);
+            house.setDescription(homestayDescription);
+            house.setStar(0);
+            house.setOwner(user);
+            house.setStatus(homestayStatus);
+            house.setAddress(address);
+            house.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
 
-            House h = new House();
-            h.setId(houseId);
-            h.setName(homestayName);
-            h.setDescription(homestayDescription);
-            h.setStar(0);
-            h.setOwner(user);
-            h.setStatus(s);
-            h.setAddress(a);
-            h.setCreated_at(java.sql.Timestamp.valueOf(LocalDateTime.now()));
-
-            if ("yes".equals(wholeHouse)) {
-                h.setIs_whole_house(true);
+            if ("yes".equalsIgnoreCase(wholeHouse)) {
+                house.setIs_whole_house(true);
 
                 String priceStr = request.getParameter("homestayPrice");
-                if (priceStr != null && !priceStr.isEmpty()) {
-                    try {
-                        double price = Double.parseDouble(priceStr);
-                        h.setPrice_per_night(price);
-                    } catch (NumberFormatException e) {
-                        jsonResponse.put("ok", false);
-                        jsonResponse.put("message", "Invalid price format!");
-                        out.print(gson.toJson(jsonResponse));
-                        return;
-                    }
-                }
-
-                boolean saved = hDao.add(h);
-
-                if (saved) {
-                    jsonResponse.put("ok", true);
-                    jsonResponse.put("message", "Homestay created successfully!");
-                } else {
+                try {
+                    double price = Double.parseDouble(priceStr);
+                    house.setPrice_per_night(price);
+                } catch (NumberFormatException e) {
                     jsonResponse.put("ok", false);
-                    jsonResponse.put("message", "Failed to create homestay!");
-                }
-
-            } else {
-                h.setIs_whole_house(false);
-                h.setPrice_per_night(0);
-
-                if (hDao.add(h)) {
-                    jsonResponse.put("ok", false);
-                    jsonResponse.put("message", "Failed to create homestay!");
+                    jsonResponse.put("message", "Invalid price format!");
                     out.print(gson.toJson(jsonResponse));
                     return;
                 }
 
-                String totalRoomsStr = request.getParameter("totalRooms");
-                int totalRooms = totalRoomsStr != null ? Integer.parseInt(totalRoomsStr) : 0;
-
-                List<Room> rooms = new ArrayList<>();
-
-                for (int i = 0; i < totalRooms; i++) {
-                    String roomNumber = request.getParameter("rooms[" + i + "][roomNumber]");
-                    String roomType = request.getParameter("rooms[" + i + "][type]");
-                    String roomPriceStr = request.getParameter("rooms[" + i + "][price]");
-                    String maxGuestsStr = request.getParameter("rooms[" + i + "][maxGuests]");
-                    String roomDescription = request.getParameter("rooms[" + i + "][description]");
-
-                    if (roomType == null || roomPriceStr == null || maxGuestsStr == null) {
-                        jsonResponse.put("ok", false);
-                        jsonResponse.put("message", "Missing room data for room " + (i + 1) + "!");
-                        out.print(gson.toJson(jsonResponse));
-                        return;
-                    }
-
-                    List<String> roomImagePaths = new ArrayList<>();
-                    for (Part part : homestayImageParts) {
-                        if (("rooms[" + i + "][images]").equals(part.getName()) && part.getSize() > 0) {
-                            String fileName = Generator.generateMediaId();
-
-                            ImageUtil.writeImageToFile(part, roomMediaBuildPath, fileName);
-                            ImageUtil.writeImageToFile(part, roomMediaRootPat, fileName);
-
-                            roomImagePaths.add(fileName);
-                        }
-                    }
-
-                    if (roomImagePaths.isEmpty()) {
-                        jsonResponse.put("ok", false);
-                        jsonResponse.put("message", "Please upload at least one image for room " + roomNumber + "!");
-                        out.print(gson.toJson(jsonResponse));
-                        return;
-                    }
-
-                    String roomId = Generator.generateRoomId();
-                    Room room = new Room();
-                    room.setHouse(h);
-                    room.setId(roomId);
-                    room.setRoomNumber(roomNumber);
-                    room.setType(roomType);
-                    try {
-                        room.setPrice(Double.parseDouble(roomPriceStr));
-                        room.setMaxGuests(Integer.parseInt(maxGuestsStr));
-                    } catch (NumberFormatException e) {
-                        jsonResponse.put("ok", false);
-                        jsonResponse.put("message", "Invalid number format for room " + (i + 1) + "!");
-                        out.print(gson.toJson(jsonResponse));
-                        return;
-                    }
-                    room.setDescription(roomDescription != null ? roomDescription : "");
-                    room.setImages(String.join(",", roomImagePaths));
-                    room.setStatus("available");
-                    room.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-
-                    rooms.add(room);
+                if (hDao.add(house)) {
+                    jsonResponse.put("ok", true);
+                    jsonResponse.put("message", "Whole house homestay created successfully!");
+                } else {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Failed to create homestay.");
                 }
 
-                boolean roomsSaved = saveRooms(rooms);
+            } else {
+                house.setIs_whole_house(false);
+                house.setPrice_per_night(0);
 
-                if (roomsSaved) {
+                if (!hDao.add(house)) {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Failed to create homestay.");
+                    out.print(gson.toJson(jsonResponse));
+                    return;
+                }
+
+                boolean success = processRooms(request, request.getParts(), house, user, basePath, jsonResponse);
+                if (success) {
                     jsonResponse.put("ok", true);
                     jsonResponse.put("message", "Homestay with rooms created successfully!");
                 } else {
-                    jsonResponse.put("ok", false);
-                    jsonResponse.put("message", "Failed to create rooms!");
+                    out.print(gson.toJson(jsonResponse));
+                    return;
                 }
             }
 
             out.print(gson.toJson(jsonResponse));
 
-        } catch (ServletException | IOException | NumberFormatException e) {
+        } catch (Exception e) {
             jsonResponse.put("ok", false);
             jsonResponse.put("message", "Server error: " + e.getMessage());
             out.print(gson.toJson(jsonResponse));
         } finally {
             out.close();
+        }
+    }
+
+    private List<String> saveImages(Collection<Part> parts, String fieldName, String path1, String path2) throws IOException {
+        List<String> paths = new ArrayList<>();
+        for (Part part : parts) {
+            if (fieldName.equals(part.getName()) && part.getSize() > 0) {
+                String fileName = Generator.generateMediaId();
+                ImageUtil.writeImageToFile(part, path1, fileName);
+                ImageUtil.writeImageToFile(part, path2, fileName);
+                paths.add(fileName);
+            }
+        }
+        return paths;
+    }
+
+    private boolean saveMedia(String fileName, String objectType, String objectId, User user) {
+        Media m = new Media();
+        Status mediaStatus = new Status();
+        mediaStatus.setId(21);
+
+        m.setId(fileName);
+        m.setObject_type(objectType);
+        m.setObject_id(objectId);
+        m.setMedia_type("image");
+        m.setPath(fileName);
+        m.setStatus(mediaStatus);
+        m.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+        m.setOwner(user);
+
+        return mDao.addMedia(m);
+    }
+
+    private boolean processRooms(HttpServletRequest request, Collection<Part> parts, House house, User user, String basePath, Map<String, Object> jsonResponse) throws IOException {
+        try {
+            int totalRooms = Integer.parseInt(request.getParameter("totalRooms"));
+            List<Room> rooms = new ArrayList<>();
+
+            for (int i = 0; i < totalRooms; i++) {
+                String prefix = "rooms[" + i + "]";
+                String roomName = request.getParameter(prefix + "[name]");
+                String roomDescription = request.getParameter(prefix + "[description]");
+                String roomType = request.getParameter(prefix + "[type]");
+                String roomPriceStr = request.getParameter(prefix + "[price]");
+                String maxGuestsStr = request.getParameter(prefix + "[maxGuests]");
+                String roomPosition = request.getParameter(prefix + "[position]");
+                String roomStatusStr = request.getParameter(prefix + "[status]");
+                String roomNumber = request.getParameter(prefix + "[roomNumber]");
+
+                List<String> roomImages = saveImages(parts, prefix + "[images]",
+                        request.getServletContext().getRealPath("Asset/Common/Room"),
+                        basePath + "/Asset/Common/Room");
+
+                if (roomImages.isEmpty()) {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Please upload image for Room " + roomNumber);
+                    return false;
+                }
+
+                for (String img : roomImages) {
+                    if (!saveMedia(img, "Room", house.getId(), user)) {
+                        jsonResponse.put("ok", false);
+                        jsonResponse.put("message", "Failed to save room image!");
+                        return false;
+                    }
+                }
+
+                Room room = new Room();
+                room.setId(Generator.generateRoomId());
+                room.setName(roomName);
+                room.setDescription(roomDescription != null ? roomDescription : "");
+                room.setStar(0);
+                room.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+                room.setRoom_position(roomPosition);
+                room.setPrice_per_night(Double.parseDouble(roomPriceStr));
+                room.setMax_guests(Integer.parseInt(maxGuestsStr));
+                room.setHouse(house);
+
+                RoomType rt = new RoomType();
+                rt.setId(Integer.parseInt(roomType));
+                room.setRoomType(rt);
+
+                Status rs = new Status();
+                rs.setId(Integer.parseInt(roomStatusStr));
+                room.setStatus(rs);
+
+                rooms.add(room);
+            }
+
+            return roomDao.addMultipleRoom(rooms);
+
+        } catch (Exception e) {
+            jsonResponse.put("ok", false);
+            jsonResponse.put("message", "Room processing failed: " + e.getMessage());
+            return false;
         }
     }
 

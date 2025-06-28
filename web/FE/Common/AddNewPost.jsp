@@ -329,6 +329,9 @@
 
                 // Handle homestay selection change
                 $(document).on('change', '#homestaySelect', function () {
+                    $('#homestayMediaPreview').html('');
+                    $('#homestayInfoContent').html('');
+
                     const selectedHomestay = $(this).val();
                     const isWholeHouse = $(this).find('option:selected').data('whole-house');
 
@@ -396,7 +399,7 @@
 //                            `;
                             mediaHtml += `
                                 <div class="relative">
-                                    <img src="` + media.path + `" 
+                                    <img src="${pageContext.request.contextPath}/Asset/Common/House/` + media.path + `" 
                                          class="homestay-media-image rounded-lg border-2 border-green-200" 
                                          alt="Homestay Media">
                                     <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs">

@@ -1,6 +1,6 @@
 <%-- 
-    Document   : AddNewHouse
-    Created on : Jun 21, 2025, 2:09:55 PM
+    Document   : EditHouse
+    Created on : Jun 27, 2025, 3:19:57 PM
     Author     : Ha
 --%>
 
@@ -772,29 +772,29 @@
                                 // Optionally reset form or redirect
                                 setTimeout(() => {
                                     window.location.href = '${pageContext.request.contextPath}/owner-house?uid=${sessionScope.user.id}';
-                                }, 2000);
-                            } else {
-                                showToast(response.message, 'error');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.close();
-                            showToast(xhr.responseText || 'Something went wrong.', 'error');
-                        }
-                    });
-                });
+                                                            }, 2000);
+                                                        } else {
+                                                            showToast(response.message, 'error');
+                                                        }
+                                                    },
+                                                    error: function (xhr, status, error) {
+                                                        Swal.close();
+                                                        showToast(xhr.responseText || 'Something went wrong.', 'error');
+                                                    }
+                                                });
+                                            });
 
-                function showToast(message, type = 'success') {
-                    Toastify({
-                        text: message,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
-                        stopOnFocus: true
-                    }).showToast();
-                }
-            });
+                                            function showToast(message, type = 'success') {
+                                                Toastify({
+                                                    text: message,
+                                                    duration: 3000,
+                                                    gravity: "top",
+                                                    position: "right",
+                                                    backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+                                                    stopOnFocus: true
+                                                }).showToast();
+                                            }
+                                        });
         </script>
     </body>
 </html>

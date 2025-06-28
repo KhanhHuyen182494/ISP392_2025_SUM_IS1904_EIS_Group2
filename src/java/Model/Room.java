@@ -21,6 +21,7 @@ public class Room {
     private Timestamp created_at;
     private Timestamp updated_at;
     private String room_position;
+    private int max_guests;
     private House house;
     private Status status;
     private RoomType roomType;
@@ -125,9 +126,17 @@ public class Room {
         this.medias = medias;
     }
 
+    public int getMax_guests() {
+        return max_guests;
+    }
+
+    public void setMax_guests(int max_guests) {
+        this.max_guests = max_guests;
+    }
+
     @Override
     public String toString() {
-        return "Room{" + "id=" + id + ", name=" + name + ", description=" + description + ", star=" + star + ", price_per_night=" + price_per_night + ", created_at=" + created_at + ", updated_at=" + updated_at + ", room_position=" + room_position + ", house=" + house + ", status=" + status + ", roomType=" + roomType + ", medias=" + medias + '}';
+        return "Room{" + "id=" + id + ", name=" + name + ", description=" + description + ", star=" + star + ", price_per_night=" + price_per_night + ", created_at=" + created_at + ", updated_at=" + updated_at + ", room_position=" + room_position + ", max_guests=" + max_guests + ", house=" + house + ", status=" + status + ", roomType=" + roomType + ", medias=" + medias + '}';
     }
 
 }

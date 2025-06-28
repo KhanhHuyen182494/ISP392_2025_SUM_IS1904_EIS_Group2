@@ -37,6 +37,7 @@ import DAL.PostTypeDAO;
 import DAL.RoomDAO;
 import DAL.RoomTypeDAO;
 import DAL.StatusDAO;
+import java.util.List;
 
 /**
  *
@@ -97,27 +98,28 @@ public abstract class BaseAuthorization extends HttpServlet {
     }
 
     private boolean isAllowedAccess(User u, HttpServletRequest request) {
-        String current_endpoint = request.getServletPath();
+        String currentEndpoint = request.getServletPath().toLowerCase();
 
-        if (current_endpoint == null || u == null || u.getRole() == null) {
+        if (currentEndpoint == null || u == null || u.getRole() == null) {
             return false;
         }
 
         Role userRole = u.getRole();
 
         try {
-            userRole.setFeatures(feaDao.getAllFeaturesByRoleId(userRole.getId()));
+            List<Feature> features = feaDao.getAllFeaturesByRoleId(userRole.getId());
 
-            if (userRole.getFeatures() != null) {
-                for (Feature f : userRole.getFeatures()) {
+            if (features != null) {
+                for (Feature f : features) {
                     if (f != null && f.getPath() != null
-                            && current_endpoint.startsWith(f.getPath())) {
+                            && currentEndpoint.equalsIgnoreCase(f.getPath().toLowerCase())) {
                         return true;
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("Error checking access permissions:" + e);
+            log.error("Error checking access for user ID " + u.getId() + " on path " + currentEndpoint);
+            System.out.println("Error checking access for user ID " + u.getId() + " on path " + currentEndpoint);
         }
 
         return false;
@@ -147,11 +149,7 @@ public abstract class BaseAuthorization extends HttpServlet {
 
     private void handleAccessDenied(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setAttribute("message", "Access Denied!");
-        // Redirect to login page or error page
-        request.getRequestDispatcher("/error/access-denied.jsp").forward(request, response);
-        // Or send error response:
-        // response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+        response.sendRedirect(request.getContextPath() + "/FE/ErrorPages/403.jsp");
     }
 
     protected abstract void doPostAuthorized(HttpServletRequest request,

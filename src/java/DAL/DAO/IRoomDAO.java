@@ -14,4 +14,7 @@ import java.util.List;
 public interface IRoomDAO extends IBaseUUID<Room>{
     //Get
     public List<Room> getListRoomByHomestayId(String homestayId, int statusId);
+    
+    //Add
+    public boolean addMultipleRoom(List<Room> r);
 }
