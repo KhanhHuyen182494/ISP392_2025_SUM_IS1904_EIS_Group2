@@ -15,6 +15,8 @@ public interface IRoomDAO extends IBaseUUID<Room>{
     //Get
     public List<Room> getListRoomByHomestayId(String homestayId, int statusId);
     
+    public List<Room> getAllRoomByHomestayId(String homestayId);
+    
     //Add
     public boolean addMultipleRoom(List<Room> r);
 }

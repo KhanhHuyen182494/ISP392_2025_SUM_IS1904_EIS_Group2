@@ -153,4 +153,61 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
         }
     }
 
+    @Override
+    public List<Room> getAllRoomByHomestayId(String homestayId) {
+        List<Room> rList = new ArrayList<>();
+        String sql = """
+                     SELECT r.*, s.name as StatusName, rt.name as RoomType FROM room r
+                     JOIN status s ON s.id = r.status_id
+                     JOIN room_type rt ON rt.id = r.room_type_id
+                     WHERE r.homestay_id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, homestayId);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Room r = new Room();
+
+                r.setId(rs.getString("id"));
+                r.setName(rs.getString("name"));
+                r.setDescription(rs.getString("description"));
+                r.setStar(rs.getFloat("star"));
+                r.setPrice_per_night(rs.getDouble("price_per_night"));
+                r.setCreated_at(rs.getTimestamp("created_at"));
+                r.setUpdated_at(rs.getTimestamp("updated_at"));
+                r.setRoom_position(rs.getString("rome_position"));
+
+                RoomType rt = new RoomType();
+                rt.setId(rs.getInt("room_type_id"));
+                rt.setName(rs.getString("RoomType"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+
+                r.setStatus(s);
+                r.setRoomType(rt);
+
+                rList.add(r);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return rList;
+    }
+
 }

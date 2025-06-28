@@ -335,13 +335,16 @@
                     const selectedHomestay = $(this).val();
                     const isWholeHouse = $(this).find('option:selected').data('whole-house');
 
+                    console.log('Homestay selected:', selectedHomestay);
+                    console.log('Is whole house:', isWholeHouse);
+
                     if (selectedHomestay) {
                         // Fetch homestay details including media
 //                        fetchHomestayDetails(selectedHomestay);
 
-                        if (isWholeHouse == true) {
-                            $('#roomSection').hide();
-                        } else if (isWholeHouse == false) {
+//                        if (isWholeHouse == true) {
+//                            $('#roomSection').hide();
+//                        } else if (isWholeHouse == false) {
 //                            $('#roomSection').show();
 
                             $.ajax({
@@ -373,7 +376,7 @@
                                     $('#roomSelect').html('<option value="">Error loading rooms</option>');
                                 }
                             });
-                        }
+//                        }
                     } else {
                         $('#roomSection').hide();
                         $('#roomSelect').html('<option value="">Select a room</option>');
@@ -423,7 +426,7 @@
                                 </h4>
                                 <p class="mb-2">
                                     <i class="fas fa-map-marker-alt mr-2"></i>
-                                    <span class="text-sm">` + (homestay.address.detail ? homestay.address.detail : '') + homestay.address.ward + `, ` + homestay.address.district + `, ` + homestay.address.province + `, ` + homestay.address.country + `</span>
+                                    <span class="text-sm">` + (homestay.address.detail ? homestay.address.detail : '') + ' ' + homestay.address.ward + `, ` + homestay.address.district + `, ` + homestay.address.province + `, ` + homestay.address.country + `</span>
                                 </p>
                                 <p class="mb-2">
                                     <i class="fas fa-home mr-2"></i>

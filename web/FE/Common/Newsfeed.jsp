@@ -558,8 +558,10 @@
                                             Book
                                         </button>
                                         <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
-                                            <i class="fa-solid fa-house text-white"></i>
-                                            View Detail
+                                            <a href="${pageContext.request.contextPath}/owner-house/detail?hid=${post.house.id}">
+                                                <i class="fa-solid fa-house text-white"></i>
+                                                View Detail
+                                            </a>
                                         </button>
                                         <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
                                                 data-house-id="${post.house.id}" 

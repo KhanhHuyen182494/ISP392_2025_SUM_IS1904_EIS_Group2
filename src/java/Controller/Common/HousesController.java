@@ -43,7 +43,8 @@ import java.util.logging.Logger;
 @WebServlet(name = "HousesController", urlPatterns = {
     "/owner-house",
     "/owner-house/add",
-    "/owner-house/edit"
+    "/owner-house/edit",
+    "/owner-house/detail"
 })
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024, // 1 MB
@@ -51,13 +52,13 @@ import java.util.logging.Logger;
         maxRequestSize = 1024 * 1024 * 50 // 50 MB
 )
 public class HousesController extends BaseAuthorization {
-
+    
     private static final Logger LOGGER = Logger.getLogger(HousesController.class.getName());
-
+    
     @Override
     protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String path = request.getServletPath();
-
+        
         switch (path) {
             case "/owner-house" ->
                 doGetListHouseOfOwner(request, response, user);
@@ -68,69 +69,76 @@ public class HousesController extends BaseAuthorization {
             case "/owner-house/detail" ->
                 doGetDetailHouse(request, response, user);
         }
-
+        
     }
-
+    
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String path = request.getServletPath();
-
+        
         switch (path) {
             case "/owner-house/add" ->
                 addHouse(request, response, user);
             case "/owner-house/edit" -> {
-
+                
             }
         }
     }
-
+    
     private void doGetAddHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         List<Status> statuses = sDao.getAllStatusByCategory("homestay");
         List<RoomType> rts = rtDao.getAllRoomType();
         List<Status> roomStatuses = sDao.getAllStatusByCategory("room");
-
+        
         request.setAttribute("roomStatuses", roomStatuses);
         request.setAttribute("statuses", statuses);
         request.setAttribute("rts", rts);
         request.getRequestDispatcher("/FE/Common/AddNewHouse.jsp").forward(request, response);
     }
-
+    
     private void doGetEditHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         request.getRequestDispatcher("/FE/Common/EditHouse.jsp").forward(request, response);
     }
-
+    
     private void doGetDetailHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String hid = request.getParameter("hid");
+        
+        House h = hDao.getById(hid);
+        
+        fullLoadHouseInfomationSingle(h);
+        
+        request.setAttribute("h", h);
         request.getRequestDispatcher("/FE/Common/DetailHouse.jsp").forward(request, response);
     }
-
+    
     private void doGetListHouseOfOwner(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         try {
             String uid = request.getParameter("uid");
-
+            
             if (uid == null || uid.isBlank()) {
                 request.setAttribute("message", "Oops, that user seems to be not existed!");
                 request.getRequestDispatcher("./FE/ErrorPages/404.jsp").forward(request, response);
                 return;
             }
-
+            
             PostDTO posts;
             List<House> houses;
             User u = uDao.getByUidForProfile(uid);
-
+            
             posts = pDao.getPaginatedPostsByUid(1, 10, "", "", uid);
             fullLoadPostInfomation(posts, user);
-
+            
             houses = hDao.getListPaging(10, 0, "", uid);
             fullLoadHouseInfomation(houses);
-
+            
             int totalLikes = 0;
             List<House> hList = new LinkedList<>();
-
+            
             for (Post p : posts.getItems()) {
                 totalLikes += p.getLikes().size();
                 hList.add(p.getHouse());
             }
-
+            
             request.setAttribute("posts", posts.getItems());
             request.setAttribute("totalLikes", totalLikes);
             request.setAttribute("houses", houses);
@@ -140,13 +148,13 @@ public class HousesController extends BaseAuthorization {
             LOGGER.log(Level.SEVERE, "Something error when trying to get list house data!", e);
         }
     }
-
+    
     private void addHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
         Map<String, Object> jsonResponse = new HashMap<>();
-
+        
         try {
             String homestayName = request.getParameter("homestayName");
             String homestayDescription = request.getParameter("homestayDescription");
@@ -156,7 +164,7 @@ public class HousesController extends BaseAuthorization {
             String ward = request.getParameter("ward");
             String detailAddress = request.getParameter("detailAddress");
             String status = request.getParameter("status");
-
+            
             if (homestayName == null || homestayDescription == null || wholeHouse == null
                     || province == null || district == null || ward == null || status == null || status.isEmpty()) {
                 jsonResponse.put("ok", false);
@@ -164,24 +172,24 @@ public class HousesController extends BaseAuthorization {
                 out.print(gson.toJson(jsonResponse));
                 return;
             }
-
+            
             int statusId = Integer.parseInt(status);
             String houseId = Generator.generateHouseId();
-
+            
             String realPath = request.getServletContext().getRealPath("");
             String basePath = realPath.replace("\\build", "");
             String homestayMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/House");
             String homestayMediaRootPath = basePath + "/Asset/Common/House";
-
+            
             List<String> homestayImagePaths = saveImages(request.getParts(), "homestayImages", homestayMediaBuildPath, homestayMediaRootPath);
-
+            
             if (homestayImagePaths.isEmpty()) {
                 jsonResponse.put("ok", false);
                 jsonResponse.put("message", "Please upload at least one homestay image!");
                 out.print(gson.toJson(jsonResponse));
                 return;
             }
-
+            
             for (String fileName : homestayImagePaths) {
                 if (!saveMedia(fileName, "Homestay", houseId, user)) {
                     jsonResponse.put("ok", false);
@@ -200,7 +208,7 @@ public class HousesController extends BaseAuthorization {
             address.setDetail(detailAddress);
             address.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
             address.setCreated_by(user.getId());
-
+            
             int addressId = aDao.addAddress(address);
             if (addressId == -1) {
                 jsonResponse.put("ok", false);
@@ -213,7 +221,7 @@ public class HousesController extends BaseAuthorization {
             // Save homestay
             Status homestayStatus = new Status();
             homestayStatus.setId(statusId);
-
+            
             House house = new House();
             house.setId(houseId);
             house.setName(homestayName);
@@ -223,10 +231,10 @@ public class HousesController extends BaseAuthorization {
             house.setStatus(homestayStatus);
             house.setAddress(address);
             house.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
-
+            
             if ("yes".equalsIgnoreCase(wholeHouse)) {
                 house.setIs_whole_house(true);
-
+                
                 String priceStr = request.getParameter("homestayPrice");
                 try {
                     double price = Double.parseDouble(priceStr);
@@ -237,7 +245,7 @@ public class HousesController extends BaseAuthorization {
                     out.print(gson.toJson(jsonResponse));
                     return;
                 }
-
+                
                 if (hDao.add(house)) {
                     jsonResponse.put("ok", true);
                     jsonResponse.put("message", "Whole house homestay created successfully!");
@@ -245,18 +253,18 @@ public class HousesController extends BaseAuthorization {
                     jsonResponse.put("ok", false);
                     jsonResponse.put("message", "Failed to create homestay.");
                 }
-
+                
             } else {
                 house.setIs_whole_house(false);
                 house.setPrice_per_night(0);
-
+                
                 if (!hDao.add(house)) {
                     jsonResponse.put("ok", false);
                     jsonResponse.put("message", "Failed to create homestay.");
                     out.print(gson.toJson(jsonResponse));
                     return;
                 }
-
+                
                 boolean success = processRooms(request, request.getParts(), house, user, basePath, jsonResponse);
                 if (success) {
                     jsonResponse.put("ok", true);
@@ -266,9 +274,9 @@ public class HousesController extends BaseAuthorization {
                     return;
                 }
             }
-
+            
             out.print(gson.toJson(jsonResponse));
-
+            
         } catch (Exception e) {
             jsonResponse.put("ok", false);
             jsonResponse.put("message", "Server error: " + e.getMessage());
@@ -277,7 +285,7 @@ public class HousesController extends BaseAuthorization {
             out.close();
         }
     }
-
+    
     private List<String> saveImages(Collection<Part> parts, String fieldName, String path1, String path2) throws IOException {
         List<String> paths = new ArrayList<>();
         for (Part part : parts) {
@@ -290,12 +298,12 @@ public class HousesController extends BaseAuthorization {
         }
         return paths;
     }
-
+    
     private boolean saveMedia(String fileName, String objectType, String objectId, User user) {
         Media m = new Media();
         Status mediaStatus = new Status();
         mediaStatus.setId(21);
-
+        
         m.setId(fileName);
         m.setObject_type(objectType);
         m.setObject_id(objectId);
@@ -304,15 +312,15 @@ public class HousesController extends BaseAuthorization {
         m.setStatus(mediaStatus);
         m.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
         m.setOwner(user);
-
+        
         return mDao.addMedia(m);
     }
-
+    
     private boolean processRooms(HttpServletRequest request, Collection<Part> parts, House house, User user, String basePath, Map<String, Object> jsonResponse) throws IOException {
         try {
             int totalRooms = Integer.parseInt(request.getParameter("totalRooms"));
             List<Room> rooms = new ArrayList<>();
-
+            
             for (int i = 0; i < totalRooms; i++) {
                 String prefix = "rooms[" + i + "]";
                 String roomName = request.getParameter(prefix + "[name]");
@@ -323,17 +331,17 @@ public class HousesController extends BaseAuthorization {
                 String roomPosition = request.getParameter(prefix + "[position]");
                 String roomStatusStr = request.getParameter(prefix + "[status]");
                 String roomNumber = request.getParameter(prefix + "[roomNumber]");
-
+                
                 List<String> roomImages = saveImages(parts, prefix + "[images]",
                         request.getServletContext().getRealPath("Asset/Common/Room"),
                         basePath + "/Asset/Common/Room");
-
+                
                 if (roomImages.isEmpty()) {
                     jsonResponse.put("ok", false);
                     jsonResponse.put("message", "Please upload image for Room " + roomNumber);
                     return false;
                 }
-
+                
                 for (String img : roomImages) {
                     if (!saveMedia(img, "Room", house.getId(), user)) {
                         jsonResponse.put("ok", false);
@@ -341,7 +349,7 @@ public class HousesController extends BaseAuthorization {
                         return false;
                     }
                 }
-
+                
                 Room room = new Room();
                 room.setId(Generator.generateRoomId());
                 room.setName(roomName);
@@ -352,55 +360,55 @@ public class HousesController extends BaseAuthorization {
                 room.setPrice_per_night(Double.parseDouble(roomPriceStr));
                 room.setMax_guests(Integer.parseInt(maxGuestsStr));
                 room.setHouse(house);
-
+                
                 RoomType rt = new RoomType();
                 rt.setId(Integer.parseInt(roomType));
                 room.setRoomType(rt);
-
+                
                 Status rs = new Status();
                 rs.setId(Integer.parseInt(roomStatusStr));
                 room.setStatus(rs);
-
+                
                 rooms.add(room);
             }
-
+            
             return roomDao.addMultipleRoom(rooms);
-
-        } catch (Exception e) {
+            
+        } catch (IOException | NumberFormatException e) {
             jsonResponse.put("ok", false);
             jsonResponse.put("message", "Room processing failed: " + e.getMessage());
             return false;
         }
     }
-
+    
     private void fullLoadPostInfomation(PostDTO posts, User user) {
         try {
             //Load address, images, likes, feedbacks
             for (Post p : posts.getItems()) {
                 String pid = p.getId();
-
+                
                 Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-
+                
                 Status s = new Status();
                 s.setId(21);
-
+                
                 List<Media> medias = mDao.getMediaByObjectId(p.getId(), "Post", s);
                 List<Like> likes = lDao.getListLikeByPostId(pid);
                 List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
-
+                
                 Post parent = null;
-
+                
                 if (p.getParent_post() != null && p.getParent_post().getId() != null) {
                     parent = pDao.getById(p.getParent_post().getId());
                     fullLoadParentPost(parent);
                 }
-
+                
                 boolean isLikedByCurrentUser = false;
                 if (user != null && !user.getId().isBlank()) {
                     isLikedByCurrentUser = likes.stream()
                             .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
                 }
-
+                
                 p.setReviews(reviews);
                 p.getHouse().setAddress(a);
                 p.setMedias(medias);
@@ -413,18 +421,18 @@ public class HousesController extends BaseAuthorization {
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-
+    
     private void fullLoadHouseInfomation(List<House> houses) {
         try {
             //Load address, images, likes, feedbacks
             for (House h : houses) {
                 String hid = h.getId();
-
+                
                 Address a = aDao.getAddressById(h.getAddress().getId());
                 Status mediaS = new Status();
                 mediaS.setId(21);
                 List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
-
+                
                 h.setMedias(medias);
                 h.setAddress(a);
             }
@@ -433,41 +441,77 @@ public class HousesController extends BaseAuthorization {
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-
-    private void fullLoadHouseParentPostInfomation(House h) {
+    
+    private void fullLoadHouseInfomationSingle(House h) {
         try {
             //Load address, images, likes, feedbacks
             String hid = h.getId();
-
+            
             Address a = aDao.getAddressById(h.getAddress().getId());
             Status mediaS = new Status();
             mediaS.setId(21);
             List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
-
+            List<Room> rs = roomDao.getAllRoomByHomestayId(hid);
+            fullLoadRoomInfo(rs);
+            
+            h.setRooms(rs);
             h.setMedias(medias);
             h.setAddress(a);
-
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-
+    
+    private void fullLoadRoomInfo(List<Room> rooms) {
+        try {
+            for (Room r : rooms) {
+                Status s = new Status();
+                s.setId(21);
+                List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
+                
+                r.setMedias(mediaS);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+    
+    private void fullLoadHouseParentPostInfomation(House h) {
+        try {
+            //Load address, images, likes, feedbacks
+            String hid = h.getId();
+            
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+            
+            h.setMedias(medias);
+            h.setAddress(a);
+            
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+    
     private void fullLoadParentPost(Post p) {
         try {
             //Load address, images, likes, feedbacks
             String pid = p.getId();
-
+            
             Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-
+            
             Status s = new Status();
             s.setId(21);
-
+            
             List<Media> medias = mDao.getMediaByObjectId(pid, "Post", s);
-
+            
             p.getHouse().setAddress(a);
             p.setMedias(medias);
-
+            
             fullLoadHouseParentPostInfomation(p.getHouse());
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
