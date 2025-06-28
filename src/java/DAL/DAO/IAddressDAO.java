@@ -15,7 +15,7 @@ public interface IAddressDAO {
     public Address getAddressById(int id);
     
     //Update
-    
+    public boolean updateAddress(Address a);
     
     //Delete
     

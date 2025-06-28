@@ -110,4 +110,45 @@ public class AddressDAO extends BaseDao implements IAddressDAO {
         }
     }
 
+    @Override
+    public boolean updateAddress(Address a) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`address`
+                     SET
+                     `province` = ?,
+                     `district` = ?,
+                     `ward` = ?,
+                     `detail` = ?,
+                     `updated_at` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, a.getProvince());
+            ps.setString(2, a.getDistrict());
+            ps.setString(3, a.getWard());
+            ps.setString(4, a.getDetail());
+            ps.setTimestamp(5, a.getUpdated_at());
+            ps.setInt(6, a.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("SQL Error: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Close error: " + ex.getMessage());
+            }
+        }
+    }
+
 }

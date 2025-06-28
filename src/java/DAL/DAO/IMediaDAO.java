@@ -19,6 +19,9 @@ public interface IMediaDAO {
 
     //Update
     //Delete
+    public boolean deleteMedia(String mediaId);
+    public boolean deleteMedias(List<String> mediaIds);
+
     //Add
     public boolean addMedia(Media i);
 }

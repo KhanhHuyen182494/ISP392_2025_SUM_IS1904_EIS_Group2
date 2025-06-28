@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -79,9 +80,8 @@ public class HousesController extends BaseAuthorization {
         switch (path) {
             case "/owner-house/add" ->
                 addHouse(request, response, user);
-            case "/owner-house/edit" -> {
-
-            }
+            case "/owner-house/edit" ->
+                doPostEditHouse(request, response, user);
         }
     }
 
@@ -97,7 +97,130 @@ public class HousesController extends BaseAuthorization {
     }
 
     private void doGetEditHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        List<Status> statuses = sDao.getAllStatusByCategory("homestay");
+        String hid = request.getParameter("hid");
+
+        House h = hDao.getById(hid);
+        fullLoadHouseInfomationSingle(h);
+
+        request.setAttribute("h", h);
+        request.setAttribute("statuses", statuses);
         request.getRequestDispatcher("/FE/Common/EditHouse.jsp").forward(request, response);
+    }
+
+    private void doPostEditHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        Map<String, Object> jsonResponse = new HashMap<>();
+
+        String realPath = request.getServletContext().getRealPath("");
+        String basePath = realPath.replace("\\build", "");
+        String homestayMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/House");
+        String homestayMediaRootPath = basePath + "/Asset/Common/House";
+
+        try {
+            String homestayId = request.getParameter("homestayId");
+
+            House h = hDao.getById(homestayId);
+            Address a = aDao.getAddressById(h.getAddress().getId());
+
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+            String pricePerNightStr = request.getParameter("pricePerNight");
+            String statusStr = request.getParameter("status");
+            String province = request.getParameter("province");
+            String district = request.getParameter("district");
+            String ward = request.getParameter("ward");
+            String addressDetail = request.getParameter("addressDetail");
+
+            double pricePerNight = Double.parseDouble(pricePerNightStr);
+            int statusId = Integer.parseInt(statusStr);
+
+            h.setName(name);
+            h.setDescription(description);
+            h.setPrice_per_night(pricePerNight);
+            h.getStatus().setId(statusId);
+            h.setUpdated_at(Timestamp.valueOf(LocalDateTime.now()));
+            a.setProvince(province);
+            a.setDistrict(district);
+            a.setWard(ward);
+            a.setDetail(addressDetail);
+            a.setUpdated_at(Timestamp.valueOf(LocalDateTime.now()));
+
+            //Update address
+            if (aDao.updateAddress(a)) {
+
+                if (hDao.update(h)) {
+                    // Get new images
+                    int haveNewUpload = 0;
+                    Collection<Part> imageParts = request.getParts();
+                    for (Part part : imageParts) {
+                        if ("images".equals(part.getName()) && part.getSize() > 0) {
+                            haveNewUpload++;
+                        }
+                    }
+
+                    List<String> homestayImagePaths = new LinkedList<>();
+
+                    if (haveNewUpload > 0) {
+                        homestayImagePaths = saveImages(request.getParts(), "images", homestayMediaBuildPath, homestayMediaRootPath);
+
+                        if (homestayImagePaths.isEmpty()) {
+                            jsonResponse.put("ok", false);
+                            jsonResponse.put("message", "Please upload at least one homestay image!");
+                            out.print(gson.toJson(jsonResponse));
+                            return;
+                        }
+
+                        //Save path to db
+                        for (String fileName : homestayImagePaths) {
+                            if (!saveMedia(fileName, "Homestay", h.getId(), user)) {
+                                jsonResponse.put("ok", false);
+                                jsonResponse.put("message", "Failed to save new upload homestay image.");
+                                out.print(gson.toJson(jsonResponse));
+                                return;
+                            }
+                        }
+                    }
+
+                    // Get images to remove
+                    String[] removeImageIds = request.getParameterValues("removeImages");
+                    if (removeImageIds != null) {
+                        List<String> mediaIds = new LinkedList<>();
+                        mediaIds.addAll(Arrays.asList(removeImageIds));
+
+                        if (!mDao.deleteMedias(mediaIds)) {
+                            jsonResponse.put("ok", false);
+                            jsonResponse.put("message", "Failed to delete homestay image from db.");
+                            out.print(gson.toJson(jsonResponse));
+                            return;
+                        }
+                    }
+                } else {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Failed to update homestay, but address updated!");
+                    out.print(gson.toJson(jsonResponse));
+                    return;
+                }
+            } else {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "Failed to update address, no infomation updated!");
+                out.print(gson.toJson(jsonResponse));
+                return;
+            }
+
+            jsonResponse.put("ok", true);
+            jsonResponse.put("message", "Update homestay success!");
+            out.print(gson.toJson(jsonResponse));
+        } catch (ServletException | IOException e) {
+            jsonResponse.put("ok", false);
+            jsonResponse.put("message", "Server error: " + e.getMessage());
+            out.print(gson.toJson(jsonResponse));
+        } finally {
+            out.close();
+        }
+
     }
 
     private void doGetDetailHouse(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -277,7 +400,7 @@ public class HousesController extends BaseAuthorization {
 
             out.print(gson.toJson(jsonResponse));
 
-        } catch (Exception e) {
+        } catch (ServletException | IOException | NumberFormatException e) {
             jsonResponse.put("ok", false);
             jsonResponse.put("message", "Server error: " + e.getMessage());
             out.print(gson.toJson(jsonResponse));

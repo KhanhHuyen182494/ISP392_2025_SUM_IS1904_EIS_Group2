@@ -113,4 +113,66 @@ public class MediaDAO extends BaseDao implements IMediaDAO {
         }
     }
 
+    @Override
+    public boolean deleteMedia(String mediaId) {
+        String sql = """
+                     DELETE FROM `fuhousefinder_homestay`.`media`
+                     WHERE id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, mediaId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
+    @Override
+    public boolean deleteMedias(List<String> mediaIds) {
+        if (mediaIds == null || mediaIds.isEmpty()) {
+            return false;
+        }
+
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < mediaIds.size(); i++) {
+            placeholders.append("?");
+            if (i < mediaIds.size() - 1) {
+                placeholders.append(",");
+            }
+        }
+
+        String sql = "DELETE FROM `fuhousefinder_homestay`.`media` WHERE id IN (" + placeholders + ")";
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            for (int i = 0; i < mediaIds.size(); i++) {
+                ps.setString(i + 1, mediaIds.get(i));
+            }
+            return ps.executeUpdate() == mediaIds.size();
+        } catch (SQLException e) {
+            logger.error("SQL Error: " + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Close Error: " + ex);
+            }
+        }
+    }
+
 }

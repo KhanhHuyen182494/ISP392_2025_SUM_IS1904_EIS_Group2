@@ -730,7 +730,7 @@
                                             }
 
                                             function editHomestay(homestayId) {
-                                                window.location.href = `${pageContext.request.contextPath}/edit-homestay?id=` + homestayId;
+                                                window.location.href = `${pageContext.request.contextPath}/owner-house/edit?hid=` + homestayId;
                                             }
 
                                             function addRoom(homestayId) {
