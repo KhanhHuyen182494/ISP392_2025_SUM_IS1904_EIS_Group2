@@ -43,20 +43,31 @@
                 position: relative;
                 overflow: hidden;
                 border-radius: 1rem;
+                width: 100%;
             }
 
             .carousel-track {
                 display: flex;
                 transition: transform 0.5s ease-in-out;
+                width: 100%;
             }
 
             .carousel-slide {
                 min-width: 100%;
+                width: 100%;
                 height: 300px;
+                flex-shrink: 0;
             }
 
             .small-carousel .carousel-slide {
                 height: 200px;
+            }
+
+            .carousel-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
             }
 
             .carousel-nav {
@@ -70,6 +81,7 @@
                 cursor: pointer;
                 border-radius: 50%;
                 transition: background 0.3s;
+                z-index: 10;
             }
 
             .carousel-nav:hover {
@@ -216,13 +228,17 @@
             <div class="main space-y-5">
                 <!--Homestay section-->
                 <div class="bg-white backdrop-blur-sm rounded-2xl shadow-xl border border-white overflow-hidden p-6">
-                    <div class="flex items-center justify-between mb-6">
+                    <a class="text-blue-500" href="#" onclick="history.back()">
+                        <i class="fa-solid fa-arrow-left mr-2"></i>
+                        Go back
+                    </a>
+                    <div class="flex items-center justify-between mb-6 mt-3">
                         <label class="block text-xl font-semibold text-gray-700 flex items-center">
                             <i class="fas fa-tag text-blue-500 mr-2"></i>
                             Homestay Basic Information
                         </label>
                         <c:if test="${sessionScope.user.id == h.owner.id}">
-                            <button type="button" onclick="editHomestay(${h.id})" 
+                            <button type="button" onclick="editHomestay('${h.id}')" 
                                     class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                 <i class="fas fa-edit"></i>
                                 Edit Homestay
@@ -290,9 +306,9 @@
                                 <label class="text-lg font-semibold text-gray-700 w-32 flex-shrink-0">
                                     Status: 
                                 </label>
-                                <span class="status-badge ${h.status == 'Available' ? 'status-available' : h.status == 'Booked' ? 'status-booked' : 'status-maintenance'}">
+                                <span class="status-badge ${h.status.name == 'Available' ? 'status-available' : h.status == 'Booked' ? 'status-booked' : 'status-maintenance'}">
                                     <i class="fas fa-circle mr-1"></i>
-                                    ${h.status}
+                                    ${h.status.name}
                                 </span>
                             </div>
 
@@ -351,7 +367,7 @@
                                 Available Rooms
                             </label>
                             <c:if test="${sessionScope.user.id == h.owner.id}">
-                                <button type="button" onclick="addRoom(${h.id})" 
+                                <button type="button" onclick="addRoom('${h.id}')" 
                                         class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                     <i class="fas fa-plus"></i>
                                     Add Room
@@ -361,7 +377,7 @@
 
                         <c:choose>
                             <c:when test="${not empty h.rooms}">
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 gap-6">
                                     <c:forEach var="room" items="${h.rooms}">
                                         <div class="room-card">
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -406,7 +422,7 @@
 
                                                 <!-- Room Images -->
                                                 <div class="small-carousel carousel-container" id="roomCarousel${room.id}">
-                                                    <div class="carousel-track" id="roomTrack${room.id}">
+                                                    <div class="carousel-track" id="room${room.id}Track">
                                                         <c:forEach var="image" items="${room.medias}" varStatus="status">
                                                             <div class="carousel-slide">
                                                                 <img src="${pageContext.request.contextPath}/Asset/Common/Room/${image.path}" 
@@ -431,12 +447,12 @@
                                                             <i class="fas fa-chevron-right"></i>
                                                         </button>
 
-                                                        <div class="carousel-dots">
-                                                            <c:forEach var="image" items="${room.medias}" varStatus="status">
-                                                                <div class="carousel-dot ${status.index == 0 ? 'active' : ''}" 
-                                                                     onclick="goToSlide('room${room.id}', ${status.index}); pauseAutoSlide();"></div>
-                                                            </c:forEach>
-                                                        </div>
+                                                        <!--                                                        <div class="carousel-dots">
+                                                        <c:forEach var="image" items="${room.medias}" varStatus="status">
+                                                            <div class="carousel-dot ${status.index == 0 ? 'active' : ''}" 
+                                                                 onclick="goToSlide('room${room.id}', ${status.index}); pauseAutoSlide();"></div>
+                                                        </c:forEach>
+                                                    </div>-->
                                                     </c:if>
                                                 </div>
                                             </div>
@@ -463,7 +479,7 @@
                 </c:if>
 
                 <!-- Booking Section for non-owners -->
-                <c:if test="${sessionScope.user.id != h.owner.id and not empty sessionScope.user.id}">
+                <c:if test="${sessionScope.user.id != h.owner.id}">
                     <div class="bg-white backdrop-blur-sm rounded-2xl shadow-xl border border-white overflow-hidden p-6">
                         <label class="block text-xl font-semibold text-gray-700 mb-6 flex items-center">
                             <i class="fas fa-calendar-check text-blue-500 mr-2"></i>
@@ -500,31 +516,54 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                            // Carousel functionality
                                             let currentSlides = {};
+                                            let autoSlideInterval;
 
                                             function initCarousel(carouselId) {
+                                                console.log('Initializing carousel:', carouselId);
+
+                                                // Initialize slide index
                                                 currentSlides[carouselId] = 0;
-                                                const track = document.getElementById(carouselId + 'Track');
-                                                if (track) {
-                                                    const slides = track.children;
-                                                    if (slides.length > 0) {
-                                                        track.style.transform = 'translateX(0%)';
-                                                        // Initialize dots
-                                                        updateCarouselDots(carouselId);
-                                                    }
+
+                                                // Get the track element
+                                                const trackId = carouselId + 'Track';
+                                                const track = document.getElementById(trackId);
+
+                                                if (!track) {
+                                                    console.error('Track not found:', trackId);
+                                                    return false;
                                                 }
+
+                                                const slides = track.children;
+                                                if (slides.length === 0) {
+                                                    console.warn('No slides found for carousel:', carouselId);
+                                                    return false;
+                                                }
+
+                                                console.log(`Carousel ` + carouselId + ` initialized with ` + slides.length + ` slides`);
+
+                                                // Set initial position
+                                                track.style.transform = 'translateX(0%)';
+
+                                                // Update dots
+                                                updateCarouselDots(carouselId);
+
+                                                return true;
                                             }
 
                                             function nextSlide(carouselId) {
-                                                const track = document.getElementById(carouselId + 'Track');
-                                                console.log(track);
-                                                if (!track)
+                                                const trackId = carouselId + 'Track';
+                                                const track = document.getElementById(trackId);
+
+                                                if (!track) {
+                                                    console.error('Track not found:', trackId);
                                                     return;
+                                                }
 
                                                 const slides = track.children;
                                                 const maxSlide = slides.length - 1;
 
+                                                // Move to next slide or loop back to first
                                                 if (currentSlides[carouselId] >= maxSlide) {
                                                     currentSlides[carouselId] = 0;
                                                 } else {
@@ -535,10 +574,13 @@
                                             }
 
                                             function prevSlide(carouselId) {
-                                                const track = document.getElementById(carouselId + 'Track');
-                                                console.log(track);
-                                                if (!track)
+                                                const trackId = carouselId + 'Track';
+                                                const track = document.getElementById(trackId);
+
+                                                if (!track) {
+                                                    console.error('Track not found:', trackId);
                                                     return;
+                                                }
 
                                                 const slides = track.children;
                                                 const maxSlide = slides.length - 1;
@@ -553,64 +595,71 @@
                                             }
 
                                             function goToSlide(carouselId, slideIndex) {
+                                                const trackId = carouselId + 'Track';
+                                                const track = document.getElementById(trackId);
+
+                                                if (!track) {
+                                                    console.error('Track not found:', trackId);
+                                                    return;
+                                                }
+
+                                                const slides = track.children;
+
+                                                // Validate slide index
+                                                if (slideIndex < 0 || slideIndex >= slides.length) {
+                                                    console.error('Invalid slide index:', slideIndex);
+                                                    return;
+                                                }
+
                                                 currentSlides[carouselId] = slideIndex;
                                                 updateCarousel(carouselId);
                                             }
 
                                             function updateCarousel(carouselId) {
-                                                const track = document.getElementById(carouselId + 'Track');
-                                                if (!track)
+                                                const trackId = carouselId + 'Track';
+                                                const track = document.getElementById(trackId);
+
+                                                if (!track) {
+                                                    console.error('Track not found in updateCarousel:', trackId);
                                                     return;
+                                                }
 
                                                 const slideWidth = 100;
                                                 const moveX = currentSlides[carouselId] * slideWidth;
-                                                track.style.transform = `translateX(-${moveX}%)`;
+                                                const transformValue = `translateX(-` + moveX + `%)`;
+
+                                                track.style.transform = transformValue;
 
                                                 updateCarouselDots(carouselId);
+
+                                                console.log(`Carousel ${carouselId} moved to slide ` + currentSlides[carouselId]);
                                             }
 
                                             function updateCarouselDots(carouselId) {
-                                                const carousel = document.getElementById(carouselId + 'Carousel');
-                                                if (carousel) {
-                                                    const dots = carousel.querySelectorAll('.carousel-dot');
-                                                    dots.forEach((dot, index) => {
-                                                        if (index === currentSlides[carouselId]) {
-                                                            dot.classList.add('active');
-                                                        } else {
-                                                            dot.classList.remove('active');
-                                                        }
-                                                    });
+                                                const carouselContainerId = carouselId + 'Carousel';
+                                                const carousel = document.getElementById(carouselContainerId);
+
+                                                if (!carousel) {
+                                                    console.warn('Carousel container not found:', carouselContainerId);
+                                                    return;
                                                 }
+
+                                                const dots = carousel.querySelectorAll('.carousel-dot');
+
+                                                dots.forEach((dot, index) => {
+                                                    if (index === currentSlides[carouselId]) {
+                                                        dot.classList.add('active');
+                                                    } else {
+                                                        dot.classList.remove('active');
+                                                    }
+                                                });
                                             }
 
-                                            document.addEventListener('DOMContentLoaded', function () {
-                                                // Initialize homestay carousel
-                                                initCarousel('homestay');
-
-                                                // Initialize room carousels - fix the ID pattern
-                                                const roomCarousels = document.querySelectorAll('[id^="roomCarousel"]');
-                                                roomCarousels.forEach(carousel => {
-                                                    const carouselId = carousel.id.replace('Carousel', '');
-                                                    initCarousel(carouselId);
-                                                });
-
-                                                // Set minimum date for booking
-                                                const today = new Date().toISOString().split('T')[0];
-                                                const checkinInput = document.querySelector('input[name="checkin_date"]');
-                                                const checkoutInput = document.querySelector('input[name="checkout_date"]');
-
-                                                if (checkinInput) {
-                                                    checkinInput.min = today;
-                                                    checkinInput.addEventListener('change', function () {
-                                                        if (checkoutInput) {
-                                                            checkoutInput.min = this.value;
-                                                        }
-                                                    });
-                                                }
-                                            });
-
-                                            let autoSlideInterval;
                                             function startAutoSlide() {
+                                                if (autoSlideInterval) {
+                                                    clearInterval(autoSlideInterval);
+                                                }
+
                                                 autoSlideInterval = setInterval(() => {
                                                     const homestayTrack = document.getElementById('homestayTrack');
                                                     if (homestayTrack && homestayTrack.children.length > 1) {
@@ -619,31 +668,77 @@
                                                 }, 5000);
                                             }
 
-                                            document.addEventListener('DOMContentLoaded', function () {
-                                                setTimeout(startAutoSlide, 1000); // Start after 1 second
-                                            });
-
                                             function pauseAutoSlide() {
                                                 if (autoSlideInterval) {
                                                     clearInterval(autoSlideInterval);
+                                                    autoSlideInterval = null;
                                                 }
                                             }
 
                                             function resumeAutoSlide() {
                                                 pauseAutoSlide();
-                                                setTimeout(startAutoSlide, 3000); // Resume after 3 seconds
+                                                setTimeout(startAutoSlide, 3000);
+                                            }
+
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                console.log('DOM loaded - initializing carousels');
+
+                                                if (initCarousel('homestay')) {
+                                                    console.log('Homestay carousel initialized successfully');
+                                                }
+
+                                                const roomCarousels = document.querySelectorAll('[id^="roomCarousel"]');
+                                                console.log(`Found ` + roomCarousels.length + ` room carousels`);
+
+                                                roomCarousels.forEach(carousel => {
+                                                    const carouselId = carousel.id.replace('Carousel', '');
+                                                    console.log(`Initializing room carousel: ` + carouselId);
+                                                    initCarousel(carouselId);
+                                                });
+
+                                                setupBookingDates();
+
+                                                setTimeout(() => {
+                                                    const homestayTrack = document.getElementById('homestayTrack');
+                                                    if (homestayTrack && homestayTrack.children.length > 1) {
+                                                        startAutoSlide();
+                                                        console.log('Auto-slide started for homestay carousel');
+                                                    }
+                                                }, 2000);
+                                            });
+
+                                            function setupBookingDates() {
+                                                const today = new Date().toISOString().split('T')[0];
+                                                const checkinInput = document.querySelector('input[name="checkin_date"]');
+                                                const checkoutInput = document.querySelector('input[name="checkout_date"]');
+
+                                                if (checkinInput) {
+                                                    checkinInput.min = today;
+
+                                                    checkinInput.addEventListener('change', function () {
+                                                        if (checkoutInput) {
+                                                            const checkinDate = new Date(this.value);
+                                                            checkinDate.setDate(checkinDate.getDate() + 1);
+                                                            checkoutInput.min = checkinDate.toISOString().split('T')[0];
+
+                                                            if (checkoutInput.value && checkoutInput.value <= this.value) {
+                                                                checkoutInput.value = '';
+                                                            }
+                                                        }
+                                                    });
+                                                }
                                             }
 
                                             function editHomestay(homestayId) {
-                                                window.location.href = '${pageContext.request.contextPath}/edit-homestay?id=' + homestayId;
+                                                window.location.href = `${pageContext.request.contextPath}/edit-homestay?id=` + homestayId;
                                             }
 
                                             function addRoom(homestayId) {
-                                                window.location.href = '${pageContext.request.contextPath}/add-room?homestay_id=' + homestayId;
+                                                window.location.href = `${pageContext.request.contextPath}/add-room?homestay_id=` + homestayId;
                                             }
 
                                             function editRoom(roomId) {
-                                                window.location.href = '${pageContext.request.contextPath}/edit-room?id=' + roomId;
+                                                window.location.href = `${pageContext.request.contextPath}/edit-room?id=` + roomId;
                                             }
 
                                             function deleteRoom(roomId) {
@@ -657,19 +752,27 @@
                                                     confirmButtonText: 'Yes, delete it!'
                                                 }).then((result) => {
                                                     if (result.isConfirmed) {
-                                                        window.location.href = '${pageContext.request.contextPath}/delete-room?id=' + roomId;
+                                                        window.location.href = `${pageContext.request.contextPath}/delete-room?id=` + roomId;
                                                     }
                                                 });
                                             }
 
                                             function showToast(message, type = 'success') {
+                                                const backgroundColor = {
+                                                    'success': '#10b981',
+                                                    'error': '#ef4444',
+                                                    'warning': '#f59e0b',
+                                                    'info': '#3b82f6'
+                                                };
+
                                                 Toastify({
                                                     text: message,
                                                     duration: 3000,
                                                     gravity: "top",
                                                     position: "right",
-                                                    backgroundColor: type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b',
-                                                    stopOnFocus: true
+                                                    backgroundColor: backgroundColor[type] || backgroundColor.success,
+                                                    stopOnFocus: true,
+                                                    close: true
                                                 }).showToast();
                                             }
         </script>

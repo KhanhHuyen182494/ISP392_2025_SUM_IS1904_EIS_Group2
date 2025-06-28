@@ -57,6 +57,7 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
                 r.setCreated_at(rs.getTimestamp("created_at"));
                 r.setUpdated_at(rs.getTimestamp("updated_at"));
                 r.setRoom_position(rs.getString("rome_position"));
+                r.setMax_guests(rs.getInt("max_guests"));
 
                 RoomType rt = new RoomType();
                 rt.setId(rs.getInt("room_type_id"));
@@ -65,7 +66,7 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
                 Status s = new Status();
                 s.setId(statusId);
                 s.setName(rs.getString("StatusName"));
-
+                
                 r.setStatus(s);
                 r.setRoomType(rt);
 
