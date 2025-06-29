@@ -26,7 +26,7 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
         HouseDAO hDao = new HouseDAO();
         User u = new User();
         u.setId("U-87fbb6d15ad548318110b60b797f84da");
-        System.out.println(hDao.getById("HOMESTAY-87fbb6d15ad548318110b60b7"));
+        System.out.println(hDao.getListAvailable("", 6, 1.0f, Double.MIN_VALUE, Double.MAX_VALUE, 0, 10));
     }
 
     @Override
@@ -365,6 +365,106 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                 this.closeResources();
             } catch (Exception ex) {
                 logger.error("" + ex);
+            }
+        }
+
+        return hList;
+    }
+
+    @Override
+    public List<House> getListAvailable(
+            String keyword,
+            Integer statusId,
+            Float minStar,
+            Double minPrice,
+            Double maxPrice,
+            int offset,
+            int limit) {
+
+        List<House> hList = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT 
+            h.*,
+            s.name as StatusName
+        FROM homestay h
+        JOIN status s ON s.id = h.status_id
+        WHERE 1 = 1
+        """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (LOWER(h.name) LIKE ? OR LOWER(h.description) LIKE ?)");
+            String like = "%" + keyword.toLowerCase() + "%";
+            params.add(like);
+            params.add(like);
+        }
+
+        if (statusId != null) {
+            sql.append(" AND h.status_id = ?");
+            params.add(statusId);
+        }
+
+        if (minStar != null) {
+            sql.append(" AND h.star >= ?");
+            params.add(minStar);
+        }
+
+        if (minPrice != null) {
+            sql.append(" AND h.price_per_night >= ?");
+            params.add(minPrice);
+        }
+        if (maxPrice != null) {
+            sql.append(" AND h.price_per_night <= ?");
+            params.add(maxPrice);
+        }
+
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                House h = new House();
+                Status s = new Status();
+                Address a = new Address();
+
+                h.setId(rs.getString("id"));
+                h.setName(rs.getString("name"));
+                h.setDescription(rs.getString("description"));
+                h.setStar(rs.getFloat("star"));
+                h.setIs_whole_house(rs.getBoolean("is_whole_house"));
+                h.setPrice_per_night(rs.getDouble("price_per_night"));
+                h.setCreated_at(rs.getTimestamp("created_at"));
+                h.setUpdated_at(rs.getTimestamp("updated_at"));
+
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+
+                a.setId(rs.getInt("address_id"));
+
+                h.setStatus(s);
+                h.setAddress(a);
+                hList.add(h);
+            }
+
+        } catch (SQLException e) {
+            logger.error("SQL Exception: " + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
             }
         }
 
