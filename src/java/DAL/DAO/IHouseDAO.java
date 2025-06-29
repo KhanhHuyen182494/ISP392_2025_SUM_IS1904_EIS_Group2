@@ -18,6 +18,8 @@ public interface IHouseDAO extends IBaseUUID<House> {
     public List<House> getListPaging(int limit, int offset, String searchKey, String uid);
 
     public List<House> getListByOwnerId(User owner);
+    
+    public List<House> getListByOwnerIdAndType(User owner, boolean isWholeHouse);
 
     //Add
     //Delete

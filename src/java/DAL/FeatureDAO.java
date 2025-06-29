@@ -5,15 +5,11 @@
 package DAL;
 
 import Base.Logging;
-import Model.Address;
 import Model.Feature;
-import Model.Role;
 import Model.Status;
-import Model.User;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import DAL.DAO.IFeatureDAO;
 

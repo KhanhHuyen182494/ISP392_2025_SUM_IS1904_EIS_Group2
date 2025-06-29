@@ -185,8 +185,8 @@
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
-                                    <div class="avatar">
-                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
+                                    <div class="avatar w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
+                                        <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -587,7 +587,7 @@
                                     type: 'POST',
                                     data: formData,
                                     processData: false,
-                                    contentType: false, 
+                                    contentType: false,
                                     success: function (result) {
                                         if (result.success === true) {
                                             showToast(result.message, 'success');

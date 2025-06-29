@@ -50,4 +50,9 @@ public class Feature {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return "Feature{" + "id=" + id + ", name=" + name + ", path=" + path + ", status=" + status + '}';
+    }
+
 }

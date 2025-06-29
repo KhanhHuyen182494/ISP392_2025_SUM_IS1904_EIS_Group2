@@ -174,8 +174,8 @@
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
-                                    <div class="avatar">
-                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
+                                    <div class="avatar w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
+                                        <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
@@ -330,8 +330,24 @@
                                                 <span class="text-sm"><strong>Status: </strong> ${house.status.name}</span>
                                             </div>
                                             <div class="flex items-center gap-2">
+                                                <i class="fa-solid fa-house-user text-orange-500"></i>
+                                                <c:if test="${house.is_whole_house == true}">
+                                                    <span class="text-sm"><strong>Type: </strong> Whole House</span>
+                                                </c:if>
+                                                <c:if test="${house.is_whole_house == false}">
+                                                    <span class="text-sm"><strong>Type: </strong> Rooms</span>
+                                                </c:if>
+                                            </div>
+                                            <div class="flex items-center gap-2">
                                                 <i class="fas fa-dollar-sign text-green-500"></i>
-                                                <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / night</span>
+                                                <span class="text-sm"><strong>Price:</strong> 
+                                                    <c:if test="${house.price_per_night != 0}">
+                                                        <fmt:formatNumber value="${house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / night
+                                                    </c:if>
+                                                    <c:if test="${house.price_per_night == 0}">
+                                                        Each rooms different
+                                                    </c:if>
+                                                </span>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-map-marker-alt text-red-500"></i>
@@ -344,7 +360,9 @@
                                                 <i class="fas fa-key"></i>
                                             </button>
                                             <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
-                                                <i class="fa-solid fa-house text-white"></i>
+                                                <a href="${pageContext.request.contextPath}/owner-house/detail?hid=${house.id}">
+                                                    <i class="fa-solid fa-house text-white"></i>
+                                                </a>
                                             </button>
                                             <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
                                                     data-house-id="${house.id}" 

@@ -98,6 +98,14 @@ public class Generator {
     public static String generateMediaId() {
         return generate("MEDIA", 36);
     }
+    
+    public static String generateHouseId() {
+        return generate("HOUSE", 36);
+    }
+    
+    public static String generateRoomId() {
+        return generate("ROOM", 36);
+    }
 
     public static void main(String[] args) {
         System.out.println(generatePassword(8));

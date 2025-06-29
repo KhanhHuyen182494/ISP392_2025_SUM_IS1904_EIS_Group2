@@ -114,7 +114,7 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
                     FROM homestay h
                         JOIN 
                      status s ON s.id = h.status_id
-                     WHERE h.id = ? and h.status_id = ?;
+                     WHERE h.id = ?;
                      """;
 
         try {
@@ -122,13 +122,13 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
             ps = con.prepareStatement(sql);
 
             ps.setString(1, id);
-            ps.setInt(2, 6);
 
             rs = ps.executeQuery();
 
             while (rs.next()) {
                 Status s = new Status();
                 Address a = new Address();
+                User owner = new User();
 
                 h.setId(rs.getString("id"));
                 h.setName(rs.getString("name"));
@@ -144,6 +144,9 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
                 a.setId(rs.getInt("address_id"));
 
+                owner.setId(rs.getString("owner_id"));
+
+                h.setOwner(owner);
                 h.setStatus(s);
                 h.setAddress(a);
             }
@@ -168,7 +171,40 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
     @Override
     public boolean add(House t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO `fuhousefinder_homestay`.`homestay`
+                     (`id`, `name`, `description`, `star`, `is_whole_house`, `price_per_night`, `owner_id`, `status_id`, `address_id`, `created_at`)
+                     VALUES
+                     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getId());
+            ps.setString(2, t.getName());
+            ps.setString(3, t.getDescription());
+            ps.setFloat(4, t.getStar());
+            ps.setBoolean(5, t.isIs_whole_house());
+            ps.setDouble(6, t.getPrice_per_night());
+            ps.setString(7, t.getOwner().getId());
+            ps.setInt(8, t.getStatus().getId());
+            ps.setInt(9, t.getAddress().getId());
+            ps.setTimestamp(10, t.getCreated_at());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override
@@ -178,7 +214,42 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
     @Override
     public boolean update(House t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`homestay`
+                     SET
+                     `name` = ?,
+                     `description` = ?,
+                     `price_per_night` = ?,
+                     `status_id` = ?,
+                     `updated_at` = ?
+                     WHERE `id` = ?;
+                     """;
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getName());
+            ps.setString(2, t.getDescription());
+            ps.setDouble(3, t.getPrice_per_night());
+            ps.setInt(4, t.getStatus().getId());
+            ps.setTimestamp(5, t.getUpdated_at());
+            ps.setString(6, t.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("SQL Error: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Close error: " + ex.getMessage());
+            }
+        }
     }
 
     @Override
@@ -199,6 +270,66 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
             ps.setString(1, owner.getId());
             ps.setInt(2, 6);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                House h = new House();
+                Status s = new Status();
+                Address a = new Address();
+
+                h.setId(rs.getString("id"));
+                h.setName(rs.getString("name"));
+                h.setDescription(rs.getString("description"));
+                h.setStar(rs.getFloat("star"));
+                h.setIs_whole_house(rs.getBoolean("is_whole_house"));
+                h.setPrice_per_night(rs.getDouble("price_per_night"));
+                h.setCreated_at(rs.getTimestamp("created_at"));
+                h.setUpdated_at(rs.getTimestamp("updated_at"));
+
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+
+                a.setId(rs.getInt("address_id"));
+
+                h.setOwner(owner);
+                h.setStatus(s);
+                h.setAddress(a);
+                hList.add(h);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return hList;
+    }
+
+    @Override
+    public List<House> getListByOwnerIdAndType(User owner, boolean isWholeHouse) {
+        List<House> hList = new ArrayList<>();
+        String sql = """
+                     SELECT 
+                        h.*,
+                        s.name as StatusName
+                     FROM homestay h
+                     JOIN status s ON s.id = h.status_id
+                     WHERE h.owner_id = ? AND h.status_id = ? AND is_whole_house = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, owner.getId());
+            ps.setInt(2, 6);
+            ps.setBoolean(3, isWholeHouse);
 
             rs = ps.executeQuery();
 
