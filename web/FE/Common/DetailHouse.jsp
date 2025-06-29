@@ -385,7 +385,6 @@
                                                     <!-- Room Info -->
                                                     <div class="space-y-3">
                                                         <h3 class="text-xl font-bold text-gray-800">${room.name}</h3>
-                                                        <p class="text-gray-600">${room.description}</p>
 
                                                         <div class="space-y-2">
                                                             <div class="flex items-center gap-2">
@@ -400,30 +399,40 @@
                                                                 </span>
                                                             </div>
                                                             <div class="flex items-center gap-2">
+                                                                <span class="text-lg font-bold text-orange-600">
+                                                                    <div class="star-rating">
+                                                                        <c:forEach var="i" begin="1" end="5">
+                                                                            <i class="fas fa-star ${i <= room.star ? '' : 'text-gray-300'}"></i>
+                                                                        </c:forEach>
+                                                                        <span class="ml-2 text-gray-600">(${room.star}/5)</span>
+                                                                    </div>
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex items-center gap-2">
                                                                 <i class="fas fa-circle text-xs ${room.status.name == 'Available' ? 'text-green-500' : room.status.name == 'Booked' ? 'text-yellow-500' : 'text-red-500'}"></i>
                                                                 <span class="text-sm text-gray-600">${room.status.name}</span>
                                                             </div>
                                                         </div>
 
-                                                        <c:if test="${sessionScope.user.id == h.owner.id}">
-                                                            <div class="flex gap-2 mt-4">
-                                                                <button type="button" onclick="editRoom(${room.id})" 
+                                                        <div class="flex gap-2 mt-4">
+                                                            <c:if test="${sessionScope.user.id == h.owner.id}">
+                                                                <button type="button" onclick="editRoom('${room.id}')" 
                                                                         class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
                                                                     <i class="fas fa-edit"></i>
                                                                     Edit
                                                                 </button>
-                                                                <button type="button" onclick="deleteRoom(${room.id})" 
+<!--                                                                <button type="button" onclick="deleteRoom('${room.id}')" 
                                                                         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
                                                                     <i class="fas fa-trash"></i>
                                                                     Delete
-                                                                </button>
-                                                                <button type="button" onclick="detail(${room.id})" 
-                                                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
-                                                                    <i class="fas fa-trash"></i>
-                                                                    Detail
-                                                                </button>
-                                                            </div>
-                                                        </c:if>
+                                                                </button>-->
+                                                            </c:if>
+                                                            <button type="button" onclick="detail('${room.id}')" 
+                                                                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
+                                                                <i class="fa-solid fa-circle-info"></i>
+                                                                Detail
+                                                            </button>
+                                                        </div>
                                                     </div>
 
                                                     <!-- Room Images -->
@@ -747,7 +756,7 @@
                                             function editRoom(roomId) {
                                                 window.location.href = `${pageContext.request.contextPath}/room/edit?id=` + roomId;
                                             }
-                                            
+
                                             function detail(roomId) {
                                                 window.location.href = `${pageContext.request.contextPath}/room?id=` + roomId;
                                             }

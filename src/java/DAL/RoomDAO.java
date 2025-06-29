@@ -6,6 +6,7 @@ package DAL;
 
 import Base.Logging;
 import DAL.DAO.IRoomDAO;
+import Model.House;
 import Model.Room;
 import Model.RoomType;
 import Model.Status;
@@ -65,7 +66,7 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
                 Status s = new Status();
                 s.setId(statusId);
                 s.setName(rs.getString("StatusName"));
-                
+
                 r.setStatus(s);
                 r.setRoomType(rt);
 
@@ -87,7 +88,65 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
 
     @Override
     public Room getById(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Room r = new Room();
+        String sql = """
+                     SELECT 
+                         r.*, s.name AS StatusName, rt.name AS RoomType
+                     FROM
+                         room r
+                             JOIN
+                         status s ON s.id = r.status_id
+                             JOIN
+                         room_type rt ON rt.id = r.room_type_id
+                     WHERE r.id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, id);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                r.setId(rs.getString("id"));
+                r.setName(rs.getString("name"));
+                r.setDescription(rs.getString("description"));
+                r.setStar(rs.getFloat("star"));
+                r.setPrice_per_night(rs.getDouble("price_per_night"));
+                r.setCreated_at(rs.getTimestamp("created_at"));
+                r.setUpdated_at(rs.getTimestamp("updated_at"));
+                r.setRoom_position(rs.getString("rome_position"));
+                r.setMax_guests(rs.getInt("max_guests"));
+
+                RoomType rt = new RoomType();
+                rt.setId(rs.getInt("room_type_id"));
+                rt.setName(rs.getString("RoomType"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+
+                r.setHouse(h);
+                r.setStatus(s);
+                r.setRoomType(rt);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error inserting rooms: " + e.getMessage());
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+
+        return r;
     }
 
     @Override
@@ -107,7 +166,46 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
 
     @Override
     public boolean update(Room t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`room`
+                     SET
+                     `name` = ?,
+                     `description` = ?,
+                     `price_per_night` = ?,
+                     `updated_at` = ?,
+                     `rome_position` = ?,
+                     `status_id` = ?,
+                     `room_type_id` = ?,
+                     `max_guests` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getName());
+            ps.setString(2, t.getDescription());
+            ps.setDouble(3, t.getPrice_per_night());
+            ps.setTimestamp(4, t.getUpdated_at());
+            ps.setString(5, t.getRoom_position());
+            ps.setInt(6, t.getStatus().getId());
+            ps.setInt(7, t.getRoomType().getId());
+            ps.setInt(8, t.getMax_guests());
+            ps.setString(9, t.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override

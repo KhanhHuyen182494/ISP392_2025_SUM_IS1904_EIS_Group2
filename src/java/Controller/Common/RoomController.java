@@ -6,6 +6,7 @@ package Controller.Common;
 
 import Base.Generator;
 import Base.ImageUtil;
+import Model.Address;
 import Model.House;
 import Model.Media;
 import Model.Room;
@@ -23,10 +24,13 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -56,6 +60,8 @@ public class RoomController extends BaseAuthorization {
                 doGetEdit(request, response, user);
             case BASE_PATH + "/add" ->
                 doGetAdd(request, response, user);
+            case BASE_PATH ->
+                doGetDetail(request, response, user);
         }
     }
 
@@ -71,8 +77,36 @@ public class RoomController extends BaseAuthorization {
         }
     }
 
-    private void doGetEdit(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+    private void doGetDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String roomId = request.getParameter("id");
 
+        Room r = roomDao.getById(roomId);
+        fullLoadRoomInfo(r);
+
+        House h = hDao.getById(r.getHouse().getId());
+
+        r.setHouse(h);
+
+        request.setAttribute("r", r);
+        request.getRequestDispatcher("./FE/Common/RoomDetail.jsp").forward(request, response);
+    }
+
+    private void doGetEdit(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String roomId = request.getParameter("id");
+
+        Room r = roomDao.getById(roomId);
+        fullLoadRoomInfo(r);
+
+        House h = hDao.getById(r.getHouse().getId());
+        r.setHouse(h);
+
+        List<Status> statuses = sDao.getAllStatusByCategory("room");
+        List<RoomType> rts = rtDao.getAllRoomType();
+
+        request.setAttribute("rts", rts);
+        request.setAttribute("statuses", statuses);
+        request.setAttribute("r", r);
+        request.getRequestDispatcher("../FE/Common/RoomEdit.jsp").forward(request, response);
     }
 
     private void doGetAdd(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -92,7 +126,104 @@ public class RoomController extends BaseAuthorization {
     }
 
     private void doPostEdit(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        Map<String, Object> jsonResponse = new HashMap<>();
 
+        String realPath = request.getServletContext().getRealPath("");
+        String basePath = realPath.replace("\\build", "");
+        String roomMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/Room");
+        String roomMediaRootPath = basePath + "/Asset/Common/Room";
+
+        try {
+            String roomId = request.getParameter("roomId");
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+            String position = request.getParameter("position");
+            String pricePerNightStr = request.getParameter("pricePerNight");
+            String statusStr = request.getParameter("status");
+            String roomTypeStr = request.getParameter("roomType");
+            String maxGuestStr = request.getParameter("maxGuest");
+
+            double pricePerNight = Double.parseDouble(pricePerNightStr);
+            int statusId = Integer.parseInt(statusStr);
+            int roomTypeId = Integer.parseInt(roomTypeStr);
+            int maxGuest = Integer.parseInt(maxGuestStr);
+
+            Room r = roomDao.getById(roomId);
+
+            r.setName(name);
+            r.setDescription(description);
+            r.setRoom_position(position);
+            r.setPrice_per_night(pricePerNight);
+            r.getStatus().setId(statusId);
+            r.getRoomType().setId(roomTypeId);
+            r.setMax_guests(maxGuest);
+
+            if (roomDao.update(r)) {
+                // Get new images
+                int haveNewUpload = 0;
+                Collection<Part> imageParts = request.getParts();
+                for (Part part : imageParts) {
+                    if ("images".equals(part.getName()) && part.getSize() > 0) {
+                        haveNewUpload++;
+                    }
+                }
+
+                List<String> homestayImagePaths = new LinkedList<>();
+
+                if (haveNewUpload > 0) {
+                    homestayImagePaths = saveImages(request.getParts(), "images", roomMediaBuildPath, roomMediaRootPath);
+
+                    if (homestayImagePaths.isEmpty()) {
+                        jsonResponse.put("ok", false);
+                        jsonResponse.put("message", "Please upload at least one room image!");
+                        out.print(gson.toJson(jsonResponse));
+                        return;
+                    }
+
+                    //Save path to db
+                    for (String fileName : homestayImagePaths) {
+                        if (!saveMedia(fileName, "Room", r.getId(), user)) {
+                            jsonResponse.put("ok", false);
+                            jsonResponse.put("message", "Failed to save new upload room image.");
+                            out.print(gson.toJson(jsonResponse));
+                            return;
+                        }
+                    }
+                }
+
+                // Get images to remove
+                String[] removeImageIds = request.getParameterValues("removeImages");
+                if (removeImageIds != null) {
+                    List<String> mediaIds = new LinkedList<>();
+                    mediaIds.addAll(Arrays.asList(removeImageIds));
+
+                    if (!mDao.deleteMedias(mediaIds)) {
+                        jsonResponse.put("ok", false);
+                        jsonResponse.put("message", "Failed to delete room image from db.");
+                        out.print(gson.toJson(jsonResponse));
+                        return;
+                    }
+                }
+            } else {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "Failed to update room!");
+                out.print(gson.toJson(jsonResponse));
+                return;
+            }
+
+            jsonResponse.put("ok", true);
+            jsonResponse.put("message", "Update room success!");
+            out.print(gson.toJson(jsonResponse));
+        } catch (ServletException | IOException e) {
+            jsonResponse.put("ok", false);
+            jsonResponse.put("message", "Server error: " + e.getMessage());
+            out.print(gson.toJson(jsonResponse));
+        } finally {
+            out.close();
+        }
     }
 
     private void doPostAdd(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -238,5 +369,17 @@ public class RoomController extends BaseAuthorization {
         m.setOwner(user);
 
         return mDao.addMedia(m);
+    }
+
+    private void fullLoadRoomInfo(Room r) {
+        try {
+            Status s = new Status();
+            s.setId(21);
+            List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
+
+            r.setMedias(mediaS);
+        } catch (Exception e) {
+            log.error("Error during fullLoadPostInfomation process");
+        }
     }
 }
