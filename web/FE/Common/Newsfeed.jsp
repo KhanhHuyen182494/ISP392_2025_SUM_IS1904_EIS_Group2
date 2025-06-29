@@ -227,6 +227,12 @@
                             <i class="fa-solid fa-star"></i>
                             Top House
                         </button>
+                        <a href="${pageContext.request.contextPath}/house/available">
+                            <button class="flex-1 bg-green-400 hover:bg-green-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
+                                <i class="fa-solid fa-house"></i>
+                                View Available House
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
