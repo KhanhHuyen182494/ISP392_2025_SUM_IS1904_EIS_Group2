@@ -12,7 +12,6 @@ import Model.Status;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 /**
  *
@@ -183,6 +182,7 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
                 r.setCreated_at(rs.getTimestamp("created_at"));
                 r.setUpdated_at(rs.getTimestamp("updated_at"));
                 r.setRoom_position(rs.getString("rome_position"));
+                r.setMax_guests(rs.getInt("max_guests"));
 
                 RoomType rt = new RoomType();
                 rt.setId(rs.getInt("room_type_id"));

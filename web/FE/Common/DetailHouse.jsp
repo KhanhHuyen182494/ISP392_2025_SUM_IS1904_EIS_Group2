@@ -379,84 +379,91 @@
                             <c:when test="${not empty h.rooms}">
                                 <div class="grid grid-cols-1 gap-6">
                                     <c:forEach var="room" items="${h.rooms}">
-                                        <div class="room-card">
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <!-- Room Info -->
-                                                <div class="space-y-3">
-                                                    <h3 class="text-xl font-bold text-gray-800">${room.name}</h3>
-                                                    <p class="text-gray-600">${room.description}</p>
+                                        <c:if test="${room.status.id != 27 || h.owner.id == sessionScope.user.id}">
+                                            <div class="room-card">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <!-- Room Info -->
+                                                    <div class="space-y-3">
+                                                        <h3 class="text-xl font-bold text-gray-800">${room.name}</h3>
+                                                        <p class="text-gray-600">${room.description}</p>
 
-                                                    <div class="space-y-2">
-                                                        <div class="flex items-center gap-2">
-                                                            <i class="fas fa-users text-blue-500"></i>
-                                                            <span class="text-sm text-gray-600">Capacity: ${room.max_guests} guests</span>
-                                                        </div>
-                                                        <div class="flex items-center gap-2">
-                                                            <i class="fas fa-dollar-sign text-green-500"></i>
-                                                            <span class="text-lg font-bold text-orange-600">
-                                                                <fmt:formatNumber value="${room.price_per_night}" type="currency" currencySymbol="VND" />
-                                                                <span class="text-sm font-normal text-gray-600">/night</span>
-                                                            </span>
-                                                        </div>
-                                                        <div class="flex items-center gap-2">
-                                                            <i class="fas fa-circle text-xs ${room.status.name == 'Available' ? 'text-green-500' : room.status.name == 'Booked' ? 'text-yellow-500' : 'text-red-500'}"></i>
-                                                            <span class="text-sm text-gray-600">${room.status.name}</span>
-                                                        </div>
-                                                    </div>
-
-                                                    <c:if test="${sessionScope.user.id == h.owner.id}">
-                                                        <div class="flex gap-2 mt-4">
-                                                            <button type="button" onclick="editRoom(${room.id})" 
-                                                                    class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
-                                                                <i class="fas fa-edit"></i>
-                                                                Edit
-                                                            </button>
-                                                            <button type="button" onclick="deleteRoom(${room.id})" 
-                                                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
-                                                                <i class="fas fa-trash"></i>
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    </c:if>
-                                                </div>
-
-                                                <!-- Room Images -->
-                                                <div class="small-carousel carousel-container" id="roomCarousel${room.id}">
-                                                    <div class="carousel-track" id="room${room.id}Track">
-                                                        <c:forEach var="image" items="${room.medias}" varStatus="status">
-                                                            <div class="carousel-slide">
-                                                                <img src="${pageContext.request.contextPath}/Asset/Common/Room/${image.path}" 
-                                                                     alt="${room.name}" 
-                                                                     class="w-full h-full object-cover rounded-lg">
+                                                        <div class="space-y-2">
+                                                            <div class="flex items-center gap-2">
+                                                                <i class="fas fa-users text-blue-500"></i>
+                                                                <span class="text-sm text-gray-600">Capacity: ${room.max_guests} guests</span>
                                                             </div>
-                                                        </c:forEach>
-                                                        <c:if test="${empty room.medias}">
-                                                            <div class="carousel-slide">
-                                                                <img src="${pageContext.request.contextPath}/Asset/Common/Room/no-image.webp" 
-                                                                     alt="No image available" 
-                                                                     class="w-full h-full object-cover rounded-lg">
+                                                            <div class="flex items-center gap-2">
+                                                                <i class="fas fa-dollar-sign text-green-500"></i>
+                                                                <span class="text-lg font-bold text-orange-600">
+                                                                    <fmt:formatNumber value="${room.price_per_night}" type="currency" currencySymbol="VND" />
+                                                                    <span class="text-sm font-normal text-gray-600">/night</span>
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex items-center gap-2">
+                                                                <i class="fas fa-circle text-xs ${room.status.name == 'Available' ? 'text-green-500' : room.status.name == 'Booked' ? 'text-yellow-500' : 'text-red-500'}"></i>
+                                                                <span class="text-sm text-gray-600">${room.status.name}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <c:if test="${sessionScope.user.id == h.owner.id}">
+                                                            <div class="flex gap-2 mt-4">
+                                                                <button type="button" onclick="editRoom(${room.id})" 
+                                                                        class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
+                                                                    <i class="fas fa-edit"></i>
+                                                                    Edit
+                                                                </button>
+                                                                <button type="button" onclick="deleteRoom(${room.id})" 
+                                                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
+                                                                    <i class="fas fa-trash"></i>
+                                                                    Delete
+                                                                </button>
+                                                                <button type="button" onclick="detail(${room.id})" 
+                                                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1">
+                                                                    <i class="fas fa-trash"></i>
+                                                                    Detail
+                                                                </button>
                                                             </div>
                                                         </c:if>
                                                     </div>
 
-                                                    <c:if test="${fn:length(room.medias) > 1}">
-                                                        <button class="carousel-nav carousel-prev" onclick="prevSlide('room${room.id}'); pauseAutoSlide();">
-                                                            <i class="fas fa-chevron-left"></i>
-                                                        </button>
-                                                        <button class="carousel-nav carousel-next" onclick="nextSlide('room${room.id}'); pauseAutoSlide();">
-                                                            <i class="fas fa-chevron-right"></i>
-                                                        </button>
+                                                    <!-- Room Images -->
+                                                    <div class="small-carousel carousel-container" id="roomCarousel${room.id}">
+                                                        <div class="carousel-track" id="room${room.id}Track">
+                                                            <c:forEach var="image" items="${room.medias}" varStatus="status">
+                                                                <div class="carousel-slide">
+                                                                    <img src="${pageContext.request.contextPath}/Asset/Common/Room/${image.path}" 
+                                                                         alt="${room.name}" 
+                                                                         class="w-full h-full object-cover rounded-lg">
+                                                                </div>
+                                                            </c:forEach>
+                                                            <c:if test="${empty room.medias}">
+                                                                <div class="carousel-slide">
+                                                                    <img src="${pageContext.request.contextPath}/Asset/Common/Room/no-image.webp" 
+                                                                         alt="No image available" 
+                                                                         class="w-full h-full object-cover rounded-lg">
+                                                                </div>
+                                                            </c:if>
+                                                        </div>
 
-                                                        <!--                                                        <div class="carousel-dots">
-                                                        <c:forEach var="image" items="${room.medias}" varStatus="status">
-                                                            <div class="carousel-dot ${status.index == 0 ? 'active' : ''}" 
-                                                                 onclick="goToSlide('room${room.id}', ${status.index}); pauseAutoSlide();"></div>
-                                                        </c:forEach>
-                                                    </div>-->
-                                                    </c:if>
+                                                        <c:if test="${fn:length(room.medias) > 1}">
+                                                            <button class="carousel-nav carousel-prev" onclick="prevSlide('room${room.id}'); pauseAutoSlide();">
+                                                                <i class="fas fa-chevron-left"></i>
+                                                            </button>
+                                                            <button class="carousel-nav carousel-next" onclick="nextSlide('room${room.id}'); pauseAutoSlide();">
+                                                                <i class="fas fa-chevron-right"></i>
+                                                            </button>
+
+                                                            <!--                                                        <div class="carousel-dots">
+                                                            <c:forEach var="image" items="${room.medias}" varStatus="status">
+                                                                <div class="carousel-dot ${status.index == 0 ? 'active' : ''}" 
+                                                                     onclick="goToSlide('room${room.id}', ${status.index}); pauseAutoSlide();"></div>
+                                                            </c:forEach>
+                                                        </div>-->
+                                                        </c:if>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </c:if>
                                     </c:forEach>
                                 </div>
                             </c:when>
@@ -734,11 +741,15 @@
                                             }
 
                                             function addRoom(homestayId) {
-                                                window.location.href = `${pageContext.request.contextPath}/add-room?homestay_id=` + homestayId;
+                                                window.location.href = `${pageContext.request.contextPath}/room/add?hid=` + homestayId;
                                             }
 
                                             function editRoom(roomId) {
-                                                window.location.href = `${pageContext.request.contextPath}/edit-room?id=` + roomId;
+                                                window.location.href = `${pageContext.request.contextPath}/room/edit?id=` + roomId;
+                                            }
+                                            
+                                            function detail(roomId) {
+                                                window.location.href = `${pageContext.request.contextPath}/room?id=` + roomId;
                                             }
 
                                             function deleteRoom(roomId) {
