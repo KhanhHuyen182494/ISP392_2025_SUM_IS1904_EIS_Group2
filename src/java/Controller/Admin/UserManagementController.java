@@ -92,7 +92,7 @@ public class UserManagementController extends BaseAuthorization {
         request.setAttribute("keyword", keyword);
         request.setAttribute("statusId", statusId);
         request.setAttribute("roleId", roleId);
-        request.setAttribute("joinDate", joinDate);
+        request.setAttribute("joinDate", joinDateStr);
         request.getRequestDispatcher("../FE/Admin/UserManagement/UserList.jsp").forward(request, response);
     }
 

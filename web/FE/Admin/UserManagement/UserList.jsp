@@ -60,11 +60,11 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
-                                    <a href="${pageContext.request.contextPath}/feeds">
-                                        <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
-                                            Back to feeds
-                                        </button>
-                                    </a>
+                                <a href="${pageContext.request.contextPath}/feeds">
+                                    <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                        Back to feeds
+                                    </button>
+                                </a>
                                 <a href="${pageContext.request.contextPath}/logout">
                                     <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                         Logout
@@ -324,7 +324,7 @@
                                 </select>
 
                                 <!-- Date Input -->
-                                <input name="joinDate" type="date" 
+                                <input name="joinDate" type="date" value="${joinDate}"
                                        class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
 
                                 <!-- Action Buttons -->
@@ -391,9 +391,12 @@
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                                                 </c:when>
                                                 <c:when test="${user.status.id == 2}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">Inactive</span>
                                                 </c:when>
                                                 <c:when test="${user.status.id == 3}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-orange-800">Pending Verification</span>
+                                                </c:when>
+                                                <c:when test="${user.status.id == 4}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Banned</span>
                                                 </c:when>
                                             </c:choose>
@@ -405,7 +408,7 @@
                                             <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
                                             <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
                                             <c:choose>
-                                                <c:when test="${user.status.id == 3}">
+                                                <c:when test="${user.status.id == 4}">
                                                     <a href="#" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</a>
                                                 </c:when>
                                                 <c:otherwise>
