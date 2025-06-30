@@ -89,7 +89,7 @@ public class ReviewsController extends BaseAuthorization {
         request.setAttribute("keyword", keyword);
         request.setAttribute("roomId", roomId);
         request.setAttribute("joinDate", createdFromStr);
-        request.getRequestDispatcher("../FE/Admin/UserManagement/UserList.jsp").forward(request, response);
+        request.getRequestDispatcher("./FE/Common/Reviews.jsp").forward(request, response);
     }
 
 }
