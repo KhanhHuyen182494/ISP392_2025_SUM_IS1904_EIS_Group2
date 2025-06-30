@@ -114,6 +114,8 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                     """;
 
         try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
 
             ps.setString(1, roomId);
             ps.setDate(2, new java.sql.Date(checkOut.getTime()));
@@ -149,7 +151,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setString(1, houseId);
             ps.setDate(2, new java.sql.Date(checkOut.getTime()));
             ps.setDate(3, new java.sql.Date(checkIn.getTime()));

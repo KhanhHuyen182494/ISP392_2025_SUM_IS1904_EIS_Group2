@@ -582,14 +582,15 @@
                                             `);
 
                                             $.ajax({
-                                                url: '${pageContext.request.contextPath}/api/homestay/' + homestayId + '/rooms/available',
+                                                url: '${pageContext.request.contextPath}/homestay/room/available',
                                                 method: 'GET',
                                                 data: {
+                                                    hid: homestayId,
                                                     checkIn: checkIn,
                                                     checkOut: checkOut
                                                 },
-                                                success: function (rooms) {
-                                                    displayRooms(rooms);
+                                                success: function (response) {
+                                                    displayRooms(response.rooms);
                                                 },
                                                 error: function () {
                                                     $('#roomsList').html(`
@@ -606,10 +607,13 @@
                                     function displayRooms(rooms) {
                                         const roomsList = $('#roomsList');
                                         roomsList.empty();
+                                        console.log(typeof rooms); // should be 'object'
+                                        console.log(Array.isArray(rooms)); // should be true
+                                        console.log(rooms);
 
                                         if (rooms && rooms.length > 0) {
                                             rooms.forEach(room => {
-                                                const roomOption = $(`
+                                                const roomOption = `
                 <div class="border border-gray-300 rounded-lg p-4 cursor-pointer room-option hover:border-blue-500 hover:bg-blue-50 transition-all" 
                      data-room-id="` + room.id + `" 
                      data-room-price="` + room.price_per_night + `"
@@ -631,7 +635,7 @@
                         </div>
                     </div>
                 </div>
-            `);
+            `;
                                                 roomsList.append(roomOption);
                                             });
 
@@ -677,11 +681,12 @@
 
                                     function loadRoomDetails(roomId) {
                                         $.ajax({
-                                            url: '${pageContext.request.contextPath}/api/room/' + roomId + '/details',
+                                            url: '${pageContext.request.contextPath}/homestay/room',
                                             method: 'GET',
-                                            success: function (roomData) {
-                                                displayRoomPreview(roomData);
-                                                selectedRoomData = roomData;
+                                            data: {roomId: roomId},
+                                            success: function (response) {
+                                                displayRoomPreview(response.room);
+                                                selectedRoomData = response.room;
                                             },
                                             error: function () {
                                                 console.error('Failed to load room details');
@@ -696,58 +701,57 @@
 
                                         // Display room image
                                         let imageHtml = '';
-                                        if (roomData.images && roomData.images.length > 0) {
+                                        if (roomData.medias && roomData.medias.length > 0) {
                                             imageHtml = `
-            <img src="${pageContext.request.contextPath}/Asset/Common/Room/` + roomData.images[0].path + `" 
-                 alt="` + roomData.name + `" 
-                 class="w-full h-48 object-cover rounded-lg">
-        `;
+                                                <img src="${pageContext.request.contextPath}/Asset/Common/Room/` + roomData.medias[0].path + `" 
+                                                     alt="` + roomData.name + `" 
+                                                     class="w-full h-48 object-cover rounded-lg">
+                                            `;
 
                                             // Add additional images if available
-                                            if (roomData.images.length > 1) {
+                                            if (roomData.medias.length > 1) {
                                                 imageHtml += `
-                <div class="grid grid-cols-3 gap-2 mt-2">
-            ` + roomData.images.slice(1, 4).map(img => `
-              <img src="${pageContext.request.contextPath}/Asset/Common/Room/` + img.path + `" 
-              alt="` + roomData.name + `" 
-              class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80"
-              onclick="openImageModal('${pageContext.request.contextPath}/Asset/Common/Room/` + img.path + `')">
-              `).join('') + `
-                </div>
-            `;
+                                                <div class="grid grid-cols-3 gap-2 mt-2">
+                                            ` + roomData.medias.slice(1, 4).map(img => `
+                                              <img src="${pageContext.request.contextPath}/Asset/Common/Room/` + img.path + `" 
+                                              alt="` + roomData.name + `" 
+                                              class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80"
+                                              onclick="openImageModal('${pageContext.request.contextPath}/Asset/Common/Room/` + img.path + `')">
+                                              `).join('') + `
+                                                </div>
+                                            `;
                                             }
                                         } else {
                                             imageHtml = `
-            <div class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                <i class="fas fa-bed text-gray-400 text-3xl"></i>
-            </div>
-        `;
+                                                <div class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                    <i class="fas fa-bed text-gray-400 text-3xl"></i>
+                                                </div>
+                                            `;
                                         }
 
                                         imageContainer.html(imageHtml);
 
                                         // Display room details
                                         const detailsHtml = `
-        <div>
-            <h4 class="text-lg font-semibold mb-3">` + roomData.name + `</h4>
-            <p class="text-gray-600 mb-4">` + roomData.description || 'Comfortable private room' + `</p>
-
-            <div class="space-y-2">
-                <div class="flex items-center">
-                    <i class="fas fa-users text-blue-500 w-5 mr-2"></i>
-                    <span class="text-sm">Max ` + roomData.max_guests + ` guests</span>
-                </div>
-                <div class="flex items-center">
-                    <i class="fas fa-expand-arrows-alt text-blue-500 w-5 mr-2"></i>
-                    <span class="text-sm">` + roomData.size || 'Standard' + ` size</span>
-                </div>
-                <div class="flex items-center">
-                    <i class="fas fa-bed text-blue-500 w-5 mr-2"></i>
-                    <span class="text-sm">` + roomData.bed_type || 'Comfortable bed' + `</span>
-                </div>
-            </div>
-        </div>
-    `;
+                                            <div>
+                                                <h4 class="text-lg font-semibold mb-3">` + roomData.name + `</h4>
+                                                <p class="text-gray-600 mb-4">` + roomData.description + `</p>
+                                                <div class="space-y-2">
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-users text-blue-500 w-5 mr-2"></i>
+                                                        <span class="text-sm">Max ` + roomData.max_guests + ` guests</span>
+                                                    </div>
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-expand-arrows-alt text-blue-500 w-5 mr-2"></i>
+                                                        <span class="text-sm">` + roomData.room_position + ` </span>
+                                                    </div>
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-bed text-blue-500 w-5 mr-2"></i>
+                                                        <span class="text-sm">` + roomData.roomType.name + `</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
 
                                         detailsContainer.html(detailsHtml);
                                         roomPreview.removeClass('hidden');

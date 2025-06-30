@@ -10,9 +10,12 @@ import Model.House;
 import Model.Room;
 import Model.RoomType;
 import Model.Status;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -24,7 +27,21 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
 
     public static void main(String[] args) {
         RoomDAO rDao = new RoomDAO();
-        System.out.println(rDao.getListRoomByHomestayId("HOMESTAY-87fbb6d15ad548318110b60b7", 26));
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            // Sample inputs
+            int roomId = 101; // Replace with a real room ID
+            Date checkIn = new Date(sdf.parse("2025-06-30").getTime());
+            Date checkOut = new Date(sdf.parse("2025-07-10").getTime());
+
+            System.out.println(rDao.getAllRoomAvailable(checkIn, checkOut, "HOUSE-ceba29ae2440479085e22bac728678").size());
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -304,6 +321,74 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
             } catch (Exception ex) {
                 logger.error("" + ex);
             }
+        }
+
+        return rList;
+    }
+
+    @Override
+    public List<Room> getAllRoomAvailable(Date checkin, Date checkout, String hid) {
+        List<Room> rList = new ArrayList<>();
+        String sql = """
+                 SELECT r.*, s.name as StatusName, rt.name as RoomType
+                 FROM `room` r
+                 JOIN room_type rt ON r.room_type_id = rt.id
+                 JOIN status s ON s.id = r.status_id
+                 WHERE r.id NOT IN (
+                     SELECT b.room_id
+                     FROM `fuhousefinder_homestay`.`booking` b
+                     WHERE b.status_id NOT IN (10, 11)
+                       AND (
+                           (b.check_in < ? AND b.check_out > ?)
+                           OR (b.check_in BETWEEN ? AND ?)
+                           OR (b.check_out BETWEEN ? AND ?)
+                       )
+                 ) AND r.homestay_id = ?;
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setDate(1, new java.sql.Date(checkout.getTime()));
+            ps.setDate(2, new java.sql.Date(checkin.getTime()));
+            ps.setDate(3, new java.sql.Date(checkin.getTime()));
+            ps.setDate(4, new java.sql.Date(checkout.getTime()));
+            ps.setDate(5, new java.sql.Date(checkin.getTime()));
+            ps.setDate(6, new java.sql.Date(checkout.getTime()));
+            ps.setString(7, hid);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Room r = new Room();
+
+                r.setId(rs.getString("id"));
+                r.setName(rs.getString("name"));
+                r.setDescription(rs.getString("description"));
+                r.setStar(rs.getFloat("star"));
+                r.setPrice_per_night(rs.getDouble("price_per_night"));
+                r.setCreated_at(rs.getTimestamp("created_at"));
+                r.setUpdated_at(rs.getTimestamp("updated_at"));
+                r.setRoom_position(rs.getString("rome_position"));
+                r.setMax_guests(rs.getInt("max_guests"));
+
+                RoomType rt = new RoomType();
+                rt.setId(rs.getInt("room_type_id"));
+                rt.setName(rs.getString("RoomType"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+
+                r.setStatus(s);
+                r.setRoomType(rt);
+
+                rList.add(r);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error in getAllRoomAvailable: " + e.getMessage());
         }
 
         return rList;

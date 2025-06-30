@@ -67,11 +67,8 @@ public class BookingController extends BaseAuthorization {
             Status mediaS = new Status();
             mediaS.setId(21);
             List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
-            List<Room> rs = roomDao.getAllRoomByHomestayId(hid);
-            fullLoadRoomInfo(rs);
 
             h.setOwner(u);
-            h.setRooms(rs);
             h.setMedias(medias);
             h.setAddress(a);
         } catch (Exception e) {
