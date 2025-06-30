@@ -60,6 +60,11 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                    <a href="${pageContext.request.contextPath}/feeds">
+                                        <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                            Back to feeds
+                                        </button>
+                                    </a>
                                 <a href="${pageContext.request.contextPath}/logout">
                                     <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                         Logout

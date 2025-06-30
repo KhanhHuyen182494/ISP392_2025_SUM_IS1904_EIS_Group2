@@ -61,6 +61,13 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                <c:if test="${sessionScope.user.role.id == 1}">
+                                    <a href="${pageContext.request.contextPath}/manage/user">
+                                        <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                            Admin Panel
+                                        </button>
+                                    </a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/logout">
                                     <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                         Logout
@@ -70,8 +77,8 @@
                                     <p><b>${sessionScope.user.first_name} ${sessionScope.user.last_name}</b></p>
                                 </div>
                                 <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
-                                    <div class="avatar">
-                                        <img class="rounded-[50%]" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
+                                    <div class="avatar w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
+                                        <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" width="40"/>
                                     </div>
                                 </a>
                             </div>
