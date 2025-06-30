@@ -823,11 +823,11 @@
                                                     clearPriceBreakdown();
                                                     if (!isWholeHouse) {
                                                         $('#roomsList').html(`
-                        <div class="text-center py-8 text-orange-500">
-                            <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
-                            <div>Check-out date must be after check-in date</div>
-                        </div>
-                    `);
+                                                        <div class="text-center py-8 text-orange-500">
+                                                            <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                                                            <div>Check-out date must be after check-in date</div>
+                                                        </div>
+                                                    `);
                                                     }
                                                     return;
                                                 }
@@ -844,11 +844,11 @@
                                                 if (!isWholeHouse) {
                                                     clearRoomSelection();
                                                     $('#roomsList').html(`
-                    <div class="text-center py-8 text-gray-400">
-                        <i class="fas fa-calendar-alt text-2xl mb-2"></i>
-                        <div>Please select check-in and check-out dates first</div>
-                    </div>
-                `);
+                                                        <div class="text-center py-8 text-gray-400">
+                                                            <i class="fas fa-calendar-alt text-2xl mb-2"></i>
+                                                            <div>Please select check-in and check-out dates first</div>
+                                                        </div>
+                                                    `);
                                                 } else {
                                                     clearPriceBreakdown();
                                                 }
@@ -858,11 +858,11 @@
                                         // Initial state for room-only properties
                                         if (!isWholeHouse) {
                                             $('#roomsList').html(`
-            <div class="text-center py-8 text-gray-400">
-                <i class="fas fa-calendar-alt text-2xl mb-2"></i>
-                <div>Please select check-in and check-out dates first</div>
-            </div>
-        `);
+                                                <div class="text-center py-8 text-gray-400">
+                                                    <i class="fas fa-calendar-alt text-2xl mb-2"></i>
+                                                    <div>Please select check-in and check-out dates first</div>
+                                                </div>
+                                            `);
                                             clearPriceBreakdown();
                                         } else {
                                             // Initial calculation for whole house

@@ -24,7 +24,9 @@ import java.util.logging.Logger;
  * @author Hien
  */
 @WebServlet(name = "BookingController", urlPatterns = {
-    "/booking"
+    "/booking",
+    "/booking/contract",
+    "/booking/confirm"
 })
 public class BookingController extends BaseAuthorization {
 
@@ -38,12 +40,29 @@ public class BookingController extends BaseAuthorization {
         switch (path) {
             case BASE_PATH ->
                 doGetBookingDetail(request, response, user);
+            case BASE_PATH + "/contract" ->
+                doGetBookingContract(request, response, user);
+            case BASE_PATH + "/confirm" ->
+                doGetBookingDetail(request, response, user);
         }
     }
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String path = request.getServletPath();
 
+        switch (path) {
+            case BASE_PATH + "/confirm" ->
+                doPostBookingConfirm(request, response, user);
+        }
+    }
+
+    private void doGetBookingContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        
+    }
+
+    private void doPostBookingConfirm(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        
     }
 
     private void doGetBookingDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -62,7 +81,7 @@ public class BookingController extends BaseAuthorization {
             String hid = h.getId();
 
             User u = uDao.getById(h.getOwner().getId());
-            
+
             Address a = aDao.getAddressById(h.getAddress().getId());
             Status mediaS = new Status();
             mediaS.setId(21);
