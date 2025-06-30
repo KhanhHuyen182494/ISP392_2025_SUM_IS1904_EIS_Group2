@@ -7,6 +7,10 @@ package DAL;
 import Base.Logging;
 import DAL.DAO.IBookingDAO;
 import Model.Booking;
+import Model.House;
+import Model.Room;
+import Model.Status;
+import Model.User;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -87,7 +91,41 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
 
     @Override
     public boolean addBooking(Booking b) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO `fuhousefinder_homestay`.`booking`
+                     (`id`, `tenant_id`, `homestay_id`, `room_id`, `check_in`, `check_out`, `total_price`, `deposit`, `status_id`, `created_at`, `service_fee`, `cleaning_fee`)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, b.getId());
+            ps.setString(2, b.getTenant().getId());
+            ps.setString(3, b.getHomestay().getId());
+            ps.setString(4, b.getRoom().getId());
+            ps.setDate(5, b.getCheck_in());
+            ps.setDate(6, b.getCheckout());
+            ps.setDouble(7, b.getTotal_price());
+            ps.setDouble(8, b.getDeposit());
+            ps.setInt(9, b.getStatus().getId());
+            ps.setTimestamp(10, b.getCreated_at());
+            ps.setDouble(11, b.getService_fee());
+            ps.setDouble(12, b.getCleaning_fee());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override
@@ -167,6 +205,60 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             logger.error("" + e);
             return false;
         }
+    }
+
+    @Override
+    public Booking getById(String bookId) {
+        Booking b = new Booking();
+        String sql = """
+                     SELECT * FROM `fuhousefinder_homestay`.`booking`;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                b.setId(rs.getString("id"));
+
+                User u = new User();
+                u.setId(rs.getString("tenant_id"));
+
+                b.setTenant(u);
+
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+
+                b.setHomestay(h);
+
+                Room r = new Room();
+                r.setId(rs.getString("room_id"));
+
+                b.setRoom(r);
+
+                b.setCheck_in(rs.getDate("check_in"));
+                b.setCheckout(rs.getDate("check_out"));
+                b.setTotal_price(rs.getDouble("total_price"));
+                b.setDeposit(rs.getDouble("deposit"));
+                b.setService_fee(rs.getDouble("service_fee"));
+                b.setCleaning_fee(rs.getDouble("cleaning_fee"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+
+                b.setStatus(s);
+
+                b.setCreated_at(rs.getTimestamp("created_at"));
+                b.setNote(rs.getString("note"));
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        }
+
+        return b;
     }
 
 }

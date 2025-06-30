@@ -336,8 +336,15 @@
                             </div>
                         </div>
 
-                        <form action="${pageContext.request.contextPath}/booking/confirm" method="POST">
+                        <form id="bookingForm" action="${pageContext.request.contextPath}/booking/confirm" method="POST">
                             <input type="hidden" name="homestayId" value="${h.id}">
+                            <input type="hidden" name="subtotal" id="subtotalHidden" value="0">
+                            <input type="hidden" name="serviceFee" id="serviceFeeHidden" value="0">
+                            <input type="hidden" name="cleaningFee" id="cleaningFeeHidden" value="0">
+                            <input type="hidden" name="totalAmount" id="totalAmountHidden" value="0">
+                            <input type="hidden" name="depositAmount" id="depositAmountHidden" value="0">
+                            <input type="hidden" name="nightCount" id="nightCountHidden" value="0">
+                            <input type="hidden" name="pricePerNight" id="pricePerNightHidden" value="${h.price_per_night}">
 
                             <!-- Booking Type Selection (only for whole house properties) -->
                             <c:if test="${h.is_whole_house}">
@@ -560,12 +567,21 @@
                                     }
 
                                     function clearPriceBreakdown() {
+                                        // Clear display
                                         $('#nightCount').text('0');
                                         $('#subtotal').text('₫0');
                                         $('#serviceFee').text('₫0');
                                         $('#cleaningFeeAmount').text('₫0');
                                         $('#totalPrice').text('₫0');
                                         $('#depositAmount').text('₫0');
+
+                                        $('#subtotalHidden').val('0');
+                                        $('#serviceFeeHidden').val('0');
+                                        $('#cleaningFeeHidden').val('0');
+                                        $('#totalAmountHidden').val('0');
+                                        $('#depositAmountHidden').val('0');
+                                        $('#nightCountHidden').val('0');
+                                        $('#pricePerNightHidden').val(basePricePerNight);
                                     }
 
                                     function loadAvailableRooms(checkIn, checkOut) {
@@ -655,6 +671,8 @@
                                                 // Update selected room data
                                                 selectedRoomId = roomId;
                                                 currentRoomPrice = roomPrice;
+
+                                                $('#pricePerNightHidden').val(roomPrice);
 
                                                 // Update pricing display
                                                 updatePricingDisplay(roomPrice);
@@ -787,6 +805,15 @@
                                                 $('#cleaningFeeAmount').text(`₫` + cleaningFee.toLocaleString());
                                                 $('#totalPrice').text(`₫` + total.toLocaleString());
                                                 $('#depositAmount').text(`₫` + deposit.toLocaleString());
+
+                                                // *** ADD THIS SECTION: Update hidden form fields ***
+                                                $('#subtotalHidden').val(subtotal);
+                                                $('#serviceFeeHidden').val(serviceFee);
+                                                $('#cleaningFeeHidden').val(cleaningFee);
+                                                $('#totalAmountHidden').val(total);
+                                                $('#depositAmountHidden').val(deposit);
+                                                $('#nightCountHidden').val(nights);
+                                                $('#pricePerNightHidden').val(pricePerNight);
                                             } else {
                                                 clearPriceBreakdown();
                                             }
@@ -867,6 +894,98 @@
                                         } else {
                                             // Initial calculation for whole house
                                             calculateTotal();
+                                        }
+
+                                        $('#bookingForm').on('submit', function (e) {
+                                            e.preventDefault(); // Prevent default form submission
+
+                                            // Disable the submit button and show loading state
+                                            const $submitBtn = $('#bookButton');
+                                            const originalText = $submitBtn.text();
+                                            $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Processing...');
+
+                                            // Gather form data
+                                            const formData = {
+                                                homestayId: $('input[name="homestayId"]').val(),
+                                                bookingType: $('input[name="bookingType"]:checked').val() || 'whole',
+                                                checkIn: $('#checkIn').val(),
+                                                checkOut: $('#checkOut').val(),
+                                                specialRequests: $('textarea[name="specialRequests"]').val(),
+                                                subtotal: $('#subtotalHidden').val(),
+                                                serviceFee: $('#serviceFeeHidden').val(),
+                                                cleaningFee: $('#cleaningFeeHidden').val(),
+                                                totalAmount: $('#totalAmountHidden').val(),
+                                                depositAmount: $('#depositAmountHidden').val(),
+                                                nightCount: $('#nightCountHidden').val(),
+                                                pricePerNight: $('#pricePerNightHidden').val()
+                                            };
+
+                                            // Add selected room ID for room bookings
+                                            if (!isWholeHouse && selectedRoomId) {
+                                                formData.selectedRoom = selectedRoomId;
+                                                formData.bookingType = 'room';
+                                            }
+
+                                            // Validate required fields
+                                            if (!formData.checkIn || !formData.checkOut) {
+                                                showToast('Please select check-in and check-out dates', 'error');
+                                                resetSubmitButton($submitBtn, originalText);
+                                                return;
+                                            }
+
+                                            if (!isWholeHouse && !selectedRoomId) {
+                                                showToast('Please select a room', 'error');
+                                                resetSubmitButton($submitBtn, originalText);
+                                                return;
+                                            }
+
+                                            // Send AJAX request
+                                            $.ajax({
+                                                url: '${pageContext.request.contextPath}/booking/contract',
+                                                method: 'POST',
+                                                data: formData,
+                                                dataType: 'json',
+                                                success: function (response) {
+                                                    if (response.ok) {
+                                                        // Show success message
+                                                        showToast(response.message, 'success');
+
+                                                        setTimeout(function () {
+                                                            location.href = '${pageContext.request.contextPath}/booking/contract?bookId=' + response.bookId;
+                                                        }, 2000);
+                                                    } else {
+                                                        // Show error message
+                                                        showToast(response.message || 'Booking failed. Please try again.', 'error');
+                                                        resetSubmitButton($submitBtn, originalText);
+                                                    }
+                                                },
+                                                error: function (xhr, status, error) {
+                                                    showToast(xhr.message, 'error');
+                                                    resetSubmitButton($submitBtn, originalText);
+                                                }
+                                            });
+                                        });
+
+                                        // Helper function to reset submit button
+                                        function resetSubmitButton($button, originalText) {
+                                            $button.prop('disabled', false).text(originalText);
+                                        }
+
+                                        // Helper function to show toast notifications
+                                        function showToast(message, type = 'info') {
+                                            const backgroundColor = type === 'error' ? '#ef4444' :
+                                                    type === 'success' ? '#10b981' : '#3b82f6';
+
+                                            Toastify({
+                                                text: message,
+                                                duration: 4000,
+                                                gravity: "top",
+                                                position: "right",
+                                                style: {
+                                                    background: backgroundColor,
+                                                },
+                                                stopOnFocus: true
+                                            }).showToast();
                                         }
                                     });
         </script>

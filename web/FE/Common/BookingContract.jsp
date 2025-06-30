@@ -180,8 +180,8 @@
                             <div>
                                 <div class="aspect-video rounded-lg overflow-hidden mb-4">
                                     <c:choose>
-                                        <c:when test="${not empty bookingData.homestay.medias and fn:length(bookingData.homestay.medias) > 0}">
-                                            <img src="${pageContext.request.contextPath}/Asset/Common/House/${bookingData.homestay.medias[0].path}" 
+                                        <c:when test="${not empty b.homestay.medias and fn:length(b.homestay.medias) > 0}">
+                                            <img src="${pageContext.request.contextPath}/Asset/Common/House/${b.homestay.medias[0].path}" 
                                                  alt="Property image" 
                                                  class="w-full h-full object-cover">
                                         </c:when>
@@ -194,24 +194,57 @@
                                 </div>
                             </div>
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">${bookingData.homestay.name}</h3>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">${b.homestay.name}</h3>
                                 <div class="space-y-2 text-sm text-gray-600">
                                     <div class="flex items-start">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-2 mt-1 flex-shrink-0"></i>
-                                        <span>${bookingData.homestay.address.detail} ${bookingData.homestay.address.ward}, ${bookingData.homestay.address.district}, ${bookingData.homestay.address.province}</span>
+                                        <span>${b.homestay.address.detail} ${b.homestay.address.ward}, ${b.homestay.address.district}, ${b.homestay.address.province}</span>
                                     </div>
                                     <div class="flex items-center">
                                         <i class="fas fa-star text-yellow-500 mr-2"></i>
-                                        <span>${bookingData.homestay.star} stars</span>
+                                        <span>${b.homestay.star} stars</span>
                                     </div>
                                     <div class="flex items-center">
                                         <i class="fas fa-user text-blue-500 mr-2"></i>
-                                        <span>Host: ${bookingData.homestay.owner.first_name} ${bookingData.homestay.owner.last_name}</span>
+                                        <span>Host: ${b.homestay.owner.first_name} ${b.homestay.owner.last_name}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <c:if test="${b.room.id != null}">
+                        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Property Information</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="aspect-video rounded-lg overflow-hidden mb-4">
+                                        <c:choose>
+                                            <c:when test="${not empty b.room.medias and fn:length(b.room.medias) > 0}">
+                                                <img src="${pageContext.request.contextPath}/Asset/Common/Room/${b.room.medias[0].path}" 
+                                                     alt="Property image" 
+                                                     class="w-full h-full object-cover">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                    <i class="fas fa-home text-gray-400 text-3xl"></i>
+                                                </div>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">${b.room.name}</h3>
+                                    <div class="space-y-2 text-sm text-gray-600">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-star text-yellow-500 mr-2"></i>
+                                            <span>${b.room.star} stars</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:if>
 
                     <!-- Booking Details -->
                     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -223,17 +256,17 @@
                                     <div class="flex items-center text-gray-900">
                                         <i class="fas fa-calendar-check text-green-500 mr-2"></i>
                                         <span class="font-medium">
-                                            <fmt:formatDate value="${bookingData.checkInDate}" pattern="EEEE, dd/MM/yyyy" />
+                                            <fmt:formatDate value="${b.check_in}" pattern="EEEE, dd/MM/yyyy" />
                                         </span>
                                     </div>
-                                    <div class="text-sm text-gray-500 ml-6">After 3:00 PM</div>
+                                    <div class="text-sm text-gray-500 ml-6">After 12:00 PM</div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
                                     <div class="flex items-center text-gray-900">
                                         <i class="fas fa-calendar-times text-red-500 mr-2"></i>
                                         <span class="font-medium">
-                                            <fmt:formatDate value="${bookingData.checkOutDate}" pattern="EEEE, dd/MM/yyyy" />
+                                            <fmt:formatDate value="${b.checkout}" pattern="EEEE, dd/MM/yyyy" />
                                         </span>
                                     </div>
                                     <div class="text-sm text-gray-500 ml-6">Before 11:00 AM</div>
@@ -244,14 +277,14 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Duration</label>
                                     <div class="flex items-center text-gray-900">
                                         <i class="fas fa-clock text-blue-500 mr-2"></i>
-                                        <span class="font-medium">${bookingData.nights} nights</span>
+                                        <span class="font-medium">${(b.total_price - b.service_fee - b.cleaning_fee) / b.homestay.price_per_night} nights</span>
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Booking Type</label>
                                     <div class="flex items-center text-gray-900">
                                         <c:choose>
-                                            <c:when test="${bookingData.bookingType == 'whole'}">
+                                            <c:when test="${b.homestay.is_whole_house == true}">
                                                 <i class="fas fa-home text-purple-500 mr-2"></i>
                                                 <span class="font-medium">Whole House</span>
                                             </c:when>
@@ -398,17 +431,17 @@
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">
-                                    ₫<fmt:formatNumber value="${bookingData.pricePerNight}" pattern="#,###" /> × ${bookingData.nights} nights
+                                    ₫<fmt:formatNumber value="${b.homestay.price_per_night}" pattern="#,###" /> × ${(b.total_price - b.service_fee - b.cleaning_fee) / b.homestay.price_per_night} nights
                                 </span>
-                                <span>₫<fmt:formatNumber value="${bookingData.subtotal}" pattern="#,###" /></span>
+                                <span>₫<fmt:formatNumber value="${b.total_price - b.service_fee - b.cleaning_fee}" pattern="#,###" /></span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Service fee</span>
-                                <span>₫<fmt:formatNumber value="${bookingData.serviceFee}" pattern="#,###" /></span>
+                                <span>₫<fmt:formatNumber value="${b.service_fee}" pattern="#,###" /></span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Cleaning fee</span>
-                                <span>₫<fmt:formatNumber value="${bookingData.cleaningFee}" pattern="#,###" /></span>
+                                <span>₫<fmt:formatNumber value="${b.cleaning_fee}" pattern="#,###" /></span>
                             </div>
                         </div>
 
@@ -416,7 +449,7 @@
                         <div class="border-t pt-4 mb-6">
                             <div class="flex justify-between text-lg font-semibold">
                                 <span>Total</span>
-                                <span>₫<fmt:formatNumber value="${bookingData.total}" pattern="#,###" /></span>
+                                <span>₫<fmt:formatNumber value="${b.total_price}" pattern="#,###" /></span>
                             </div>
                         </div>
 
@@ -427,7 +460,7 @@
                                     <div class="font-medium text-blue-900">Due Now (Deposit)</div>
                                     <div class="text-sm text-blue-700">20% of total amount</div>
                                 </div>
-                                <div class="text-lg font-bold text-blue-900">₫<fmt:formatNumber value="${bookingData.deposit}" pattern="#,###" /></div>
+                                <div class="text-lg font-bold text-blue-900">₫<fmt:formatNumber value="${b.deposit}" pattern="#,###" /></div>
                             </div>
                         </div>
 
@@ -682,22 +715,6 @@
                         }
                     }
                 });
-
-                // Show keyboard shortcuts hint
-                setTimeout(function () {
-                    if (window.innerWidth > 768) { // Only on desktop
-                        Toastify({
-                            text: "💡 Tip: Press 'T' for terms, 'P' for privacy agreement",
-                            duration: 4000,
-                            close: true,
-                            gravity: "bottom",
-                            position: "right",
-                            style: {
-                                background: "linear-gradient(to right, #3b82f6, #1d4ed8)",
-                            }
-                        }).showToast();
-                    }
-                }, 3000);
 
                 // Validate payment method format (if needed for future enhancements)
                 function validatePaymentSelection() {

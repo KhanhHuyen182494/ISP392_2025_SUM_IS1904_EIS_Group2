@@ -106,6 +106,10 @@ public class Generator {
     public static String generateRoomId() {
         return generate("ROOM", 36);
     }
+    
+    public static String generateBookingId() {
+        return generate("BOOK", 36);
+    }
 
     public static void main(String[] args) {
         System.out.println(generatePassword(8));

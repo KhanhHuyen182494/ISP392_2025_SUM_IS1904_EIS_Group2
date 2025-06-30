@@ -3,8 +3,10 @@ package Controller.Common;
 import Base.Generator;
 import Base.Logging;
 import DAL.AddressDAO;
+import DAL.BookingDAO;
 import DAL.CommentDAO;
 import DAL.DAO.IAddressDAO;
+import DAL.DAO.IBookingDAO;
 import DAL.DAO.ICommentDAO;
 import DAL.DAO.IHouseDAO;
 import DAL.DAO.IMediaDAO;
@@ -61,6 +63,7 @@ public abstract class BaseAuthorization extends HttpServlet {
     public IRoomDAO roomDao;
     public IRoomTypeDAO rtDao;
     public IRoleDAO roleDao;
+    public IBookingDAO bookDao;
     public Logging log = new Logging();
     public Gson gson;
 
@@ -81,6 +84,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         roomDao = new RoomDAO();
         rtDao = new RoomTypeDAO();
         roleDao = new RoleDAO();
+        bookDao = new BookingDAO();
     }
 
     private User getUser(HttpServletRequest request) {

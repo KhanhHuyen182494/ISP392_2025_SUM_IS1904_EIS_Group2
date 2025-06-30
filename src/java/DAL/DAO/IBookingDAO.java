@@ -15,6 +15,8 @@ public interface IBookingDAO {
 
     //GET
     public Booking getBookingViaCheckinAndCheckOutDate(Date checkIn, Date checkOut);
+    
+    public Booking getById(String bookId);
 
     //ADD
     public boolean addBooking(Booking b);
