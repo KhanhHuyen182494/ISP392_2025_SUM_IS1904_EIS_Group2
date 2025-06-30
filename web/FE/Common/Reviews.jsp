@@ -389,23 +389,23 @@
                                             <span class="text-gray-500">Property:</span>
                                             <span class="font-medium ml-2">${review.homestay.name}</span>
                                         </div>
-                                            <c:if test="${not empty review.room.name}">
+                                        <c:if test="${not empty review.room.name}">
                                             <div>
                                                 <span class="text-gray-500">Room:</span>
                                                 <span class="font-medium ml-2">${review.room.name}</span>
                                             </div>
                                         </c:if>
-<!--                                        <div>
-                                            <span class="text-gray-500">Status:</span>
-                                            <span class="inline-flex ml-2 px-2 py-1 rounded-full text-xs font-medium
-                                                  <c:choose>
-                                                      <c:when test="${review.status.id == 1}">bg-green-100 text-green-800</c:when>
-                                                      <c:when test="${review.status.id == 2}">bg-yellow-100 text-yellow-800</c:when>
-                                                      <c:otherwise>bg-red-100 text-red-800</c:otherwise>
-                                                  </c:choose>">
-                                                ${review.status.name}
-                                            </span>
-                                        </div>-->
+                                        <!--                                        <div>
+                                                                                    <span class="text-gray-500">Status:</span>
+                                                                                    <span class="inline-flex ml-2 px-2 py-1 rounded-full text-xs font-medium
+                                        <c:choose>
+                                            <c:when test="${review.status.id == 1}">bg-green-100 text-green-800</c:when>
+                                            <c:when test="${review.status.id == 2}">bg-yellow-100 text-yellow-800</c:when>
+                                            <c:otherwise>bg-red-100 text-red-800</c:otherwise>
+                                        </c:choose>">
+                                        ${review.status.name}
+                                    </span>
+                                </div>-->
                                     </div>
                                 </div>
 
