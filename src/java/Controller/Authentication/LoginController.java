@@ -116,7 +116,7 @@ public class LoginController extends HttpServlet {
             }
 
             // Check if account is active
-            if (user.getStatus().getId() == 2 || user.getStatus().getId() == 3) {
+            if (user.getStatus().getId() == 4 || user.getStatus().getId() == 2 || user.getStatus().getId() == 3) {
                 result.put("success", false);
                 result.put("errorCode", 2);
                 result.put("message", "Account is disabled. Please contact administrator.");
