@@ -271,12 +271,22 @@
                                     </div>
 
                                     <div class="flex items-center justify-between mb-3">
-                                        <div class="text-2xl font-bold text-orange-600">
-                                            <fmt:formatNumber value="${house.price_per_night}" type="currency"/>
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            /night
-                                        </div>
+                                        <c:if test="${house.is_whole_house == true}">
+                                            <div class="text-2xl font-bold text-orange-600">
+                                                <fmt:formatNumber value="${house.price_per_night}" type="currency"/>
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                /night
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${house.is_whole_house == false}">
+                                            <div class="text-2xl font-bold text-orange-600">
+                                                Different Price
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                /room
+                                            </div>
+                                        </c:if>
                                     </div>
 
                                     <!-- Description -->
