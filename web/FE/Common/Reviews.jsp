@@ -389,11 +389,13 @@
                                             <span class="text-gray-500">Property:</span>
                                             <span class="font-medium ml-2">${review.homestay.name}</span>
                                         </div>
-                                        <div>
-                                            <span class="text-gray-500">Room:</span>
-                                            <span class="font-medium ml-2">${review.room.name}</span>
-                                        </div>
-                                        <div>
+                                            <c:if test="${not empty review.room.name}">
+                                            <div>
+                                                <span class="text-gray-500">Room:</span>
+                                                <span class="font-medium ml-2">${review.room.name}</span>
+                                            </div>
+                                        </c:if>
+<!--                                        <div>
                                             <span class="text-gray-500">Status:</span>
                                             <span class="inline-flex ml-2 px-2 py-1 rounded-full text-xs font-medium
                                                   <c:choose>
@@ -403,7 +405,7 @@
                                                   </c:choose>">
                                                 ${review.status.name}
                                             </span>
-                                        </div>
+                                        </div>-->
                                     </div>
                                 </div>
 

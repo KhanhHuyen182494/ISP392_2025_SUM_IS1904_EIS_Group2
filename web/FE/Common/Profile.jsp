@@ -336,6 +336,12 @@
                                 </button>
                             </a>
                         </c:if>
+                        <a href="${pageContext.request.contextPath}/review">
+                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-star"></i>
+                                View Your's Reviews
+                            </button>
+                        </a>
                         <a href="${pageContext.request.contextPath}/profile-edit">
                             <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-edit"></i>

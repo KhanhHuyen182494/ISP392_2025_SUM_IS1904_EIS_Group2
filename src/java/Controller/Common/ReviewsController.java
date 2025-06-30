@@ -4,7 +4,11 @@
  */
 package Controller.Common;
 
+import Model.Address;
+import Model.House;
+import Model.Media;
 import Model.Review;
+import Model.Room;
 import Model.Status;
 import Model.User;
 import jakarta.servlet.ServletException;
@@ -17,6 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -30,6 +36,7 @@ import java.util.List;
 })
 public class ReviewsController extends BaseAuthorization {
 
+    private static final Logger LOGGER = Logger.getLogger(HousesController.class.getName());
     private static final String BASE_URL = "/review";
     private static int LIMIT = 10;
 
@@ -74,12 +81,26 @@ public class ReviewsController extends BaseAuthorization {
             List<String> hidList = hDao.getListIdByOwner(user);
 
             rList = rDao.getReviewsForHouseOwnerPaging(hidList, star, keyword, createdFrom, roomId, LIMIT, offset);
+
             totalCount = rDao.getReviewsForHouseOwnerPaging(hidList, star, keyword, createdFrom, roomId, LIMIT, offset).size();
             totalPages = (int) Math.ceil((double) totalCount / LIMIT);
         } else if (user.getRole().getId() == 5) {
             rList = rDao.getReviewsForTenantPaging(user, star, keyword, createdFrom, roomId, LIMIT, offset);
+
             totalCount = rDao.getReviewsForTenantPaging(user, star, keyword, createdFrom, roomId, LIMIT, offset).size();
             totalPages = (int) Math.ceil((double) totalCount / LIMIT);
+        }
+
+        for (Review r : rList) {
+            House h = hDao.getById(r.getHomestay().getId());
+            fullLoadHouseInfomationSingle(h);
+
+            if (r.getRoom().getId() != null && !r.getRoom().getId().isEmpty()) {
+                Room room = roomDao.getById(r.getRoom().getId());
+                r.setRoom(room);
+            }
+
+            r.setHomestay(h);
         }
 
         request.setAttribute("totalCount", totalCount);
@@ -90,6 +111,21 @@ public class ReviewsController extends BaseAuthorization {
         request.setAttribute("roomId", roomId);
         request.setAttribute("joinDate", createdFromStr);
         request.getRequestDispatcher("./FE/Common/Reviews.jsp").forward(request, response);
+    }
+
+    private void fullLoadHouseInfomationSingle(House h) {
+        try {
+            String hid = h.getId();
+
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            List<Room> rs = roomDao.getAllRoomByHomestayId(hid);
+
+            h.setRooms(rs);
+            h.setAddress(a);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
     }
 
 }

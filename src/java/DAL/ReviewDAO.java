@@ -32,18 +32,21 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
 
         Timestamp from = Timestamp.valueOf("2025-01-01 00:00:00");
         Timestamp to = Timestamp.valueOf("2025-12-31 23:59:59");
+        
+        User u = new User();
+        u.setId("U-ab0c71c0b2fa412ea760eeb459dfab6e");
 
-        List<Review> result = fDao.getReviewsForHouseOwnerPaging(
-                homestayIds,
-                5, // star
+        List<Review> result = fDao.getReviewsForTenantPaging(
+                u,
+                null, // star
                 "", // content
-                from, // created from
+                null, // created from
                 null, // roomId
                 10, // limit
                 0 // offset
         );
 
-        System.out.println(result.size());
+        System.out.println(result.get(3).getRoom());
     }
 
     @Override
@@ -238,11 +241,19 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
                 u.setLast_name(rs.getString("UserLastName"));
                 u.setAvatar(rs.getString("UserAvatar"));
 
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+
+                Room ro = new Room();
+                ro.setId(rs.getString("room_id"));
+
                 Status s = new Status();
                 s.setId(rs.getInt("status_id"));
 
                 r.setOwner(u);
                 r.setStatus(s);
+                r.setHomestay(h);
+                r.setRoom(ro);
 
                 reviews.add(r);
             }
@@ -345,11 +356,19 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
                 u.setLast_name(rs.getString("UserLastName"));
                 u.setAvatar(rs.getString("UserAvatar"));
 
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+
+                Room ro = new Room();
+                ro.setId(rs.getString("room_id"));
+
                 Status s = new Status();
                 s.setId(rs.getInt("status_id"));
 
                 r.setOwner(u);
                 r.setStatus(s);
+                r.setHomestay(h);
+                r.setRoom(ro);
 
                 reviews.add(r);
             }
