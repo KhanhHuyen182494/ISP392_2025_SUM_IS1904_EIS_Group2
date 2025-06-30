@@ -69,6 +69,10 @@ public class UserManagementController extends BaseAuthorization {
             joinDate = Timestamp.valueOf(localDateTime);
         }
 
+        int countBanUser = uDao.countUserByStatusId(4);
+        int countActive = uDao.countUserByStatusId(1);
+        int countNew = uDao.countNewUsers();
+        int countTotalUser = uDao.countAllUsers();
         List<Role> rList = roleDao.getAllRole();
         List<Status> sList = sDao.getAllStatusByCategory("user");
         List<User> uList = uDao.getAllUserPaging(keyword, statusId, roleId, joinDate, offset, LIMIT);
@@ -76,6 +80,10 @@ public class UserManagementController extends BaseAuthorization {
         int totalPages = (int) Math.ceil((double) totalCount / LIMIT);
 
         request.setAttribute("totalCount", totalCount);
+        request.setAttribute("countBanUser", countBanUser);
+        request.setAttribute("countActive", countActive);
+        request.setAttribute("countNew", countNew);
+        request.setAttribute("countTotalUser", countTotalUser);
         request.setAttribute("userList", uList);
         request.setAttribute("sList", sList);
         request.setAttribute("rList", rList);

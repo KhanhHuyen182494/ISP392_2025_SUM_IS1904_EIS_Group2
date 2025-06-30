@@ -758,4 +758,94 @@ public class UserDAO extends BaseDao implements IUserDAO {
         return uList;
     }
 
+    @Override
+    public int countUserByStatusId(int statusId) {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) FROM fuhousefinder_homestay.user WHERE status_id = ?;
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, statusId);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching user count by statusId: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public int countNewUsers() {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) 
+                 FROM fuhousefinder_homestay.user 
+                 WHERE DATE(created_at) = CURDATE();
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching user count by statusId: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public int countAllUsers() {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) FROM fuhousefinder_homestay.user;
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching user count by statusId: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return count;
+    }
+
 }

@@ -105,11 +105,11 @@
                                 <i class="fas fa-users w-5"></i>
                                 <span>All Users</span>
                             </a>
-                            <a href="${pageContext.request.contextPath}/manage/user/permissions" 
+<!--                            <a href="${pageContext.request.contextPath}/manage/user/permissions" 
                                class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
                                 <i class="fas fa-shield-alt w-5"></i>
                                 <span>Permissions</span>
-                            </a>
+                            </a>-->
                         </div>
                     </div>
 
@@ -235,7 +235,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-blue-600">1,234</p>
+                                <p class="text-3xl font-bold text-blue-600">${countTotalUser}</p>
                                 <p class="text-gray-600 text-sm font-medium">Total Users</p>
                             </div>
                             <div class="bg-blue-100 p-3 rounded-full">
@@ -249,7 +249,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-green-600">856</p>
+                                <p class="text-3xl font-bold text-green-600">${countActive}</p>
                                 <p class="text-gray-600 text-sm font-medium">Active Users</p>
                             </div>
                             <div class="bg-green-100 p-3 rounded-full">
@@ -263,7 +263,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-yellow-600">67</p>
+                                <p class="text-3xl font-bold text-yellow-600">${countNew}</p>
                                 <p class="text-gray-600 text-sm font-medium">New Today</p>
                             </div>
                             <div class="bg-yellow-100 p-3 rounded-full">
@@ -277,7 +277,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-red-600">23</p>
+                                <p class="text-3xl font-bold text-red-600">${countBanUser}</p>
                                 <p class="text-gray-600 text-sm font-medium">Banned Users</p>
                             </div>
                             <div class="bg-red-100 p-3 rounded-full">

@@ -30,6 +30,12 @@ public interface IUserDAO extends IBaseUUID<User> {
     public User getByUidForProfile(String uid);
     
     public List<User> getAllUserPaging(String keyword, Integer statusId, Integer roleId, Timestamp joinDate, int page, int pageSize);
+    
+    public int countUserByStatusId(int statusId);
+    
+    public int countNewUsers();
+    
+    public int countAllUsers();
 
     //Add
     //Delete
