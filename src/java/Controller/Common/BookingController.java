@@ -58,7 +58,7 @@ public class BookingController extends BaseAuthorization {
     }
 
     private void doGetBookingContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        
+        request.getRequestDispatcher("/FE/Common/BookingContract.jsp").forward(request, response);
     }
 
     private void doPostBookingConfirm(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {

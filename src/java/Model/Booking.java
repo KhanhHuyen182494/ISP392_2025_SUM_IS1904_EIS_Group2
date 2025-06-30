@@ -18,6 +18,9 @@ public class Booking {
     private Date checkout;
     private double total_price;
     private double deposit;
+    private String note;
+    private Double service_fee;
+    private Double cleaning_fee;
     private Timestamp created_at;
     private Timestamp updated_at;
 
@@ -117,9 +120,33 @@ public class Booking {
         this.status = status;
     }
 
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public Double getService_fee() {
+        return service_fee;
+    }
+
+    public void setService_fee(Double service_fee) {
+        this.service_fee = service_fee;
+    }
+
+    public Double getCleaning_fee() {
+        return cleaning_fee;
+    }
+
+    public void setCleaning_fee(Double cleaning_fee) {
+        this.cleaning_fee = cleaning_fee;
+    }
+
     @Override
     public String toString() {
-        return "Booking{" + "id=" + id + ", check_in=" + check_in + ", checkout=" + checkout + ", total_price=" + total_price + ", deposit=" + deposit + ", created_at=" + created_at + ", updated_at=" + updated_at + ", tenant=" + tenant + ", homestay=" + homestay + ", room=" + room + ", status=" + status + '}';
+        return "Booking{" + "id=" + id + ", check_in=" + check_in + ", checkout=" + checkout + ", total_price=" + total_price + ", deposit=" + deposit + ", note=" + note + ", service_fee=" + service_fee + ", cleaning_fee=" + cleaning_fee + ", created_at=" + created_at + ", updated_at=" + updated_at + ", tenant=" + tenant + ", homestay=" + homestay + ", room=" + room + ", status=" + status + '}';
     }
 
 }
