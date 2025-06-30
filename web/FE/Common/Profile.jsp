@@ -208,6 +208,13 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                <c:if test="${sessionScope.user.role.id == 1}">
+                                    <a href="${pageContext.request.contextPath}/manage/user">
+                                        <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                            Admin Panel
+                                        </button>
+                                    </a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/logout">
                                     <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                         Logout
@@ -329,6 +336,12 @@
                                 </button>
                             </a>
                         </c:if>
+                        <a href="${pageContext.request.contextPath}/review">
+                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-star"></i>
+                                View Your's Reviews
+                            </button>
+                        </a>
                         <a href="${pageContext.request.contextPath}/profile-edit">
                             <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-edit"></i>

@@ -471,4 +471,39 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
         return hList;
     }
 
+    @Override
+    public List<String> getListIdByOwner(User u) {
+        List<String> hIdList = new ArrayList<>();
+        String sql = """
+                     SELECT 
+                        id
+                     FROM homestay
+                     WHERE owner_id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, u.getId());
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                hIdList.add(rs.getString("id"));
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return hIdList;
+    }
+
 }

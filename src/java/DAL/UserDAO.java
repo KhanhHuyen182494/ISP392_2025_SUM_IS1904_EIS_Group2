@@ -16,6 +16,7 @@ import java.util.List;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  *
@@ -27,31 +28,8 @@ public class UserDAO extends BaseDao implements IUserDAO {
 
     public static void main(String[] args) {
         UserDAO udao = new UserDAO();
-//        System.out.println(udao.isValidEmail("huyen@gmail.com"));
-//        System.out.println(udao.isValidPhoneNumber("091203901923"));
-//
-//
-//        User u = new User();
-//        Role r = new Role();
-//        Status s = new Status();
-//        r.setId(5);
-//        s.setId(1);
-//        
-//        Date d = Date.valueOf("2004-01-22");
-//        
-//        u.setFirst_name("Khanh");
-//        u.setLast_name("Huyen");
-//        u.setBirthdate(d);
-//        u.setPassword("1");
-//        u.setPhone("123123");
-//        u.setEmail("huyen@gmail.com");
-//        u.setGender("male");
-//        u.setRole(r);
-//        u.setStatus(s);
-//        
-//        System.out.println(udao.add(u));
 
-        System.out.println(udao.getByUidForProfile("U-35334b61da31443da5f850b5856fb4bf"));
+        System.out.println(udao.getAllUserPaging("", null, null, null, 0, 10));
     }
 
     @Override
@@ -677,6 +655,197 @@ public class UserDAO extends BaseDao implements IUserDAO {
                 logger.error("" + ex);
             }
         }
+    }
+
+    @Override
+    public List<User> getAllUserPaging(String keyword, Integer statusId, Integer roleId, Timestamp joinDate, int offset, int pageSize) {
+        List<User> uList = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT 
+            u.*, s.name AS statusName, r.name AS roleName
+        FROM
+            fuhousefinder_homestay.user u
+            JOIN status s ON u.status_id = s.id
+            JOIN role r ON u.role_id = r.id
+        WHERE 1=1
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append(" AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ? OR u.email LIKE ? OR u.phone LIKE ?) ");
+            String like = "%" + keyword + "%";
+            for (int i = 0; i < 5; i++) {
+                params.add(like);
+            }
+        }
+
+        if (statusId != null) {
+            sql.append(" AND u.status_id = ? ");
+            params.add(statusId);
+        }
+
+        if (roleId != null) {
+            sql.append(" AND u.role_id = ? ");
+            params.add(roleId);
+        }
+
+        if (joinDate != null) {
+            sql.append(" AND DATE(u.created_at) = DATE(?) ");
+            params.add(joinDate);
+        }
+
+        sql.append(" ORDER BY u.created_at DESC ");
+        sql.append(" LIMIT ? OFFSET ? ");
+        params.add(pageSize);
+        params.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            // Set parameters dynamically
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getString("id"));
+                u.setFirst_name(rs.getString("first_name"));
+                u.setLast_name(rs.getString("last_name"));
+                u.setUsername(rs.getString("username"));
+                u.setBirthdate(rs.getDate("birthdate"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setDescription(rs.getString("description"));
+                u.setPhone(rs.getString("phone"));
+                u.setCreated_at(rs.getTimestamp("created_at"));
+                u.setUpdated_at(rs.getTimestamp("updated_at"));
+                u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
+                u.setIs_verified(rs.getBoolean("is_verified"));
+                u.setLast_verification_sent(rs.getTimestamp("last_verification_sent"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCover(rs.getString("cover"));
+
+                Role r = new Role();
+                Status s = new Status();
+                Address add = new Address();
+                r.setId(rs.getInt("role_id"));
+                s.setId(rs.getInt("status_id"));
+                add.setId(rs.getInt("address_id"));
+
+                u.setRole(r);
+                u.setStatus(s);
+                u.setAddress(add);
+
+                uList.add(u);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching paginated user list: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return uList;
+    }
+
+    @Override
+    public int countUserByStatusId(int statusId) {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) FROM fuhousefinder_homestay.user WHERE status_id = ?;
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, statusId);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching user count by statusId: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public int countNewUsers() {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) 
+                 FROM fuhousefinder_homestay.user 
+                 WHERE DATE(created_at) = CURDATE();
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching user count by statusId: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public int countAllUsers() {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) FROM fuhousefinder_homestay.user;
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching user count by statusId: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return count;
     }
 
 }

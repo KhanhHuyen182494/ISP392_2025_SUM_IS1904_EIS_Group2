@@ -77,6 +77,13 @@
                         </c:if>
                         <c:if test="${not empty sessionScope.user.id}">
                             <div class="user-info flex items-center gap-3">
+                                <c:if test="${sessionScope.user.role.id == 1}">
+                                    <a href="${pageContext.request.contextPath}/manage/user">
+                                        <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                            Admin Panel
+                                        </button>
+                                    </a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/logout">
                                     <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                         Logout
@@ -772,29 +779,29 @@
                                 // Optionally reset form or redirect
                                 setTimeout(() => {
                                     window.location.href = '${pageContext.request.contextPath}/owner-house?uid=${sessionScope.user.id}';
-                                }, 2000);
-                            } else {
-                                showToast(response.message, 'error');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            Swal.close();
-                            showToast(xhr.responseText || 'Something went wrong.', 'error');
-                        }
-                    });
-                });
+                                                            }, 2000);
+                                                        } else {
+                                                            showToast(response.message, 'error');
+                                                        }
+                                                    },
+                                                    error: function (xhr, status, error) {
+                                                        Swal.close();
+                                                        showToast(xhr.responseText || 'Something went wrong.', 'error');
+                                                    }
+                                                });
+                                            });
 
-                function showToast(message, type = 'success') {
-                    Toastify({
-                        text: message,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
-                        stopOnFocus: true
-                    }).showToast();
-                }
-            });
+                                            function showToast(message, type = 'success') {
+                                                Toastify({
+                                                    text: message,
+                                                    duration: 3000,
+                                                    gravity: "top",
+                                                    position: "right",
+                                                    backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+                                                    stopOnFocus: true
+                                                }).showToast();
+                                            }
+                                        });
         </script>
     </body>
 </html>
