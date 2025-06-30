@@ -269,6 +269,16 @@
                                         <i class="fas fa-map-marker-alt mr-2"></i>
                                         <span class="text-sm">${house.address.detail} ${house.address.ward}, ${house.address.district}, ${house.address.province}, ${house.address.country}</span>
                                     </div>
+                                    
+                                    <div class="flex items-center text-gray-600 mb-2">
+                                        <i class="fas fa-bed mr-2"></i>
+                                        <c:if test="${house.is_whole_house == true}">
+                                            <span class="text-sm">Whole house</span>
+                                        </c:if>
+                                        <c:if test="${house.is_whole_house == false}">
+                                            <span class="text-sm">Rooms</span>
+                                        </c:if>
+                                    </div>
 
                                     <div class="flex items-center justify-between mb-3">
                                         <c:if test="${house.is_whole_house == true}">
