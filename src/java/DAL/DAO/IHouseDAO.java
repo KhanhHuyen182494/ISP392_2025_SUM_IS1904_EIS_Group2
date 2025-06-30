@@ -29,6 +29,8 @@ public interface IHouseDAO extends IBaseUUID<House> {
             int offset,
             int limit);
 
+    public List<String> getListIdByOwner(User u);
+    
     //Add
     //Delete
     //Update

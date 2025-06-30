@@ -5,14 +5,34 @@
 package DAL.DAO;
 
 import Model.Review;
+import Model.User;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
  *
  * @author Tam
  */
-public interface IReviewDAO extends IBaseUUID<Review>{
-    
+public interface IReviewDAO extends IBaseUUID<Review> {
+
     public List<Review> getReviewsByHouseId(String homestayId, int limit, int offset);
-    
+
+    public List<Review> getReviewsForHouseOwnerPaging(List<String> homestayIds,
+            Integer star,
+            String contentKeyword,
+            Timestamp createdFrom,
+            String roomId,
+            int limit,
+            int offset);
+
+    public List<Review> getReviewsForTenantPaging(User owner,
+            Integer star,
+            String contentKeyword,
+            Timestamp createdFrom,
+            String roomId,
+            int limit,
+            int offset);
+
+    public List<Review> getAllReviewsPaging();
+
 }
