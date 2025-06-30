@@ -86,15 +86,15 @@
             <aside class="bg-white shadow-lg w-64 min-h-screen sticky top-20 z-40">
                 <nav class="p-6">
                     <h2 class="text-lg font-semibold text-gray-800 mb-6">Admin Panel</h2>
-                    
+
                     <!-- Dashboard -->
-<!--                    <div class="mb-6">
-                        <a href="${pageContext.request.contextPath}/admin/dashboard" 
-                           class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                            <i class="fas fa-tachometer-alt w-5"></i>
-                            <span class="font-medium">Dashboard</span>
-                        </a>
-                    </div>-->
+                    <!--                    <div class="mb-6">
+                                            <a href="${pageContext.request.contextPath}/admin/dashboard" 
+                                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                <i class="fas fa-tachometer-alt w-5"></i>
+                                                <span class="font-medium">Dashboard</span>
+                                            </a>
+                                        </div>-->
 
                     <!-- User Management -->
                     <div class="mb-6">
@@ -114,109 +114,109 @@
                     </div>
 
                     <!-- Homestay Management -->
-<!--                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Homestay Management</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/homestay" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-home w-5"></i>
-                                <span>All Homestays</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/homestay/pending" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-clock w-5"></i>
-                                <span>Pending Approval</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/homestay/categories" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-tags w-5"></i>
-                                <span>Categories</span>
-                            </a>
-                        </div>
-                    </div>-->
+                    <!--                    <div class="mb-6">
+                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Homestay Management</h3>
+                                            <div class="space-y-2">
+                                                <a href="${pageContext.request.contextPath}/manage/homestay" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-home w-5"></i>
+                                                    <span>All Homestays</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/homestay/pending" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-clock w-5"></i>
+                                                    <span>Pending Approval</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/homestay/categories" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-tags w-5"></i>
+                                                    <span>Categories</span>
+                                                </a>
+                                            </div>
+                                        </div>-->
 
                     <!-- Booking Management -->
-<!--                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Booking Management</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/booking" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-calendar-check w-5"></i>
-                                <span>All Bookings</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/booking/disputes" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-exclamation-triangle w-5"></i>
-                                <span>Disputes</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/booking/refunds" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-undo w-5"></i>
-                                <span>Refunds</span>
-                            </a>
-                        </div>
-                    </div>-->
+                    <!--                    <div class="mb-6">
+                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Booking Management</h3>
+                                            <div class="space-y-2">
+                                                <a href="${pageContext.request.contextPath}/manage/booking" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-calendar-check w-5"></i>
+                                                    <span>All Bookings</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/booking/disputes" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-exclamation-triangle w-5"></i>
+                                                    <span>Disputes</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/booking/refunds" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-undo w-5"></i>
+                                                    <span>Refunds</span>
+                                                </a>
+                                            </div>
+                                        </div>-->
 
                     <!-- Financial Management -->
-<!--                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Financial</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/payments" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-credit-card w-5"></i>
-                                <span>Payments</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/commissions" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-percentage w-5"></i>
-                                <span>Commissions</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/reports" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-chart-bar w-5"></i>
-                                <span>Financial Reports</span>
-                            </a>
-                        </div>
-                    </div>-->
+                    <!--                    <div class="mb-6">
+                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Financial</h3>
+                                            <div class="space-y-2">
+                                                <a href="${pageContext.request.contextPath}/manage/payments" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-credit-card w-5"></i>
+                                                    <span>Payments</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/commissions" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-percentage w-5"></i>
+                                                    <span>Commissions</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/reports" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-chart-bar w-5"></i>
+                                                    <span>Financial Reports</span>
+                                                </a>
+                                            </div>
+                                        </div>-->
 
                     <!-- Content Management -->
-<!--                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/reviews" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-star w-5"></i>
-                                <span>Reviews</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/messages" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-comments w-5"></i>
-                                <span>Messages</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/notifications" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-bell w-5"></i>
-                                <span>Notifications</span>
-                            </a>
-                        </div>
-                    </div>-->
+                    <!--                    <div class="mb-6">
+                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
+                                            <div class="space-y-2">
+                                                <a href="${pageContext.request.contextPath}/manage/reviews" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-star w-5"></i>
+                                                    <span>Reviews</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/messages" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-comments w-5"></i>
+                                                    <span>Messages</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/notifications" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-bell w-5"></i>
+                                                    <span>Notifications</span>
+                                                </a>
+                                            </div>
+                                        </div>-->
 
                     <!-- System Settings -->
-<!--                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">System</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/settings" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-cog w-5"></i>
-                                <span>Settings</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/logs" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-file-alt w-5"></i>
-                                <span>System Logs</span>
-                            </a>
-                        </div>
-                    </div>-->
+                    <!--                    <div class="mb-6">
+                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">System</h3>
+                                            <div class="space-y-2">
+                                                <a href="${pageContext.request.contextPath}/manage/settings" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-cog w-5"></i>
+                                                    <span>Settings</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/logs" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-file-alt w-5"></i>
+                                                    <span>System Logs</span>
+                                                </a>
+                                            </div>
+                                        </div>-->
                 </nav>
             </aside>
 
@@ -460,33 +460,33 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-            // Simple interactivity for demo purposes
-            document.addEventListener('DOMContentLoaded', function () {
-                // Handle checkbox selections
-                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                        if (this.checked) {
-                            this.closest('tr')?.classList.add('bg-blue-50');
-                        } else {
-                            this.closest('tr')?.classList.remove('bg-blue-50');
-                        }
-                    });
-                });
+                                    // Simple interactivity for demo purposes
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        // Handle checkbox selections
+                                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                                        checkboxes.forEach(checkbox => {
+                                            checkbox.addEventListener('change', function () {
+                                                if (this.checked) {
+                                                    this.closest('tr')?.classList.add('bg-blue-50');
+                                                } else {
+                                                    this.closest('tr')?.classList.remove('bg-blue-50');
+                                                }
+                                            });
+                                        });
 
-                // Handle action buttons
-                const actionButtons = document.querySelectorAll('button');
-                actionButtons.forEach(button => {
-                    button.addEventListener('click', function (e) {
-                        if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
-                            e.preventDefault();
-                            const action = this.textContent.trim();
-                            const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
-                            alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
-                        }
-                    });
-                });
-            });
+                                        // Handle action buttons
+                                        const actionButtons = document.querySelectorAll('button');
+                                        actionButtons.forEach(button => {
+                                            button.addEventListener('click', function (e) {
+                                                if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
+                                                    e.preventDefault();
+                                                    const action = this.textContent.trim();
+                                                    const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
+                                                    alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
+                                                }
+                                            });
+                                        });
+                                    });
         </script>
     </body>
 </html>
