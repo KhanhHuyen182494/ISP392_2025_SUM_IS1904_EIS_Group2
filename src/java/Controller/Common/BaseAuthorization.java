@@ -30,10 +30,12 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import DAL.DAO.IFeatureDAO;
 import DAL.DAO.IPostTypeDAO;
+import DAL.DAO.IRoleDAO;
 import DAL.DAO.IRoomDAO;
 import DAL.DAO.IRoomTypeDAO;
 import DAL.DAO.IStatusDAO;
 import DAL.PostTypeDAO;
+import DAL.RoleDAO;
 import DAL.RoomDAO;
 import DAL.RoomTypeDAO;
 import DAL.StatusDAO;
@@ -58,6 +60,7 @@ public abstract class BaseAuthorization extends HttpServlet {
     public IPostTypeDAO ptDao;
     public IRoomDAO roomDao;
     public IRoomTypeDAO rtDao;
+    public IRoleDAO roleDao;
     public Logging log = new Logging();
     public Gson gson;
 
@@ -77,6 +80,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         ptDao = new PostTypeDAO();
         roomDao = new RoomDAO();
         rtDao = new RoomTypeDAO();
+        roleDao = new RoleDAO();
     }
 
     private User getUser(HttpServletRequest request) {

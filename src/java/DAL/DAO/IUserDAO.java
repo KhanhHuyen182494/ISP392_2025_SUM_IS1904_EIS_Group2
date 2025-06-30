@@ -7,6 +7,8 @@ package DAL.DAO;
 import DTO.UserDTO;
 import Model.User;
 import java.sql.Date;
+import java.util.List;
+import java.sql.Timestamp;
 
 /**
  *
@@ -26,6 +28,8 @@ public interface IUserDAO extends IBaseUUID<User> {
     public User authenticateUser(String contact, String password);
 
     public User getByUidForProfile(String uid);
+    
+    public List<User> getAllUserPaging(String keyword, Integer statusId, Integer roleId, Timestamp joinDate, int page, int pageSize);
 
     //Add
     //Delete
