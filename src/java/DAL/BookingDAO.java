@@ -14,6 +14,8 @@ import Model.User;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -259,6 +261,63 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         }
 
         return b;
+    }
+
+    @Override
+    public List<Booking> getListBookingPaging(User u, int limit, int offset) {
+        List<Booking> bList = new ArrayList<>();
+        String sql = """
+                    SELECT * FROM `fuhousefinder_homestay`.`booking`
+                    WHERE tenant_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT ? OFFSET ?
+                    """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setString(1, u.getId());
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Booking b = new Booking();
+
+                b.setId(rs.getString("id"));
+                b.setTenant(u);
+
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+                b.setHomestay(h);
+
+                Room r = new Room();
+                r.setId(rs.getString("room_id"));
+                b.setRoom(r);
+
+                b.setCheck_in(rs.getDate("check_in"));
+                b.setCheckout(rs.getDate("check_out"));
+                b.setTotal_price(rs.getDouble("total_price"));
+                b.setDeposit(rs.getDouble("deposit"));
+                b.setService_fee(rs.getDouble("service_fee"));
+                b.setCleaning_fee(rs.getDouble("cleaning_fee"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                b.setStatus(s);
+
+                b.setCreated_at(rs.getTimestamp("created_at"));
+                b.setNote(rs.getString("note"));
+
+                bList.add(b);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching paginated bookings: " + e);
+        }
+
+        return bList;
     }
 
 }

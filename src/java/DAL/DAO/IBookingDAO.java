@@ -5,7 +5,9 @@
 package DAL.DAO;
 
 import Model.Booking;
+import Model.User;
 import java.sql.Date;
+import java.util.List;
 
 /**
  *
@@ -29,4 +31,6 @@ public interface IBookingDAO {
     public boolean isRoomAvailable(String roomId, Date checkIn, Date checkOut);
     
     public boolean isHouseAvailable(String houseId, Date checkIn, Date checkOut);
+    
+    public List<Booking> getListBookingPaging(User u, int limit, int offset);
 }
