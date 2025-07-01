@@ -209,7 +209,7 @@
 
                     <c:if test="${b.room.id != null}">
                         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Property Information</h2>
+                            <h2 class="text-xl font-semibold text-gray-900 mb-4">Room Information</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <div class="aspect-video rounded-lg overflow-hidden mb-4">
@@ -233,6 +233,10 @@
                                         <div class="flex items-center">
                                             <i class="fas fa-star text-yellow-500 mr-2"></i>
                                             <span>${b.room.star} stars</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-users text-blue-500 mr-2"></i>
+                                            <span>${b.room.max_guests} guest</span>
                                         </div>
                                     </div>
                                 </div>
@@ -271,7 +275,12 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Duration</label>
                                     <div class="flex items-center text-gray-900">
                                         <i class="fas fa-clock text-blue-500 mr-2"></i>
-                                        <span class="font-medium">${(b.total_price - b.service_fee - b.cleaning_fee) / b.homestay.price_per_night} nights</span>
+                                        <c:if test="${b.homestay.is_whole_house == true}">
+                                            <span class="font-medium">${(b.total_price - b.service_fee - b.cleaning_fee) / b.homestay.price_per_night} nights</span>
+                                        </c:if>
+                                        <c:if test="${b.homestay.is_whole_house == false}">
+                                            <span class="font-medium">${(b.total_price - b.service_fee - b.cleaning_fee) / b.room.price_per_night} nights</span>
+                                        </c:if>
                                     </div>
                                 </div>
                                 <div>
@@ -285,8 +294,8 @@
                                             <c:otherwise>
                                                 <i class="fas fa-bed text-purple-500 mr-2"></i>
                                                 <span class="font-medium">Room Booking</span>
-                                                <c:if test="${not empty bookingData.selectedRoom}">
-                                                    <span class="text-gray-600 ml-2">(${bookingData.selectedRoom.name})</span>
+                                                <c:if test="${not empty b.room.id}">
+                                                    <span class="text-gray-600 ml-2">(${b.room.name})</span>
                                                 </c:if>
                                             </c:otherwise>
                                         </c:choose>
@@ -295,14 +304,82 @@
                             </div>
                         </div>
 
-                        <c:if test="${not empty bookingData.specialRequests}">
+                        <c:if test="${not empty b.note}">
                             <div class="mt-4 pt-4 border-t">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Special Requests</label>
                                 <div class="bg-gray-50 rounded-lg p-3 text-sm text-gray-700">
-                                    ${bookingData.specialRequests}
+                                    ${b.note}
                                 </div>
                             </div>
                         </c:if>
+                    </div>
+
+                    <!-- Representative Information (Optional) -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Representative Information (Optional)</h2>
+                        <p class="text-sm text-gray-600 mb-4">If someone else will be checking in on your behalf, please provide their information below.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" 
+                                           name="representativeName" 
+                                           id="representativeName"
+                                           placeholder="Enter representative's full name"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                    <input type="tel" 
+                                           name="representativePhone" 
+                                           id="representativePhone"
+                                           placeholder="Enter phone number"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <input type="email" 
+                                           name="representativeEmail" 
+                                           id="representativeEmail"
+                                           placeholder="Enter email address"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Relationship to Guest</label>
+                                    <select name="representativeRelationship" 
+                                            id="representativeRelationship"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Select relationship</option>
+                                        <option value="family">Family Member</option>
+                                        <option value="friend">Friend</option>
+                                        <option value="colleague">Colleague</option>
+                                        <option value="assistant">Personal Assistant</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                            <textarea name="representativeNotes" 
+                                      id="representativeNotes"
+                                      rows="3" 
+                                      placeholder="Any additional information about the representative or special instructions..."
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-yellow-600 mt-0.5 mr-2"></i>
+                                <div class="text-sm text-yellow-800">
+                                    <strong>Important:</strong> The representative must bring a valid ID and may be required to provide authorization from the primary guest during check-in.
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Terms and Conditions -->
@@ -390,15 +467,6 @@
                                 I consent to the collection and processing of my personal data as described in the <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>.
                             </label>
                         </div>
-
-                        <div class="flex items-start space-x-3 mt-4">
-                            <input type="checkbox" 
-                                   id="agreeMarketing" 
-                                   class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <label for="agreeMarketing" class="text-sm text-gray-700">
-                                <span class="font-medium">(Optional)</span> I would like to receive promotional emails and updates about special offers.
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -425,7 +493,12 @@
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">
-                                    ₫<fmt:formatNumber value="${b.homestay.price_per_night}" pattern="#,###" /> × ${(b.total_price - b.service_fee - b.cleaning_fee) / b.homestay.price_per_night} nights
+                                    <c:if test="${b.homestay.is_whole_house == true}">
+                                        ₫<fmt:formatNumber value="${b.homestay.price_per_night}" pattern="#,###" /> × ${(b.total_price - b.service_fee - b.cleaning_fee) / b.homestay.price_per_night} nights
+                                    </c:if>
+                                    <c:if test="${b.homestay.is_whole_house == false}">
+                                        ₫<fmt:formatNumber value="${b.room.price_per_night}" pattern="#,###" /> × ${(b.total_price - b.service_fee - b.cleaning_fee) / b.room.price_per_night} nights
+                                    </c:if>
                                 </span>
                                 <span>₫<fmt:formatNumber value="${b.total_price - b.service_fee - b.cleaning_fee}" pattern="#,###" /></span>
                             </div>
@@ -482,7 +555,7 @@
 
                         <!-- Action Buttons -->
                         <div class="space-y-3">
-                            <form action="${pageContext.request.contextPath}/booking/process-payment" method="POST">
+                            <form action="${pageContext.request.contextPath}/booking/contract/get" method="GET">
                                 <!-- Include all booking data -->
                                 <input type="hidden" name="homestayId" value="${bookingData.homestay.id}">
                                 <input type="hidden" name="bookingType" value="${bookingData.bookingType}">
@@ -493,15 +566,21 @@
                                 <input type="hidden" name="checkOut" value="<fmt:formatDate value='${bookingData.checkOutDate}' pattern='yyyy-MM-dd' />">
                                 <input type="hidden" name="specialRequests" value="${bookingData.specialRequests}">
 
+                                <input type="hidden" name="representativeName" id="hiddenRepresentativeName">
+                                <input type="hidden" name="representativePhone" id="hiddenRepresentativePhone">
+                                <input type="hidden" name="representativeEmail" id="hiddenRepresentativeEmail">
+                                <input type="hidden" name="representativeRelationship" id="hiddenRepresentativeRelationship">
+                                <input type="hidden" name="representativeNotes" id="hiddenRepresentativeNotes">
+
                                 <button type="submit" 
                                         id="proceedPaymentBtn"
                                         disabled
                                         class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                                    Proceed to Payment
+                                    Confirm
                                 </button>
                             </form>
 
-                            <a href="${pageContext.request.contextPath}/booking?hid=${bookingData.homestay.id}" 
+                            <a href="${pageContext.request.contextPath}/booking/history" 
                                class="w-full block text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-colors">
                                 Back to Booking
                             </a>
@@ -509,7 +588,7 @@
 
                         <div class="text-center text-sm text-gray-600 mt-4">
                             <i class="fas fa-lock mr-1"></i>
-                            Your payment information is secure and encrypted
+                            Your payment information is secure
                         </div>
                     </div>
                 </div>
@@ -521,7 +600,6 @@
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
             $(document).ready(function () {
-                // Handle agreement checkboxes
                 function checkAgreements() {
                     const termsChecked = $('#agreeTerms').is(':checked');
                     const privacyChecked = $('#agreePrivacy').is(':checked');
@@ -535,17 +613,13 @@
 
                 $('#agreeTerms, #agreePrivacy').on('change', checkAgreements);
 
-                // Handle payment method selection
                 $('input[name="paymentMethod"]').on('change', function () {
                     const selectedMethod = $(this).val();
 
-                    // Remove active class from all payment options
                     $('input[name="paymentMethod"]').closest('label').removeClass('border-blue-500 bg-blue-50');
 
-                    // Add active class to selected option
                     $(this).closest('label').addClass('border-blue-500 bg-blue-50');
 
-                    // Store selected payment method for form submission
                     $('<input>').attr({
                         type: 'hidden',
                         name: 'paymentMethod',
@@ -555,7 +629,6 @@
                     console.log('Selected payment method:', selectedMethod);
                 });
 
-                // Form submission validation
                 $('form').on('submit', function (e) {
                     const termsChecked = $('#agreeTerms').is(':checked');
                     const privacyChecked = $('#agreePrivacy').is(':checked');
@@ -563,7 +636,6 @@
 
                     if (!termsChecked || !privacyChecked) {
                         e.preventDefault();
-
                         Swal.fire({
                             icon: 'warning',
                             title: 'Agreement Required',
@@ -575,7 +647,6 @@
 
                     if (!paymentMethodSelected) {
                         e.preventDefault();
-
                         Swal.fire({
                             icon: 'warning',
                             title: 'Payment Method Required',
@@ -585,14 +656,19 @@
                         return false;
                     }
 
-                    // Show loading state
+                    if (!validateRepresentativeInfo()) {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    updateRepresentativeData();
+
                     $('#proceedPaymentBtn').html('<i class="fas fa-spinner fa-spin mr-2"></i>Processing...').prop('disabled', true);
 
-                    // Show confirmation dialog
                     Swal.fire({
                         icon: 'info',
                         title: 'Processing Payment',
-                        text: 'Redirecting to payment gateway...',
+                        text: 'Redirecting to contract preview...',
                         timer: 2000,
                         timerProgressBar: true,
                         showConfirmButton: false,
@@ -600,13 +676,11 @@
                     });
                 });
 
-                // Smooth scroll for terms and conditions
                 $('.terms-scroll').on('scroll', function () {
                     const scrollTop = $(this).scrollTop();
                     const scrollHeight = $(this)[0].scrollHeight - $(this).height();
                     const scrollPercent = (scrollTop / scrollHeight) * 100;
 
-                    // You can add a progress indicator here if needed
                     console.log('Terms scroll progress:', Math.round(scrollPercent) + '%');
                 });
 
@@ -615,8 +689,12 @@
                     const formData = {
                         agreeTerms: $('#agreeTerms').is(':checked'),
                         agreePrivacy: $('#agreePrivacy').is(':checked'),
-                        agreeMarketing: $('#agreeMarketing').is(':checked'),
-                        paymentMethod: $('input[name="paymentMethod"]:checked').val()
+                        paymentMethod: $('input[name="paymentMethod"]:checked').val(),
+                        representativeName: $('#representativeName').val(),
+                        representativePhone: $('#representativePhone').val(),
+                        representativeEmail: $('#representativeEmail').val(),
+                        representativeRelationship: $('#representativeRelationship').val(),
+                        representativeNotes: $('#representativeNotes').val()
                     };
 
                     try {
@@ -635,11 +713,17 @@
 
                             $('#agreeTerms').prop('checked', formData.agreeTerms);
                             $('#agreePrivacy').prop('checked', formData.agreePrivacy);
-                            $('#agreeMarketing').prop('checked', formData.agreeMarketing);
 
                             if (formData.paymentMethod) {
                                 $(`input[name="paymentMethod"][value="${formData.paymentMethod}"]`).prop('checked', true).trigger('change');
                             }
+
+                            // Restore representative information
+                            $('#representativeName').val(formData.representativeName || '');
+                            $('#representativePhone').val(formData.representativePhone || '');
+                            $('#representativeEmail').val(formData.representativeEmail || '');
+                            $('#representativeRelationship').val(formData.representativeRelationship || '');
+                            $('#representativeNotes').val(formData.representativeNotes || '');
 
                             checkAgreements();
                         }
@@ -648,14 +732,12 @@
                     }
                 }
 
-                // Save form data on checkbox/radio changes
                 $('input[type="checkbox"], input[type="radio"]').on('change', saveFormData);
 
-                // Initialize
                 restoreFormData();
 
                 // Handle back button confirmation
-                $('a[href*="booking?hid="]').on('click', function (e) {
+                $('a[href*="${pageContext.request.contextPath}/booking/history"]').on('click', function (e) {
                     const hasChanges = $('#agreeTerms').is(':checked') || $('#agreePrivacy').is(':checked') || $('#agreeMarketing').is(':checked');
 
                     if (hasChanges) {
@@ -671,7 +753,6 @@
                             confirmButtonColor: '#f97316'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Clear saved data and navigate
                                 try {
                                     sessionStorage.removeItem('bookingFormData');
                                 } catch (e) {
@@ -690,23 +771,6 @@
                         label.addClass('text-blue-700');
                     } else {
                         label.removeClass('text-blue-700');
-                    }
-                });
-
-                // Add keyboard navigation support
-                $(document).on('keydown', function (e) {
-                    // Press 'T' to toggle terms agreement
-                    if (e.key === 't' || e.key === 'T') {
-                        if (!$('input').is(':focus')) {
-                            $('#agreeTerms').click();
-                        }
-                    }
-
-                    // Press 'P' to toggle privacy agreement
-                    if (e.key === 'p' || e.key === 'P') {
-                        if (!$('input').is(':focus')) {
-                            $('#agreePrivacy').click();
-                        }
                     }
                 });
 
@@ -745,6 +809,171 @@
                         e.returnValue = 'Payment is being processed. Are you sure you want to leave?';
                     }
                 });
+
+                function updateRepresentativeData() {
+                    $('#hiddenRepresentativeName').val($('#representativeName').val());
+                    $('#hiddenRepresentativePhone').val($('#representativePhone').val());
+                    $('#hiddenRepresentativeEmail').val($('#representativeEmail').val());
+                    $('#hiddenRepresentativeRelationship').val($('#representativeRelationship').val());
+                    $('#hiddenRepresentativeNotes').val($('#representativeNotes').val());
+                }
+
+                $('#representativeName, #representativePhone, #representativeEmail, #representativeRelationship, #representativeNotes').on('input change', updateRepresentativeData);
+
+                function validateRepresentativeInfo() {
+                    const name = $('#representativeName').val().trim();
+                    const phone = $('#representativePhone').val().trim();
+                    const email = $('#representativeEmail').val().trim();
+                    const relationship = $('#representativeRelationship').val();
+                    const notes = $('#representativeNotes').val().trim();
+
+                    const hasAnyData = name || phone || email || relationship;
+
+                    if (hasAnyData) {
+                        if (!name) {
+                            showToast('Representative name is required', 'error');
+                            $('#representativeName').focus();
+                            return false;
+                        }
+
+                        if (name.length >= 150) {
+                            showToast('Representative name must be less than 150 characters', 'error');
+                            $('#representativeName').focus();
+                            return false;
+                        }
+
+                        if (!phone) {
+                            showToast('Representative phone number is required', 'error');
+                            $('#representativePhone').focus();
+                            return false;
+                        }
+
+                        const phoneRegex = /^(0[3-9]\d{8,9}|\+84[3-9]\d{8,9})$/;
+
+                        if (!phoneRegex.test(phone)) {
+                            showToast('Please enter a valid Vietnamese phone number (e.g., 0912345678 or +84912345678)', 'error');
+                            $('#representativePhone').focus();
+                            return false;
+                        }
+
+                        if (!email) {
+                            showToast('Representative email is required', 'error');
+                            $('#representativeEmail').focus();
+                            return false;
+                        }
+                        if (email.length >= 100) {
+                            showToast('Representative email must be less than 100 characters', 'error');
+                            $('#representativeEmail').focus();
+                            return false;
+                        }
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(email)) {
+                            showToast('Please enter a valid email address', 'error');
+                            $('#representativeEmail').focus();
+                            return false;
+                        }
+
+                        // Relationship validation
+                        if (!relationship) {
+                            showToast('Please select the relationship to guest', 'error');
+                            $('#representativeRelationship').focus();
+                            return false;
+                        }
+                    }
+
+                    // Notes validation (optional field)
+                    if (notes && notes.length >= 200) {
+                        showToast('Additional notes must be less than 200 characters', 'error');
+                        $('#representativeNotes').focus();
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                function showToast(message, type = 'info') {
+                    const backgroundColor = type === 'error' ? '#ef4444' :
+                            type === 'success' ? '#10b981' : '#3b82f6';
+
+                    Toastify({
+                        text: message,
+                        duration: 4000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: backgroundColor,
+                        },
+                        stopOnFocus: true
+                    }).showToast();
+                }
+
+                $('#representativeName').on('input', function () {
+                    const value = $(this).val().trim();
+                    const errorDiv = $('#representativeName-error');
+
+                    errorDiv.remove();
+                    $(this).removeClass('border-red-500');
+
+                    if (value && value.length >= 150) {
+                        $(this).addClass('border-red-500');
+                        $(this).after('<div id="representativeName-error" class="text-red-500 text-xs mt-1">Name must be less than 150 characters</div>');
+                    }
+                });
+
+                $('#representativePhone').on('input', function () {
+                    const value = $(this).val().trim();
+                    const errorDiv = $('#representativePhone-error');
+
+                    errorDiv.remove();
+                    $(this).removeClass('border-red-500');
+
+                    if (value) {
+                        const phoneRegex = /^(0[3-9]\d{8,9}|\+84[3-9]\d{8,9})$/;
+                        if (!phoneRegex.test(value)) {
+                            $(this).addClass('border-red-500');
+                            $(this).after('<div id="representativePhone-error" class="text-red-500 text-xs mt-1">Invalid Vietnamese phone format</div>');
+                        }
+                    }
+                });
+
+                $('#representativeEmail').on('input', function () {
+                    const value = $(this).val().trim();
+                    const errorDiv = $('#representativeEmail-error');
+
+                    errorDiv.remove();
+                    $(this).removeClass('border-red-500');
+
+                    if (value) {
+                        if (value.length >= 100) {
+                            $(this).addClass('border-red-500');
+                            $(this).after('<div id="representativeEmail-error" class="text-red-500 text-xs mt-1">Email must be less than 100 characters</div>');
+                        } else {
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailRegex.test(value)) {
+                                $(this).addClass('border-red-500');
+                                $(this).after('<div id="representativeEmail-error" class="text-red-500 text-xs mt-1">Invalid email format</div>');
+                            }
+                        }
+                    }
+                });
+
+                $('#representativeNotes').on('input', function () {
+                    const value = $(this).val().trim();
+                    const errorDiv = $('#representativeNotes-error');
+
+                    errorDiv.remove();
+                    $(this).removeClass('border-red-500');
+
+                    if (value && value.length >= 200) {
+                        $(this).addClass('border-red-500');
+                        $(this).after('<div id="representativeNotes-error" class="text-red-500 text-xs mt-1">Notes must be less than 200 characters</div>');
+                    }
+
+                    const countDiv = $('#notes-count');
+                    countDiv.remove();
+                    $(this).after(`<div id="notes-count" class="text-xs text-gray-500 mt-1">` + value.length + `/200 characters</div>`);
+                });
+
             });
         </script>
     </body>

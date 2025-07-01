@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Booking Contract</title>
+        <title>Booking History</title>
 
         <!-- Libs -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -113,60 +113,59 @@
             </div>
 
             <!-- Filters and Search Section -->
-            <!--            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                            <form action="booking-history" method="GET" class="space-y-4">
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                     Search Input 
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
-                                        <input type="text" 
-                                               name="search" 
-                                               value="${param.search}"
-                                               placeholder="Search by booking ID, tenant name..."
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                                    </div>
-            
-                                     Status Filter 
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                                            <option value="">All Status</option>
-                                            <option value="1" ${param.status == '1' ? 'selected' : ''}>Pending</option>
-                                            <option value="2" ${param.status == '2' ? 'selected' : ''}>Confirmed</option>
-                                            <option value="3" ${param.status == '3' ? 'selected' : ''}>Cancelled</option>
-                                            <option value="4" ${param.status == '4' ? 'selected' : ''}>Completed</option>
-                                        </select>
-                                    </div>
-            
-                                     Date Range 
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
-                                        <input type="date" 
-                                               name="fromDate" 
-                                               value="${param.fromDate}"
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                                    </div>
-            
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
-                                        <input type="date" 
-                                               name="toDate" 
-                                               value="${param.toDate}"
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                                    </div>
-                                </div>
-            
-                                 Filter Actions 
-                                <div class="flex flex-wrap gap-2 pt-4">
-                                    <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
-                                        <i class="fas fa-search mr-2"></i>Apply Filters
-                                    </button>
-                                    <a href="booking-history" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md font-medium transition-colors">
-                                        <i class="fas fa-times mr-2"></i>Clear Filters
-                                    </a>
-                                </div>
-                            </form>
-                        </div>-->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <form action="${pageContext.request.contextPath}/booking/history" method="GET" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!--Search Input--> 
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                            <input type="text" 
+                                   name="search" 
+                                   value="${param.search}"
+                                   placeholder="Search by booking ID, tenant name..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+
+                        <!--Status Filter--> 
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                <option value="">All Status</option>
+                                <c:forEach items="${sList}" var="s">
+                                    <option value="${s.id}" ${s.id == status ? 'selected' : ''}>${s.name}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+
+                        <!--Date Range--> 
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                            <input type="date" 
+                                   name="fromDate" 
+                                   value="${param.fromDate}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                            <input type="date" 
+                                   name="toDate" 
+                                   value="${param.toDate}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!--Filter Actions--> 
+                    <div class="flex flex-wrap gap-2 pt-4">
+                        <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
+                            <i class="fas fa-search mr-2"></i>Apply Filters
+                        </button>
+                        <a href="${pageContext.request.contextPath}/booking/history" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md font-medium transition-colors">
+                            <i class="fas fa-times mr-2"></i>Clear Filters
+                        </a>
+                    </div>
+                </form>
+            </div>
 
             <!-- Results Summary -->
             <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -279,48 +278,50 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <c:choose>
-                                            <c:when test="${booking.status.id == 1}">
+                                            <c:when test="${booking.status.id == 8}">
                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    Pending
+                                                    ${booking.status.name}
                                                 </span>
                                             </c:when>
-                                            <c:when test="${booking.status.id == 2}">
+                                            <c:when test="${booking.status.id == 9}">
                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                                    Confirmed
+                                                    ${booking.status.name}
                                                 </span>
                                             </c:when>
-                                            <c:when test="${booking.status.id == 3}">
+                                            <c:when test="${booking.status.id == 10}">
                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                                    Cancelled
+                                                    ${booking.status.name}
                                                 </span>
                                             </c:when>
-                                            <c:when test="${booking.status.id == 4}">
+                                            <c:when test="${booking.status.id == 11}">
                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                    Completed
+                                                    ${booking.status.name}
+                                                </span>
+                                            </c:when>
+                                            <c:when test="${booking.status.id == 12}">
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-green-800">
+                                                    ${booking.status.name}
                                                 </span>
                                             </c:when>
                                         </c:choose>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center space-x-2">
-                                            <a href="booking-detail?id=${booking.id}" 
+                                            <a href="${pageContext.request.contextPath}/booking/detail?bookId=${booking.id}" 
                                                class="text-indigo-600 hover:text-indigo-900" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <c:if test="${booking.status.id == 1}">
-                                                <button onclick="updateBookingStatus('${booking.id}', 2)" 
-                                                        class="text-green-600 hover:text-green-900" title="Confirm">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button onclick="updateBookingStatus('${booking.id}', 3)" 
+                                            <c:if test="${booking.status.id == 8 || booking.status.id == 9}">
+                                                <button onclick="updateBookingStatus('${booking.id}', 10)" 
                                                         class="text-red-600 hover:text-red-900" title="Cancel">
                                                     <i class="fas fa-times"></i>
                                                 </button>
+                                                <a href="${pageContext.request.contextPath}/booking/contract?bookId=${booking.id}">
+                                                    <button class="text-green-600 hover:text-green-900" title="Confirm">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </a>
                                             </c:if>
-<!--                                            <a href="booking-edit?id=${booking.id}" 
-                                               class="text-blue-600 hover:text-blue-900" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>-->
                                         </div>
                                     </td>
                                 </tr>
@@ -417,6 +418,77 @@
                                                         url.searchParams.set('pageSize', pageSize);
                                                         url.searchParams.set('page', '1'); // Reset to first page
                                                         window.location.href = url.toString();
+                                                    }
+
+                                                    function updateBookingStatus(bookingId, statusId) {
+                                                        const statusText = {
+                                                            10: 'Cancel'
+                                                        };
+
+                                                        const statusName = statusText[statusId];
+
+                                                        Swal.fire({
+                                                            title: statusName.charAt(0).toUpperCase() + statusName.slice(1) + ` Booking`,
+                                                            text: `Are you sure you want to ` + statusName + ` this booking?`,
+                                                            icon: 'warning',
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: statusId === 2 ? '#10b981' : statusId === 3 ? '#ef4444' : '#3b82f6',
+                                                            cancelButtonColor: '#6b7280',
+                                                            confirmButtonText: `Yes, ` + statusName + ` it!`
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                // Show loading
+                                                                Swal.fire({
+                                                                    title: 'Processing...',
+                                                                    text: 'Please wait while we update the booking status.',
+                                                                    allowOutsideClick: false,
+                                                                    allowEscapeKey: false,
+                                                                    showConfirmButton: false,
+                                                                    didOpen: () => {
+                                                                        Swal.showLoading();
+                                                                    }
+                                                                });
+
+                                                                $.ajax({
+                                                                    url: 'update-booking-status',
+                                                                    type: 'POST',
+                                                                    data: {
+                                                                        bookingId: bookingId,
+                                                                        statusId: statusId
+                                                                    },
+                                                                    success: function (response) {
+                                                                        Swal.close();
+                                                                        if (response.success) {
+                                                                            Swal.fire({
+                                                                                title: 'Success!',
+                                                                                text: `Booking has been ${statusName}ed successfully.`,
+                                                                                icon: 'success',
+                                                                                confirmButtonColor: '#3b82f6'
+                                                                            }).then(() => {
+                                                                                window.location.reload();
+                                                                            });
+                                                                        } else {
+                                                                            Swal.fire({
+                                                                                title: 'Error!',
+                                                                                text: response.message || 'Something went wrong. Please try again.',
+                                                                                icon: 'error',
+                                                                                confirmButtonColor: '#ef4444'
+                                                                            });
+                                                                        }
+                                                                    },
+                                                                    error: function (xhr, status, error) {
+                                                                        Swal.close();
+                                                                        Swal.fire({
+                                                                            title: 'Error!',
+                                                                            text: 'Network error. Please check your connection and try again.',
+                                                                            icon: 'error',
+                                                                            confirmButtonColor: '#ef4444'
+                                                                        });
+                                                                        console.error('Error updating booking status:', error);
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
                                                     }
 
                                                     function formatDate(dateString) {

@@ -17,20 +17,21 @@ public interface IBookingDAO {
 
     //GET
     public Booking getBookingViaCheckinAndCheckOutDate(Date checkIn, Date checkOut);
-    
+
     public Booking getById(String bookId);
 
     //ADD
     public boolean addBooking(Booking b);
-    
+
     //UPDATE
     public boolean updateBooking(Booking b);
-    
+
     public boolean updateBookingStatus(String bookingId, int statusId);
-    
+
     public boolean isRoomAvailable(String roomId, Date checkIn, Date checkOut);
-    
+
     public boolean isHouseAvailable(String houseId, Date checkIn, Date checkOut);
-    
-    public List<Booking> getListBookingPaging(User u, int limit, int offset);
+
+    public List<Booking> getListBookingPaging(User u, int limit, int offset,
+            String houseName, Date fromDate, Date toDate, Integer statusId);
 }
