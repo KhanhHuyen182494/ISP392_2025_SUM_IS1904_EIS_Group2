@@ -503,27 +503,14 @@
 
                 <!-- Booking Section for non-owners -->
                 <c:if test="${sessionScope.user.id != h.owner.id}">
-                    <div class="bg-white backdrop-blur-sm rounded-2xl shadow-xl border border-white overflow-hidden p-6">
-                        <label class="block text-xl font-semibold text-gray-700 mb-6 flex items-center">
+                    <div class="bg-white backdrop-blur-sm rounded-2xl shadow-xl border border-white overflow-hidden p-6 flex items-center justify-between flex-wrap gap-5">
+                        <label class="text-xl font-semibold text-gray-700 flex items-center m-0">
                             <i class="fas fa-calendar-check text-blue-500 mr-2"></i>
                             Book This Homestay
                         </label>
 
-                        <form action="${pageContext.request.contextPath}/booking" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                            <input type="hidden" name="homestay_id" value="${h.id}">
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Check-in Date</label>
-                                <input type="date" name="checkin_date" required 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Check-out Date</label>
-                                <input type="date" name="checkout_date" required 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
+                        <form action="${pageContext.request.contextPath}/booking" method="GET" class="flex items-center gap-4">
+                            <input type="hidden" name="hid" value="${h.id}">
                             <button type="submit" 
                                     class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
                                 <i class="fas fa-calendar-plus mr-2"></i>
