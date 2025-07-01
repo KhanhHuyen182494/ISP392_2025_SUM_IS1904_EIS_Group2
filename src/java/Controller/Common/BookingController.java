@@ -9,6 +9,7 @@ import Model.Address;
 import Model.Booking;
 import Model.House;
 import Model.Media;
+import Model.Representative;
 import Model.Room;
 import Model.Status;
 import Model.User;
@@ -37,7 +38,7 @@ import java.util.logging.Logger;
     "/booking",
     "/booking/contract",
     "/booking/confirm",
-    "/booking/contract/get"
+    "/booking/contract/preview"
 })
 public class BookingController extends BaseAuthorization {
 
@@ -67,8 +68,8 @@ public class BookingController extends BaseAuthorization {
                 doPostBookingConfirm(request, response, user);
             case BASE_PATH + "/contract" ->
                 doPostBookingContract(request, response, user);
-            case BASE_PATH + "/contract/get" ->
-                doPostGetContract(request, response, user);
+            case BASE_PATH + "/contract/preview" ->
+                doPostGetContractPreview(request, response, user);
         }
     }
 
@@ -187,8 +188,25 @@ public class BookingController extends BaseAuthorization {
         }
     }
 
-    private void doPostGetContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+    private void doPostGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String representativeName = request.getParameter("representativeName");
+        String representativePhone = request.getParameter("representativePhone");
+        String representativeEmail = request.getParameter("representativeEmail");
+        String representativeRelationship = request.getParameter("representativeRelationship");
+        String representativeNotes = request.getParameter("representativeNotes");
 
+        if (representativeName != null && !representativeName.isEmpty()) {
+            Representative rp = new Representative();
+            rp.setFull_name(representativeName);
+            rp.setPhone(representativePhone);
+            rp.setEmail(representativeEmail);
+            rp.setRelationship(representativeRelationship);
+            rp.setAdditional_notes(representativeNotes);
+            
+            
+        }
+
+        request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
 
     private void doPostBookingConfirm(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
