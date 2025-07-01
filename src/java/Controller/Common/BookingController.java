@@ -36,7 +36,8 @@ import java.util.logging.Logger;
 @WebServlet(name = "BookingController", urlPatterns = {
     "/booking",
     "/booking/contract",
-    "/booking/confirm"
+    "/booking/confirm",
+    "/booking/contract/get"
 })
 public class BookingController extends BaseAuthorization {
 
@@ -66,29 +67,43 @@ public class BookingController extends BaseAuthorization {
                 doPostBookingConfirm(request, response, user);
             case BASE_PATH + "/contract" ->
                 doPostBookingContract(request, response, user);
+            case BASE_PATH + "/contract/get" ->
+                doPostGetContract(request, response, user);
         }
     }
 
     private void doGetBookingContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        String bookId = request.getParameter("bookId");
+        try {
+            String bookId = request.getParameter("bookId");
+            System.out.println(bookId);
 
-        Booking b = bookDao.getById(bookId);
+            Booking b = bookDao.getById(bookId);
 
-        if (!user.getId().equals(b.getTenant().getId())) {
-            response.sendError(404);
-            return;
+            if (!user.getId().equals(b.getTenant().getId())) {
+                response.sendError(404);
+                return;
+            }
+
+            Room r;
+
+            if (b.getRoom().getId() != null) {
+                r = roomDao.getById(b.getRoom().getId());
+                fullLoadRoomInfo(r);
+                b.setRoom(r);
+            }
+
+            House h = hDao.getById(b.getHomestay().getId());
+            fullLoadHouseInfomationSingle(h);
+
+            b.setHomestay(h);
+
+            System.out.println(b);
+
+            request.setAttribute("b", b);
+            request.getRequestDispatcher("/FE/Common/BookingContract.jsp").forward(request, response);
+        } catch (ServletException | IOException e) {
+            LOGGER.log(Level.WARNING, "Error", e);
         }
-
-//        Room r = roomDao.getById(b.getRoom().getId());
-        House h = hDao.getById(b.getHomestay().getId());
-//        fullLoadRoomInfo(r);
-        fullLoadHouseInfomationSingle(h);
-
-        b.setHomestay(h);
-//        b.setRoom(r);
-
-        request.setAttribute("b", b);
-        request.getRequestDispatcher("/FE/Common/BookingContract.jsp").forward(request, response);
     }
 
     private void doPostBookingContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -170,6 +185,10 @@ public class BookingController extends BaseAuthorization {
             LOGGER.log(Level.WARNING, "Error", e);
             sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
         }
+    }
+
+    private void doPostGetContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+
     }
 
     private void doPostBookingConfirm(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {

@@ -33,8 +33,8 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
 
             // Sample inputs
             int roomId = 101; // Replace with a real room ID
-            Date checkIn = new Date(sdf.parse("2025-06-30").getTime());
-            Date checkOut = new Date(sdf.parse("2025-07-10").getTime());
+            Date checkIn = new Date(sdf.parse("2025-07-1").getTime());
+            Date checkOut = new Date(sdf.parse("2025-07-2").getTime());
 
             System.out.println(rDao.getAllRoomAvailable(checkIn, checkOut, "HOUSE-ceba29ae2440479085e22bac728678").size());
 
@@ -337,7 +337,9 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
                  WHERE r.id NOT IN (
                      SELECT b.room_id
                      FROM `fuhousefinder_homestay`.`booking` b
+                     JOIN `room` r2 ON b.room_id = r2.id
                      WHERE b.status_id NOT IN (10, 11)
+                       AND r2.homestay_id = r.homestay_id 
                        AND (
                            (b.check_in < ? AND b.check_out > ?)
                            OR (b.check_in BETWEEN ? AND ?)
