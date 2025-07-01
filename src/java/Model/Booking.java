@@ -28,6 +28,7 @@ public class Booking {
     private House homestay;
     private Room room;
     private Status status;
+    private Representative representative;
 
     public Booking() {
     }
@@ -144,9 +145,17 @@ public class Booking {
         this.cleaning_fee = cleaning_fee;
     }
 
+    public Representative getRepresentative() {
+        return representative;
+    }
+
+    public void setRepresentative(Representative representative) {
+        this.representative = representative;
+    }
+
     @Override
     public String toString() {
-        return "Booking{" + "id=" + id + ", check_in=" + check_in + ", checkout=" + checkout + ", total_price=" + total_price + ", deposit=" + deposit + ", note=" + note + ", service_fee=" + service_fee + ", cleaning_fee=" + cleaning_fee + ", created_at=" + created_at + ", updated_at=" + updated_at + ", tenant=" + tenant + ", homestay=" + homestay + ", room=" + room + ", status=" + status + '}';
+        return "Booking{" + "id=" + id + ", check_in=" + check_in + ", checkout=" + checkout + ", total_price=" + total_price + ", deposit=" + deposit + ", note=" + note + ", service_fee=" + service_fee + ", cleaning_fee=" + cleaning_fee + ", created_at=" + created_at + ", updated_at=" + updated_at + ", tenant=" + tenant + ", homestay=" + homestay + ", room=" + room + ", status=" + status + ", representative=" + representative + '}';
     }
 
 }

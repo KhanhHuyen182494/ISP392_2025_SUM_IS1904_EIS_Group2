@@ -20,6 +20,11 @@ public interface IBookingDAO {
 
     public Booking getById(String bookId);
 
+    public List<Booking> getListBookingPaging(User u, int limit, int offset,
+            String houseName, Date fromDate, Date toDate, Integer statusId);
+
+    public Booking getBookingDetailById(String bookId);
+
     //ADD
     public boolean addBooking(Booking b);
 
@@ -32,6 +37,4 @@ public interface IBookingDAO {
 
     public boolean isHouseAvailable(String houseId, Date checkIn, Date checkOut);
 
-    public List<Booking> getListBookingPaging(User u, int limit, int offset,
-            String houseName, Date fromDate, Date toDate, Integer statusId);
 }
