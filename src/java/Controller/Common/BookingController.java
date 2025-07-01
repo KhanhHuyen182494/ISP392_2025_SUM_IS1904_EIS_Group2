@@ -189,6 +189,7 @@ public class BookingController extends BaseAuthorization {
     }
 
     private void doPostGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String bookId = request.getParameter("bookId");
         String representativeName = request.getParameter("representativeName");
         String representativePhone = request.getParameter("representativePhone");
         String representativeEmail = request.getParameter("representativeEmail");
@@ -202,10 +203,24 @@ public class BookingController extends BaseAuthorization {
             rp.setEmail(representativeEmail);
             rp.setRelationship(representativeRelationship);
             rp.setAdditional_notes(representativeNotes);
-            
-            
+
+            rpDao.addRepresentative(rp);
         }
 
+        Booking b = bookDao.getBookingDetailById(bookId);
+        
+        House h = hDao.getById(b.getHomestay().getId());
+        fullLoadHouseInfomation(h);
+
+        if (!h.isIs_whole_house()) {
+            Room r = roomDao.getById(b.getRoom().getId());
+            fullLoadRoomInfo(r);
+            b.setRoom(r);
+        }
+
+        b.setHomestay(h);
+        
+        request.setAttribute("b", b);
         request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
 
@@ -257,6 +272,23 @@ public class BookingController extends BaseAuthorization {
         }
     }
 
+    private void fullLoadHouseInfomation(House h) {
+        try {
+            String hid = h.getId();
+
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+
+            h.setMedias(medias);
+            h.setAddress(a);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+    
     private void sendErrorResponse(HttpServletResponse response, String message, int statusCode)
             throws IOException {
         response.setStatus(statusCode);

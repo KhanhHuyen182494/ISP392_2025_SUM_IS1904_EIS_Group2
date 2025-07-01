@@ -564,6 +564,7 @@
                                 <input type="hidden" name="checkIn" value="<fmt:formatDate value='${b.check_in}' pattern='yyyy-MM-dd' />">
                                 <input type="hidden" name="checkOut" value="<fmt:formatDate value='${b.checkout}' pattern='yyyy-MM-dd' />">
                                 <input type="hidden" name="specialRequests" value="${b.note}">
+                                <input type="hidden" name="bookId" value="${b.id}">
 
                                 <input type="hidden" name="representativeName" id="hiddenRepresentativeName">
                                 <input type="hidden" name="representativePhone" id="hiddenRepresentativePhone">
