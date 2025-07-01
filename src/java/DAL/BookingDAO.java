@@ -8,6 +8,7 @@ import Base.Logging;
 import DAL.DAO.IBookingDAO;
 import Model.Booking;
 import Model.House;
+import Model.Representative;
 import Model.Room;
 import Model.Status;
 import Model.User;
@@ -22,32 +23,32 @@ import java.util.List;
  * @author Hien
  */
 public class BookingDAO extends BaseDao implements IBookingDAO {
-
+    
     private Logging logger = new Logging();
-
+    
     public static void main(String[] args) {
         BookingDAO b = new BookingDAO();
-
+        
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//
+//            // Sample inputs
+//            int roomId = 101; // Replace with a real room ID
+//            Date checkIn = new Date(sdf.parse("2025-07-10").getTime());
+//            Date checkOut = new Date(sdf.parse("2025-07-15").getTime());
+//
+//            boolean available = b.isHouseAvailable("HOUSE-0d45ce91ef7e4457a520b26ec27100", checkIn, checkOut);
+//
+//            User u = new User();
+//            u.setId("U-2bbd072d35884688ae41aa716475b5fa");
 
-            // Sample inputs
-            int roomId = 101; // Replace with a real room ID
-            Date checkIn = new Date(sdf.parse("2025-07-10").getTime());
-            Date checkOut = new Date(sdf.parse("2025-07-15").getTime());
-
-            boolean available = b.isHouseAvailable("HOUSE-0d45ce91ef7e4457a520b26ec27100", checkIn, checkOut);
-
-            User u = new User();
-            u.setId("U-2bbd072d35884688ae41aa716475b5fa");
-
-            System.out.println(b.getListBookingPaging(u, 10, 0, "", null, null, null));
-
+            System.out.println(b.getBookingDetailById("BOOK-403e00a2bbe9410e92f6a908b36ff71"));
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     public Booking getBookingViaCheckinAndCheckOutDate(Date checkIn, Date checkOut) {
         Booking b = null;
@@ -67,20 +68,20 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         FROM `fuhousefinder_homestay`.`booking`
         WHERE `check_in` = ? AND `check_out` = ?
         """;
-
+        
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-
+            
             ps.setDate(1, checkIn);
             ps.setDate(2, checkOut);
-
+            
             rs = ps.executeQuery();
-
+            
             while (rs.next()) {
-
+                
             }
-
+            
         } catch (SQLException e) {
             logger.error("" + e);
         } finally {
@@ -90,10 +91,10 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                 logger.error("" + ex);
             }
         }
-
+        
         return b;
     }
-
+    
     @Override
     public boolean addBooking(Booking b) {
         String sql = """
@@ -101,11 +102,11 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                      (`id`, `tenant_id`, `homestay_id`, `room_id`, `check_in`, `check_out`, `total_price`, `deposit`, `status_id`, `created_at`, `service_fee`, `cleaning_fee`, `note`)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                      """;
-
+        
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-
+            
             ps.setString(1, b.getId());
             ps.setString(2, b.getTenant().getId());
             ps.setString(3, b.getHomestay().getId());
@@ -119,9 +120,9 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             ps.setDouble(11, b.getService_fee());
             ps.setDouble(12, b.getCleaning_fee());
             ps.setString(13, b.getNote());
-
+            
             return ps.executeUpdate() > 0;
-
+            
         } catch (SQLException e) {
             logger.error("" + e);
             return false;
@@ -133,17 +134,17 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             }
         }
     }
-
+    
     @Override
     public boolean updateBooking(Booking b) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-
+    
     @Override
     public boolean updateBookingStatus(String bookingId, int statusId) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-
+    
     public boolean isRoomAvailable(String roomId, Date checkIn, Date checkOut) {
         String sql = """
                     SELECT 1 FROM `fuhousefinder_homestay`.`booking`
@@ -156,11 +157,11 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                       )
                     LIMIT 1;
                     """;
-
+        
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-
+            
             ps.setString(1, roomId);
             ps.setDate(2, new java.sql.Date(checkOut.getTime()));
             ps.setDate(3, new java.sql.Date(checkIn.getTime()));
@@ -168,7 +169,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             ps.setDate(5, new java.sql.Date(checkOut.getTime()));
             ps.setDate(6, new java.sql.Date(checkIn.getTime()));
             ps.setDate(7, new java.sql.Date(checkOut.getTime()));
-
+            
             rs = ps.executeQuery();
             return !rs.next(); // If nothing is found, room is available
 
@@ -177,7 +178,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             return false;
         }
     }
-
+    
     @Override
     public boolean isHouseAvailable(String houseId, Date checkIn, Date checkOut) {
         String sql = """
@@ -191,11 +192,11 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                       )
                     LIMIT 1;
                     """;
-
+        
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-
+            
             ps.setString(1, houseId);
             ps.setDate(2, new java.sql.Date(checkOut.getTime()));
             ps.setDate(3, new java.sql.Date(checkIn.getTime()));
@@ -203,7 +204,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             ps.setDate(5, new java.sql.Date(checkOut.getTime()));
             ps.setDate(6, new java.sql.Date(checkIn.getTime()));
             ps.setDate(7, new java.sql.Date(checkOut.getTime()));
-
+            
             rs = ps.executeQuery();
             return !rs.next(); // If nothing is found, room is available
 
@@ -212,63 +213,63 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             return false;
         }
     }
-
+    
     @Override
     public Booking getById(String bookId) {
         Booking b = new Booking();
         String sql = """
                      SELECT * FROM `fuhousefinder_homestay`.`booking` WHERE id = ?;
                      """;
-
+        
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-
+            
             ps.setString(1, bookId);
             
             rs = ps.executeQuery();
-
+            
             while (rs.next()) {
                 b.setId(rs.getString("id"));
-
+                
                 User u = new User();
                 u.setId(rs.getString("tenant_id"));
-
+                
                 b.setTenant(u);
-
+                
                 House h = new House();
                 h.setId(rs.getString("homestay_id"));
-
+                
                 b.setHomestay(h);
-
+                
                 Room r = new Room();
                 r.setId(rs.getString("room_id"));
-
+                
                 b.setRoom(r);
-
+                
                 b.setCheck_in(rs.getDate("check_in"));
                 b.setCheckout(rs.getDate("check_out"));
                 b.setTotal_price(rs.getDouble("total_price"));
                 b.setDeposit(rs.getDouble("deposit"));
                 b.setService_fee(rs.getDouble("service_fee"));
                 b.setCleaning_fee(rs.getDouble("cleaning_fee"));
-
+                
                 Status s = new Status();
                 s.setId(rs.getInt("status_id"));
-
+                
                 b.setStatus(s);
-
+                
                 b.setCreated_at(rs.getTimestamp("created_at"));
                 b.setNote(rs.getString("note"));
             }
-
+            
         } catch (SQLException e) {
             logger.error("" + e);
         }
-
+        
         return b;
     }
-
+    
     @Override
     public List<Booking> getListBookingPaging(User u, int limit, int offset,
             String houseName, Date fromDate, Date toDate, Integer statusId) {
@@ -279,10 +280,10 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                 JOIN `status` s ON s.id = b.status_id
                 WHERE b.tenant_id = ?
         """);
-
+        
         List<Object> params = new ArrayList<>();
         params.add(u.getId());
-
+        
         if (houseName != null && !houseName.isEmpty()) {
             sql.append(" AND h.name LIKE ? ");
             params.add("%" + houseName + "%");
@@ -299,15 +300,15 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             sql.append(" AND b.status_id = ? ");
             params.add(statusId);
         }
-
+        
         sql.append(" ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
         params.add(limit);
         params.add(offset);
-
+        
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql.toString());
-
+            
             for (int i = 0; i < params.size(); i++) {
                 Object param = params.get(i);
                 if (param instanceof String) {
@@ -320,46 +321,126 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
                     ps.setObject(i + 1, param);
                 }
             }
-
+            
             rs = ps.executeQuery();
-
+            
             while (rs.next()) {
                 Booking b = new Booking();
-
+                
                 b.setId(rs.getString("id"));
                 b.setTenant(u);
-
+                
                 House h = new House();
                 h.setId(rs.getString("homestay_id"));
                 b.setHomestay(h);
-
+                
                 Room r = new Room();
                 r.setId(rs.getString("room_id"));
                 b.setRoom(r);
-
+                
                 b.setCheck_in(rs.getDate("check_in"));
                 b.setCheckout(rs.getDate("check_out"));
                 b.setTotal_price(rs.getDouble("total_price"));
                 b.setDeposit(rs.getDouble("deposit"));
                 b.setService_fee(rs.getDouble("service_fee"));
                 b.setCleaning_fee(rs.getDouble("cleaning_fee"));
-
+                
                 Status s = new Status();
                 s.setId(rs.getInt("status_id"));
                 s.setName(rs.getString("StatusName"));
                 b.setStatus(s);
-
+                
                 b.setCreated_at(rs.getTimestamp("created_at"));
                 b.setNote(rs.getString("note"));
-
+                
                 bList.add(b);
             }
-
+            
         } catch (SQLException e) {
             logger.error("Error fetching paginated bookings with filters: " + e);
         }
-
+        
         return bList;
     }
-
+    
+    @Override
+    public Booking getBookingDetailById(String bookId) {
+        Booking b = new Booking();
+        String sql = """
+                     SELECT 
+                         b.*,
+                         rb.id as rpId,
+                         rb.full_name,
+                         rb.email,
+                         rb.phone,
+                         rb.relationship,
+                         rb.additional_notes,
+                         s.name as StatusName
+                     FROM
+                         `fuhousefinder_homestay`.`booking` b
+                             LEFT JOIN
+                         `fuhousefinder_homestay`.`representative_booking` rb ON rb.booking_id = b.id
+                     		JOIN
+                     	`fuhousefinder_homestay`.`status` s ON s.id = b.status_id
+                     WHERE b.id = ?;
+                     """;
+        
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            
+            ps.setString(1, bookId);
+            
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                b.setId(rs.getString("id"));
+                
+                User u = new User();
+                u.setId(rs.getString("tenant_id"));
+                
+                b.setTenant(u);
+                
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+                b.setHomestay(h);
+                
+                Room r = new Room();
+                r.setId(rs.getString("room_id"));
+                b.setRoom(r);
+                
+                b.setCheck_in(rs.getDate("check_in"));
+                b.setCheckout(rs.getDate("check_out"));
+                b.setTotal_price(rs.getDouble("total_price"));
+                b.setDeposit(rs.getDouble("deposit"));
+                b.setService_fee(rs.getDouble("service_fee"));
+                b.setCleaning_fee(rs.getDouble("cleaning_fee"));
+                
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+                b.setStatus(s);
+                
+                b.setCreated_at(rs.getTimestamp("created_at"));
+                b.setNote(rs.getString("note"));
+                
+                Representative rp = new Representative();
+                rp.setId(rs.getInt("rpId"));
+                rp.setFull_name(rs.getString("full_name"));
+                rp.setEmail(rs.getString("email"));
+                rp.setPhone(rs.getString("phone"));
+                rp.setRelationship(rs.getString("relationship"));
+                rp.setAdditional_notes(rs.getString("additional_notes"));
+                rp.setBooking_id(rs.getString("id"));
+                
+                b.setRepresentative(rp);
+            }
+            
+        } catch (SQLException e) {
+            logger.error("Error fetching paginated bookings with filters: " + e);
+        }
+        
+        return b;
+    }
+    
 }

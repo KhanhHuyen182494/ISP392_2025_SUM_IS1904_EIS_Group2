@@ -8,6 +8,7 @@ import Model.Address;
 import Model.Booking;
 import Model.House;
 import Model.Media;
+import Model.Room;
 import Model.Status;
 import Model.User;
 import jakarta.servlet.ServletException;
@@ -109,7 +110,28 @@ public class BookingHistoryController extends BaseAuthorization {
 
     private void doGetBookingDetail(HttpServletRequest request, HttpServletResponse response, User user)
             throws ServletException, IOException {
-        
+        String bookId = request.getParameter("bookId");
+
+        Booking b = bookDao.getBookingDetailById(bookId);
+
+        if (!user.getId().equals(b.getTenant().getId())) {
+            response.sendError(404);
+            return;
+        }
+
+        House h = hDao.getById(b.getHomestay().getId());
+        fullLoadHouseInfomation(h);
+
+        if (!h.isIs_whole_house()) {
+            Room r = roomDao.getById(b.getRoom().getId());
+            fullLoadRoomInfo(r);
+            b.setRoom(r);
+        }
+
+        b.setHomestay(h);
+
+        request.setAttribute("booking", b);
+        request.getRequestDispatcher("../FE/Common/BookingDetail.jsp").forward(request, response);
     }
 
     private void fullLoadHouseInfomation(House h) {
@@ -129,4 +151,16 @@ public class BookingHistoryController extends BaseAuthorization {
         }
     }
 
+    private void fullLoadRoomInfo(Room r) {
+        try {
+            Status s = new Status();
+            s.setId(21);
+            List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
+
+            r.setMedias(mediaS);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
 }

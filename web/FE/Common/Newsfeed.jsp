@@ -320,11 +320,11 @@
                                                 <div class="space-y-2 mb-4">
                                                     <div class="flex items-center gap-2">
                                                         <i class="fas fa-dollar-sign text-green-500"></i>
-                                                        <span class="text-sm"><strong>Giá 1 đêm:</strong> <fmt:formatNumber value="${post.parent_post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                                        <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.parent_post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
                                                     </div>
                                                     <div class="flex items-center gap-2">
                                                         <i class="fas fa-map-marker-alt text-red-500"></i>
-                                                        <span class="text-sm"><strong>Địa chỉ:</strong> ${post.parent_post.house.address.detail} ${post.parent_post.house.address.ward}, ${post.parent_post.house.address.district}, ${post.parent_post.house.address.province}, ${post.parent_post.house.address.country}</span>
+                                                        <span class="text-sm"><strong>Address:</strong> ${post.parent_post.house.address.detail} ${post.parent_post.house.address.ward}, ${post.parent_post.house.address.district}, ${post.parent_post.house.address.province}, ${post.parent_post.house.address.country}</span>
                                                     </div>
                                                 </div>
                                             </c:if>

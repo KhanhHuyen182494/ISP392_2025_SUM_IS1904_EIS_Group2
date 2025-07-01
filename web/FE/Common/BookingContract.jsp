@@ -576,7 +576,7 @@
                                         id="proceedPaymentBtn"
                                         disabled
                                         class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                                    Confirm
+                                    Next (Contract Preview)
                                 </button>
                             </form>
 
