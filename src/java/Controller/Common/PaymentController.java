@@ -14,6 +14,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,7 @@ public class PaymentController extends BaseAuthorization {
     }
 
     private void doPaymentVnPay(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
         String depositStr = request.getParameter("deposit");
         String bookId = request.getParameter("bookId");
         double deposit = Double.parseDouble(depositStr);
@@ -67,6 +69,9 @@ public class PaymentController extends BaseAuthorization {
             pm.setStatusId(31);
 
             pmDao.addPayment(p);
+            session.setAttribute("bookIdPayment", paymentId);
+        } else {
+            session.setAttribute("bookIdPayment", p.getId());
         }
 
         String vnp_Version = "2.1.0";
@@ -109,7 +114,7 @@ public class PaymentController extends BaseAuthorization {
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
-        cld.add(Calendar.MINUTE, 15);
+        cld.add(Calendar.MINUTE, 1);
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 

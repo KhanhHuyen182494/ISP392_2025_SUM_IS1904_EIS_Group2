@@ -18,43 +18,43 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "VNPayReturnController", urlPatterns = {"/vnpay-return"})
 public class VNPayReturnController extends HttpServlet {
-    
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
+        String vnp_Amount = request.getParameter("vnp_Amount");
+        double amount = Double.parseDouble(vnp_Amount) / 100;
 
+        switch (vnp_ResponseCode) {
+            case "00" ->
+                HandleSuccessPayment(request, response);
+            case "24" ->
+                HandleCancelPayment(request, response);
+            case "15" ->
+                HandleTimeoutPayment(request, response);
+        }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
+    protected void HandleSuccessPayment(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+    }
+
+    protected void HandleCancelPayment(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+    }
+    
+    protected void HandleTimeoutPayment(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
     }
 
 }
