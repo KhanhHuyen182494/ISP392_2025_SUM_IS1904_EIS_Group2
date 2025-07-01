@@ -187,7 +187,7 @@
                         <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
                             <div class="text-center">
                                 <h2 class="text-2xl font-bold mb-2">HOMESTAY BOOKING CONTRACT</h2>
-                                <div class="text-blue-100">Contract #BK-${b.id}-<fmt:formatDate value="${b.booking_date}" pattern="yyyyMMdd" /></div>
+                                <div class="text-blue-100">Contract #BK-${b.id}-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" /></div>
                             </div>
                         </div>
 
@@ -197,7 +197,7 @@
                             <div class="border-b pb-6">
                                 <div class="text-center mb-6">
                                     <h3 class="text-xl font-semibold text-gray-900 mb-2">BOOKING AGREEMENT</h3>
-                                    <p class="text-gray-600">This contract is made on <strong><fmt:formatDate value="${b.booking_date}" pattern="EEEE, MMMM dd, yyyy" /></strong></p>
+                                    <p class="text-gray-600">This contract is made on <strong><fmt:formatDate value="${b.created_at}" pattern="EEEE, MMMM dd, yyyy" /></strong></p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -211,7 +211,7 @@
                                             <div><strong>Name:</strong> ${sessionScope.user.first_name} ${sessionScope.user.last_name}</div>
                                             <div><strong>Email:</strong> ${sessionScope.user.email}</div>
                                             <div><strong>Phone:</strong> ${sessionScope.user.phone}</div>
-                                            <div><strong>Booking Date:</strong> <fmt:formatDate value="${b.booking_date}" pattern="dd/MM/yyyy HH:mm" /></div>
+                                            <div><strong>Booking Date:</strong> <fmt:formatDate value="${b.created_at}" pattern="dd/MM/yyyy HH:mm" /></div>
                                         </div>
                                     </div>
 
@@ -232,7 +232,7 @@
                             </div>
 
                             <!-- Representative Information (if provided) -->
-                            <c:if test="${not empty param.representativeName}">
+                            <c:if test="${not empty b.representative.full_name}">
                                 <div class="border-b pb-6">
                                     <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
                                         <i class="fas fa-user-tie text-purple-500 mr-2"></i>
@@ -240,12 +240,12 @@
                                     </h4>
                                     <div class="bg-gray-50 p-4 rounded-lg">
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                            <div><strong>Name:</strong> ${param.representativeName}</div>
-                                            <div><strong>Phone:</strong> ${param.representativePhone}</div>
-                                            <div><strong>Email:</strong> ${param.representativeEmail}</div>
-                                            <div><strong>Relationship:</strong> ${param.representativeRelationship}</div>
-                                            <c:if test="${not empty param.representativeNotes}">
-                                                <div class="md:col-span-2"><strong>Notes:</strong> ${param.representativeNotes}</div>
+                                            <div><strong>Name:</strong> ${b.representative.full_name}</div>
+                                            <div><strong>Phone:</strong> ${b.representative.phone}</div>
+                                            <div><strong>Email:</strong> ${b.representative.email}</div>
+                                            <div><strong>Relationship:</strong> ${b.representative.relationship}</div>
+                                            <c:if test="${not empty b.representative.additional_notes}">
+                                                <div class="md:col-span-2"><strong>Notes:</strong> ${b.representative.additional_notes}</div>
                                             </c:if>
                                         </div>
                                         <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
@@ -261,7 +261,7 @@
                                     <i class="fas fa-building text-indigo-500 mr-2"></i>
                                     PROPERTY DETAILS
                                 </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="grid ${b.room.id != null ? 'grid-cols-1 md:grid-cols-2' : ''}  gap-6">
                                     <div class="space-y-2 text-sm">
                                         <div><strong>Property Name:</strong> ${b.homestay.name}</div>
                                         <div><strong>Property Type:</strong> 
@@ -277,7 +277,7 @@
                                         <div class="space-y-2 text-sm">
                                             <div><strong>Room Name:</strong> ${b.room.name}</div>
                                             <div><strong>Room Rating:</strong> ${b.room.star} stars</div>
-                                            <div><strong>Max Guests:</strong> ${b.room.max_guests} persons</div>
+                                            <!--<div><strong>Max Guests:</strong> ${b.room.max_guests} persons</div>-->
                                         </div>
                                     </c:if>
                                 </div>
@@ -322,7 +322,7 @@
                                         </div>
                                         <div class="flex justify-between">
                                             <span><strong>Booking Status:</strong></span>
-                                            <span class="text-green-600 font-medium">Confirmed</span>
+                                            <span class="text-green-600 font-medium">${b.status.name}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -423,7 +423,7 @@
                                         </div>
                                         <div class="text-sm text-gray-600 mb-3">
                                             Digitally agreed on:<br>
-                                            <fmt:formatDate value="${b.booking_date}" pattern="dd/MM/yyyy HH:mm:ss" />
+                                            <fmt:formatDate value="${b.created_at}" pattern="dd/MM/yyyy HH:mm:ss" />
                                         </div>
                                         <div class="text-lg font-semibold text-blue-600">
                                             ${sessionScope.user.first_name} ${sessionScope.user.last_name}
@@ -448,8 +448,8 @@
 
                             <!-- Contract Footer -->
                             <div class="text-center text-xs text-gray-500 border-t pt-4">
-                                <p>This contract was generated electronically by FUHF Homestay Platform on <fmt:formatDate value="${b.booking_date}" pattern="EEEE, MMMM dd, yyyy 'at' HH:mm:ss" />.</p>
-                                <p>Contract Reference: BK-${b.id}-<fmt:formatDate value="${b.booking_date}" pattern="yyyyMMdd" /> | Platform Version: 2.0</p>
+                                <p>This contract was generated electronically by FUHF Homestay Platform on <fmt:formatDate value="${b.created_at}" pattern="EEEE, MMMM dd, yyyy 'at' HH:mm:ss" />.</p>
+                                <p>Contract Reference: BK-${b.id}-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" /> | Platform Version: 2.0</p>
                                 <p class="mt-2">For support, contact: support@fuhf.com | Emergency: +84 123 456 789</p>
                             </div>
                         </div>
@@ -472,13 +472,13 @@
                         <div class="border-t pt-4">
                             <h4 class="font-medium text-gray-900 mb-3">Contract Details</h4>
                             <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Contract ID:</span>
-                                    <span class="font-medium">BK-${b.id}-<fmt:formatDate value="${b.booking_date}" pattern="yyyyMMdd" /></span>
+                                <div class="flex justify-between gap-2">
+                                    <span class="text-gray-600">ContractID:</span>
+                                    <span class="font-medium truncate">BK-${b.id}-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" /></span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Generated:</span>
-                                    <span class="font-medium"><fmt:formatDate value="${b.booking_date}" pattern="dd/MM/yyyy" /></span>
+                                    <span class="font-medium"><fmt:formatDate value="${b.created_at}" pattern="dd/MM/yyyy" /></span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">Status:</span>
@@ -564,23 +564,17 @@
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
             $(document).ready(function () {
-                // Download PDF functionality
                 $('#downloadPdfBtn, #downloadPdfBtn2').on('click', function () {
                     const button = $(this);
                     const originalHtml = button.html();
 
-                    // Show loading state
                     button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Generating PDF...');
                     button.prop('disabled', true);
 
-                    // Simulate PDF generation (replace with actual PDF generation logic)
                     setTimeout(() => {
-                        // Create a temporary link to trigger download
-                        const contractId = 'BK-${b.id}-<fmt:formatDate value="${b.booking_date}" pattern="yyyyMMdd" />';
-                        const filename = `Contract_${contractId}.pdf`;
+                        const contractId = 'BK-' + b.id + '-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" />';
+                        const filename = `Contract_` + contractId+ `.pdf`;
 
-                        // Here you would normally call your PDF generation endpoint
-                        // For now, we'll show a success message
                         Swal.fire({
                             icon: 'success',
                             title: 'PDF Generated!',
@@ -590,16 +584,13 @@
                             showConfirmButton: false
                         });
 
-                        // Reset button state
                         button.html(originalHtml);
                         button.prop('disabled', false);
 
-                        // You can replace this with actual PDF download logic:
                         // window.open('/path/to/pdf/download?contractId=' + contractId, '_blank');
                     }, 2000);
                 });
 
-                // Email functionality
                 $('#emailContractBtn').on('click', function () {
                     const button = $(this);
                     const originalHtml = button.html();
@@ -607,7 +598,6 @@
                     button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Sending...');
                     button.prop('disabled', true);
 
-                    // Show email confirmation dialog
                     Swal.fire({
                         title: 'Email Contract',
                         text: 'Send a copy of this contract to your email address?',
@@ -619,7 +609,6 @@
                         cancelButtonText: 'Cancel'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Simulate email sending
                             setTimeout(() => {
                                 Swal.fire({
                                     icon: 'success',
@@ -630,7 +619,6 @@
                                     showConfirmButton: false
                                 });
 
-                                // Here you would make an AJAX call to your email endpoint
                                 // $.ajax({
                                 //     url: '/api/email-contract',
                                 //     method: 'POST',
@@ -648,13 +636,11 @@
                             }, 1500);
                         }
 
-                        // Reset button state
                         button.html(originalHtml);
                         button.prop('disabled', false);
                     });
                 });
 
-                // Search functionality (if needed)
                 $('.search-focus').on('focus', function () {
                     $(this).addClass('ring-2 ring-blue-500');
                     $('.icon-search-focus').addClass('text-blue-500');
@@ -665,7 +651,6 @@
                     $('.icon-search-focus').removeClass('text-blue-500');
                 });
 
-                // Smooth scroll to sections (if needed for long contracts)
                 $('a[href^="#"]').on('click', function (e) {
                     e.preventDefault();
                     const target = $($(this).attr('href'));
@@ -676,7 +661,6 @@
                     }
                 });
 
-                // Toast notifications helper function
                 function showToast(message, type = 'success') {
                     Toastify({
                         text: message,
@@ -691,7 +675,6 @@
                     }).showToast();
                 }
 
-                // Add loading overlay helper
                 function showLoadingOverlay() {
                     const overlay = $(`
             <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -708,12 +691,10 @@
                     $('#loadingOverlay').remove();
                 }
 
-                // Handle form submissions with loading states
                 $('form').on('submit', function () {
                     showLoadingOverlay();
                 });
 
-                // Auto-hide alerts after 5 seconds
                 $('.alert').each(function () {
                     const alert = $(this);
                     setTimeout(() => {
@@ -721,7 +702,6 @@
                     }, 5000);
                 });
 
-                // Add hover effects to action buttons
                 $('.action-btn').hover(
                         function () {
                             $(this).addClass('transform scale-105 shadow-lg');
@@ -731,26 +711,22 @@
                         }
                 );
 
-                // Progress bar animation (if needed)
                 $('.progress-bar').each(function () {
                     const progress = $(this);
                     const width = progress.data('width') || '100%';
                     progress.animate({width: width}, 1000);
                 });
 
-                // Handle responsive navigation
                 $('.mobile-menu-toggle').on('click', function () {
                     $('.mobile-menu').toggleClass('hidden');
                 });
 
-                // Contract section expand/collapse (for mobile)
                 $('.section-toggle').on('click', function () {
                     const target = $($(this).data('target'));
                     target.slideToggle();
                     $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
                 });
 
-                // Copy contract ID to clipboard
                 $('.copy-contract-id').on('click', function () {
                     const contractId = $(this).data('contract-id');
                     navigator.clipboard.writeText(contractId).then(() => {
@@ -758,31 +734,6 @@
                     });
                 });
 
-                // Keyboard shortcuts
-                $(document).on('keydown', function (e) {
-                    // Ctrl/Cmd + P for print
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-                        e.preventDefault();
-                        $('#printContractBtn').click();
-                    }
-                    // Ctrl/Cmd + S for save/download
-                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                        e.preventDefault();
-                        $('#downloadPdfBtn').click();
-                    }
-                });
-
-                // Analytics tracking (if needed)
-                function trackEvent(action, category = 'Contract') {
-                    // Example: Google Analytics event tracking
-                    // gtag('event', action, {
-                    //     event_category: category,
-                    //     event_label: 'Contract BK-${b.id}'
-                    // });
-                    console.log(`Event tracked: ${category} - ${action}`);
-                }
-
-                // Track important actions
                 $('#downloadPdfBtn, #downloadPdfBtn2').on('click', function () {
                     trackEvent('download_pdf');
                 });
@@ -795,19 +746,16 @@
                     trackEvent('email_contract');
                 });
 
-                // Auto-save scroll position
                 $(window).on('scroll', function () {
                     localStorage.setItem('contractScrollPosition', $(window).scrollTop());
                 });
 
-                // Restore scroll position on page load
                 const savedScrollPosition = localStorage.getItem('contractScrollPosition');
                 if (savedScrollPosition) {
                     $(window).scrollTop(savedScrollPosition);
                     localStorage.removeItem('contractScrollPosition');
                 }
 
-                // Handle contract sharing (if needed)
                 $('.share-contract').on('click', function () {
                     if (navigator.share) {
                         navigator.share({
@@ -816,14 +764,12 @@
                             url: window.location.href
                         });
                     } else {
-                        // Fallback to copy URL
                         navigator.clipboard.writeText(window.location.href).then(() => {
                             showToast('Contract URL copied to clipboard!');
                         });
                     }
                 });
 
-                // Initialize all components
                 console.log('Booking contract preview page initialized');
             });
         </script>

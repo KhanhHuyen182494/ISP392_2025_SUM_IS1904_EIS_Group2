@@ -253,6 +253,7 @@ public class BookingController extends BaseAuthorization {
             h.setOwner(u);
             h.setMedias(medias);
             h.setAddress(a);
+            h.setOwner(u);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
@@ -276,6 +277,8 @@ public class BookingController extends BaseAuthorization {
         try {
             String hid = h.getId();
 
+            User u = uDao.getById(h.getOwner().getId());
+            
             Address a = aDao.getAddressById(h.getAddress().getId());
             Status mediaS = new Status();
             mediaS.setId(21);
@@ -283,6 +286,7 @@ public class BookingController extends BaseAuthorization {
 
             h.setMedias(medias);
             h.setAddress(a);
+            h.setOwner(u);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
