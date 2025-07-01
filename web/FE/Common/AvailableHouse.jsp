@@ -269,14 +269,34 @@
                                         <i class="fas fa-map-marker-alt mr-2"></i>
                                         <span class="text-sm">${house.address.detail} ${house.address.ward}, ${house.address.district}, ${house.address.province}, ${house.address.country}</span>
                                     </div>
+                                    
+                                    <div class="flex items-center text-gray-600 mb-2">
+                                        <i class="fas fa-bed mr-2"></i>
+                                        <c:if test="${house.is_whole_house == true}">
+                                            <span class="text-sm">Whole house</span>
+                                        </c:if>
+                                        <c:if test="${house.is_whole_house == false}">
+                                            <span class="text-sm">Rooms</span>
+                                        </c:if>
+                                    </div>
 
                                     <div class="flex items-center justify-between mb-3">
-                                        <div class="text-2xl font-bold text-orange-600">
-                                            <fmt:formatNumber value="${house.price_per_night}" type="currency"/>
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            /night
-                                        </div>
+                                        <c:if test="${house.is_whole_house == true}">
+                                            <div class="text-2xl font-bold text-orange-600">
+                                                <fmt:formatNumber value="${house.price_per_night}" type="currency"/>
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                /night
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${house.is_whole_house == false}">
+                                            <div class="text-2xl font-bold text-orange-600">
+                                                Different Price
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                /room
+                                            </div>
+                                        </c:if>
                                     </div>
 
                                     <!-- Description -->

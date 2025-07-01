@@ -135,7 +135,7 @@
                 height: 2.2em !important;
                 border-width: 0.22em !important;
             }
-            
+
             /* Comment Form Styles */
             .comment-form {
                 background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -340,6 +340,12 @@
                             <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-star"></i>
                                 View Your's Reviews
+                            </button>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/booking/history">
+                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-book"></i>
+                                View Your's Booking History
                             </button>
                         </a>
                         <a href="${pageContext.request.contextPath}/profile-edit">

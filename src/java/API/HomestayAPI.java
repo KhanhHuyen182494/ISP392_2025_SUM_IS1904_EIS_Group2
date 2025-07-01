@@ -18,7 +18,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.sql.Date;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,9 @@ import java.util.logging.Logger;
  */
 @WebServlet(name = "HomestayAPI", urlPatterns = {
     "/homestay/get",
-    "/homestay/room/get"
+    "/homestay/room/get",
+    "/homestay/room/available",
+    "/homestay/room"
 })
 public class HomestayAPI extends BaseAuthorization {
 
@@ -52,6 +57,10 @@ public class HomestayAPI extends BaseAuthorization {
                 doGetHomestayLoggedInUser(request, response, user);
             case BASE_PATH + "/room/get" ->
                 doGetRoomForHomestay(request, response, user);
+            case BASE_PATH + "/room/available" ->
+                doGetAvailableRoomForHomestay(request, response, user);
+            case BASE_PATH + "/room" ->
+                doGetRoomDetail(request, response, user);
         }
     }
 
@@ -114,6 +123,77 @@ public class HomestayAPI extends BaseAuthorization {
         }
     }
 
+    private void doGetRoomDetail(HttpServletRequest request, HttpServletResponse response, User u)
+            throws ServletException, IOException {
+        // Set response content type
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Create response object
+        Map<String, Object> responseData = new HashMap<>();
+
+        try {
+            String roomId = request.getParameter("roomId");
+
+            if (roomId == null || roomId.isEmpty()) {
+                sendErrorResponse(response, "Missing required parameters.", 400);
+                return;
+            }
+
+            Room r = roomDao.getById(roomId);
+            fullLoadRoomInfoSingle(r);
+
+            responseData.put("room", r);
+
+            // Send JSON response
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(responseData));
+            out.flush();
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error", e);
+            sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
+        }
+    }
+
+    private void doGetAvailableRoomForHomestay(HttpServletRequest request, HttpServletResponse response, User u)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> responseData = new HashMap<>();
+
+        try {
+            String homestayIdStr = request.getParameter("hid");
+            String checkinStr = request.getParameter("checkIn");
+            String checkoutStr = request.getParameter("checkOut");
+
+            if (homestayIdStr == null || checkinStr == null || checkoutStr == null) {
+                sendErrorResponse(response, "Missing required parameters.", 400);
+                return;
+            }
+
+            System.out.println("hid: " + homestayIdStr);
+            System.out.println("checkIn: " + checkinStr);
+            System.out.println("checkOut: " + checkoutStr);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date checkin = new Date(sdf.parse(checkinStr).getTime());
+            Date checkout = new Date(sdf.parse(checkoutStr).getTime());
+
+            List<Room> rList = roomDao.getAllRoomAvailable(checkin, checkout, homestayIdStr);
+
+            responseData.put("rooms", rList);
+
+            PrintWriter out = response.getWriter();
+            System.out.println("Response JSON: " + gson.toJson(responseData));
+            out.print(gson.toJson(responseData));
+            out.flush();
+        } catch (IOException | ParseException e) {
+            LOGGER.log(Level.WARNING, "Error in doGetAvailableRoomForHomestay", e);
+            sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
+        }
+    }
+
     private void fullLoadHouseInfomation(List<House> houses) {
         try {
             //Load address, images, likes, feedbacks
@@ -128,6 +208,34 @@ public class HomestayAPI extends BaseAuthorization {
                 h.setMedias(medias);
                 h.setAddress(a);
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+
+    private void fullLoadRoomInfo(List<Room> rooms) {
+        try {
+            for (Room r : rooms) {
+                Status s = new Status();
+                s.setId(21);
+                List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
+
+                r.setMedias(mediaS);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+
+    private void fullLoadRoomInfoSingle(Room r) {
+        try {
+            Status s = new Status();
+            s.setId(21);
+            List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
+
+            r.setMedias(mediaS);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");

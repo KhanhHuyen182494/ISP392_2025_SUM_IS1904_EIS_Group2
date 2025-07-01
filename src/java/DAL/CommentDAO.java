@@ -13,8 +13,6 @@ import java.util.List;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
