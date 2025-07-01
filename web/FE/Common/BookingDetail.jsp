@@ -162,7 +162,7 @@
                     </h2>
                     <div class="space-y-3">
                         <c:choose>
-                            <c:when test="${booking.status.id == 8}">
+                            <c:when test="${booking.status.id != 8}">
                                 <div class="flex flex-col sm:flex-row sm:items-center">
                                     <img src="${pageContext.request.contextPath}/Asset/Common/Avatar/default-avatar.jpg" 
                                          alt="Booker" class="w-16 h-16 rounded-full object-cover mb-3 sm:mb-0 sm:mr-4 mx-auto sm:mx-0">
