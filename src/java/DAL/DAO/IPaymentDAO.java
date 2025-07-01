@@ -13,6 +13,8 @@ import Model.Payment;
 public interface IPaymentDAO {
 
     //GET
+    public Payment getPaymentByBookingId(String bookId);
+    
     //ADD
     public boolean addPayment(Payment p);
 }

@@ -56,6 +56,8 @@ public class BookingController extends BaseAuthorization {
                 doGetBookingContract(request, response, user);
             case BASE_PATH + "/confirm" ->
                 doGetBookingDetail(request, response, user);
+            case BASE_PATH + "/contract/preview" ->
+                doGetContractPreview(request, response, user);
         }
     }
 
@@ -188,6 +190,26 @@ public class BookingController extends BaseAuthorization {
         }
     }
 
+    private void doGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String bookId = request.getParameter("bookId");
+        
+        Booking b = bookDao.getBookingDetailById(bookId);
+
+        House h = hDao.getById(b.getHomestay().getId());
+        fullLoadHouseInfomation(h);
+
+        if (!h.isIs_whole_house()) {
+            Room r = roomDao.getById(b.getRoom().getId());
+            fullLoadRoomInfo(r);
+            b.setRoom(r);
+        }
+
+        b.setHomestay(h);
+
+        request.setAttribute("b", b);
+        request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
+    }
+    
     private void doPostGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String bookId = request.getParameter("bookId");
         String representativeName = request.getParameter("representativeName");

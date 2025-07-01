@@ -311,7 +311,7 @@
                                                class="text-indigo-600 hover:text-indigo-900" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <c:if test="${booking.status.id == 8 || booking.status.id == 9}">
+                                            <c:if test="${booking.status.id == 8}">
                                                 <button onclick="updateBookingStatus('${booking.id}', 10)" 
                                                         class="text-red-600 hover:text-red-900" title="Cancel">
                                                     <i class="fas fa-times"></i>
@@ -321,6 +321,14 @@
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                 </a>
+                                            </c:if>
+                                            <c:if test="${booking.status.id == 9}">
+                                                <form action="${pageContext.request.contextPath}/booking/contract/preview" method="GET">
+                                                    <input type="hidden" name="bookId" value="${booking.id}" />
+                                                    <button type="submit" class="text-green-600 hover:text-green-900" title="Confirm">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
                                             </c:if>
                                         </div>
                                     </td>

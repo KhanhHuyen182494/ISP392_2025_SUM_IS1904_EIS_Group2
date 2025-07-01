@@ -11,9 +11,9 @@ import Model.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +31,7 @@ import java.util.TimeZone;
  *
  * @author nongducdai
  */
+@WebServlet(name = "PaymentController", urlPatterns = {"/payment"})
 public class PaymentController extends BaseAuthorization {
 
     @Override
@@ -53,15 +54,21 @@ public class PaymentController extends BaseAuthorization {
         String bookId = request.getParameter("bookId");
         double deposit = Double.parseDouble(depositStr);
 
-        String paymentId = Generator.generatePaymentId();
-        
-        Payment p = new Payment();
-        p.setId(paymentId);
-        p.setAmount(deposit);
-        p.setBooking_id(bookId);
-        p.setUser_id(user.getId());
-        p.setStatusId(31);
-        
+        Payment p = pmDao.getPaymentByBookingId(bookId);
+
+        if (p == null) {
+            String paymentId = Generator.generatePaymentId();
+
+            Payment pm = new Payment();
+            pm.setId(paymentId);
+            pm.setAmount(deposit);
+            pm.setBooking_id(bookId);
+            pm.setUser_id(user.getId());
+            pm.setStatusId(31);
+
+            pmDao.addPayment(p);
+        }
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
