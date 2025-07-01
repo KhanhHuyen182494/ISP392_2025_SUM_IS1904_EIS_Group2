@@ -207,8 +207,9 @@ public class BookingController extends BaseAuthorization {
             rpDao.addRepresentative(rp);
         }
 
+        bookDao.updateBookingStatus(bookId, 9);
         Booking b = bookDao.getBookingDetailById(bookId);
-        
+
         House h = hDao.getById(b.getHomestay().getId());
         fullLoadHouseInfomation(h);
 
@@ -219,7 +220,7 @@ public class BookingController extends BaseAuthorization {
         }
 
         b.setHomestay(h);
-        
+
         request.setAttribute("b", b);
         request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
@@ -278,7 +279,7 @@ public class BookingController extends BaseAuthorization {
             String hid = h.getId();
 
             User u = uDao.getById(h.getOwner().getId());
-            
+
             Address a = aDao.getAddressById(h.getAddress().getId());
             Status mediaS = new Status();
             mediaS.setId(21);
@@ -292,7 +293,7 @@ public class BookingController extends BaseAuthorization {
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-    
+
     private void sendErrorResponse(HttpServletResponse response, String message, int statusCode)
             throws IOException {
         response.setStatus(statusCode);

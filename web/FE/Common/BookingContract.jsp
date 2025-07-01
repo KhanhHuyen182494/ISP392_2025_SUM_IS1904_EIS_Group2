@@ -540,18 +540,6 @@
                             </div>
                         </div>
 
-                        <!-- Payment Methods -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-900 mb-3">Payment Method</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                    <input type="radio" name="paymentMethod" value="vnpay" class="mr-3" checked>
-                                    <img src="${pageContext.request.contextPath}/Asset/Common/Payment/vnpay.jfif" alt="VNPay" class="w-8 h-8 mr-3 rounded-[50%]">
-                                    <span class="font-medium">VNPay</span>
-                                </label>
-                            </div>
-                        </div>
-
                         <!-- Action Buttons -->
                         <div class="space-y-3">
                             <form action="${pageContext.request.contextPath}/booking/contract/preview" method="POST">
@@ -632,7 +620,6 @@
                 $('form').on('submit', function (e) {
                     const termsChecked = $('#agreeTerms').is(':checked');
                     const privacyChecked = $('#agreePrivacy').is(':checked');
-                    const paymentMethodSelected = $('input[name="paymentMethod"]:checked').val();
 
                     if (!termsChecked || !privacyChecked) {
                         e.preventDefault();
@@ -640,17 +627,6 @@
                             icon: 'warning',
                             title: 'Agreement Required',
                             text: 'Please agree to the terms and conditions and privacy policy to proceed.',
-                            confirmButtonColor: '#f97316'
-                        });
-                        return false;
-                    }
-
-                    if (!paymentMethodSelected) {
-                        e.preventDefault();
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Payment Method Required',
-                            text: 'Please select a payment method to proceed.',
                             confirmButtonColor: '#f97316'
                         });
                         return false;
