@@ -599,6 +599,18 @@
                         const contractId = 'BK-' + bookId + '-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" />';
                         const filename = `Contract_` + contractId + `.pdf`;
 
+                        $.ajax({
+                            url: '${pageContext.request.contextPath}/contract/generate',
+                            type: 'GET',
+                            data: {
+                                bookId: bookId,
+                                filename: filename
+                            },
+                            success: function (response) {
+                                window.open(response.path + '.pdf');
+                            }
+                        });
+
                         Swal.fire({
                             icon: 'success',
                             title: 'PDF Generated!',
@@ -611,7 +623,6 @@
                         button.html(originalHtml);
                         button.prop('disabled', false);
 
-                        // window.open('/path/to/pdf/download?contractId=' + contractId, '_blank');
                     }, 2000);
                 });
 

@@ -11,12 +11,17 @@ import Model.Media;
 import Model.Room;
 import Model.Status;
 import Model.User;
+import Utils.ContractPDFGenerator;
+import com.itextpdf.text.DocumentException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,48 +51,53 @@ public class ContractController extends BaseAuthorization {
     }
 
     protected void doGetGenerateContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        String bookId = request.getParameter("bookId");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
-        Booking b = bookDao.getBookingDetailById(bookId);
+        Map<String, Object> jsonResponse = new HashMap<>();
 
-        House h = hDao.getById(b.getHomestay().getId());
-        fullLoadHouseInfomation(h);
-        b.setHomestay(h);
-
-        if (!h.isIs_whole_house()) {
-            Room r = roomDao.getById(b.getRoom().getId());
-            fullLoadRoomInfo(r);
-            b.setRoom(r);
-        }
-
-        
-    }
-
-    private void fullLoadRoomInfo(Room r) {
         try {
-            Status s = new Status();
-            s.setId(21);
-            List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
+            ContractPDFGenerator cGenner = new ContractPDFGenerator();
 
-            r.setMedias(mediaS);
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
-            log.error("Error during fullLoadPostInfomation process");
+            String bookId = request.getParameter("bookId");
+            String filename = request.getParameter("filename");
+
+            Booking b = bookDao.getBookingDetailById(bookId);
+
+            User u = uDao.getById(b.getTenant().getId());
+            
+            b.setTenant(u);
+            
+            House h = hDao.getById(b.getHomestay().getId());
+            fullLoadHouseInfomation(h);
+            b.setHomestay(h);
+
+            if (!h.isIs_whole_house()) {
+                Room r = roomDao.getById(b.getRoom().getId());
+                b.setRoom(r);
+            }
+
+            String realPath = request.getServletContext().getRealPath("");
+            String modifiedPath = realPath.replace("\\build\\web", "");
+            String contractPath = modifiedPath + "/Contract/" + filename;
+
+            cGenner.generateContractPDF(b, contractPath);
+
+            jsonResponse.put("ok", true);
+            jsonResponse.put("path", contractPath);
+            out.print(gson.toJson(jsonResponse));
+        } catch (DocumentException | IOException e) {
+            LOGGER.log(Level.WARNING, "Error during doGetGenerateContract process", e);
+            log.error("Error during doGetGenerateContract process: " + e);
         }
     }
 
     private void fullLoadHouseInfomation(House h) {
         try {
-            String hid = h.getId();
-
             User u = uDao.getById(h.getOwner().getId());
-
             Address a = aDao.getAddressById(h.getAddress().getId());
-            Status mediaS = new Status();
-            mediaS.setId(21);
-            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
 
-            h.setMedias(medias);
             h.setAddress(a);
             h.setOwner(u);
         } catch (Exception e) {

@@ -10,6 +10,10 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Locale;
+import com.itextpdf.text.pdf.BaseFont;
 
 /**
  *
@@ -17,15 +21,26 @@ import java.text.SimpleDateFormat;
  */
 public class ContractPDFGenerator {
 
-    private static final Font TITLE_FONT = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
-    private static final Font HEADER_FONT = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
-    private static final Font SUBHEADER_FONT = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
-    private static final Font NORMAL_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
-    private static final Font BOLD_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.BLACK);
-    private static final Font SMALL_FONT = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL, BaseColor.GRAY);
+    private static BaseFont unicodeFont;
+    private static Font TITLE_FONT;
+    private static Font HEADER_FONT;
+    private static Font SUBHEADER_FONT;
+    private static Font NORMAL_FONT;
+    private static Font BOLD_FONT;
+    private static Font SMALL_FONT;
 
     private static final BaseColor HEADER_COLOR = new BaseColor(59, 130, 246);
     private static final BaseColor ACCENT_COLOR = new BaseColor(249, 250, 251);
+
+    static {
+        try {
+            initializeFonts();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Fallback to default fonts if Unicode fonts fail
+            initializeDefaultFonts();
+        }
+    }
 
     public void generateContractPDF(Booking booking, String outputPath) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4, 40, 40, 50, 50);
@@ -43,7 +58,9 @@ public class ContractPDFGenerator {
         addContractDate(document, booking);
         addPartyInformation(document, booking);
 
-        if (booking.getRepresentative() != null && booking.getRepresentative().getFull_name() != null) {
+        if (booking.getRepresentative() != null && booking.getRepresentative().getFull_name() != null
+                && booking.getRepresentative().getBooking_id() != null && booking.getRepresentative().getEmail() != null
+                && booking.getRepresentative().getPhone() != null && booking.getRepresentative().getRelationship() != null) {
             addRepresentativeInfo(document, booking);
         }
 
@@ -216,7 +233,7 @@ public class ContractPDFGenerator {
         addressCell.addElement(address);
         propTable.addCell(addressCell);
 
-        if (booking.getRoom() != null) {
+        if (booking.getRoom() != null && booking.getRoom().getId() != null) {
             propTable.addCell(createInfoCell("Room Name:", booking.getRoom().getName()));
             propTable.addCell(createInfoCell("Room Rating:", booking.getRoom().getStar() + " stars"));
         }
@@ -450,6 +467,43 @@ public class ContractPDFGenerator {
         labelCell.setBorder(Rectangle.NO_BORDER);
 
         return labelCell;
+    }
+
+    private Date parseDate(String dateString) throws ParseException {
+        if (dateString == null || dateString.isEmpty()) {
+            return new Date(); // fallback to current date
+        }
+
+        // Handle the format: "Jul 1, 2025, 11:57:34 AM"
+        SimpleDateFormat fullFormat = new SimpleDateFormat("MMM d, yyyy, h:mm:ss a", Locale.ENGLISH);
+        try {
+            return fullFormat.parse(dateString);
+        } catch (ParseException e) {
+            // Handle the format: "Jul 1, 2025"
+            SimpleDateFormat dateOnlyFormat = new SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH);
+            return dateOnlyFormat.parse(dateString);
+        }
+    }
+
+    private static void initializeFonts() throws DocumentException, IOException {
+        // Method 1: Use built-in Unicode font (Recommended)
+        unicodeFont = BaseFont.createFont("Arial Unicode MS", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+
+        TITLE_FONT = new Font(unicodeFont, 18, Font.BOLD, BaseColor.DARK_GRAY);
+        HEADER_FONT = new Font(unicodeFont, 14, Font.BOLD, BaseColor.BLACK);
+        SUBHEADER_FONT = new Font(unicodeFont, 12, Font.BOLD, BaseColor.BLACK);
+        NORMAL_FONT = new Font(unicodeFont, 10, Font.NORMAL, BaseColor.BLACK);
+        BOLD_FONT = new Font(unicodeFont, 10, Font.BOLD, BaseColor.BLACK);
+        SMALL_FONT = new Font(unicodeFont, 8, Font.NORMAL, BaseColor.GRAY);
+    }
+
+    private static void initializeDefaultFonts() {
+        TITLE_FONT = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.DARK_GRAY);
+        HEADER_FONT = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+        SUBHEADER_FONT = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+        NORMAL_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+        BOLD_FONT = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.BLACK);
+        SMALL_FONT = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL, BaseColor.GRAY);
     }
 
     // Inner class for header/footer
