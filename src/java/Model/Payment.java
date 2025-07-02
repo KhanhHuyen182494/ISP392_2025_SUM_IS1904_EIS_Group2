@@ -21,6 +21,7 @@ public class Payment {
     private Timestamp created_at;
     private Timestamp updated_at;
     private String bank_code;
+    private String method;
 
     public Payment() {
     }
@@ -97,9 +98,17 @@ public class Payment {
         this.bank_code = bank_code;
     }
 
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     @Override
     public String toString() {
-        return "Payment{" + "id=" + id + ", user_id=" + user_id + ", booking_id=" + booking_id + ", amount=" + amount + ", statusId=" + statusId + ", transaction_id=" + transaction_id + ", created_at=" + created_at + ", updated_at=" + updated_at + ", bank_code=" + bank_code + '}';
+        return "Payment{" + "id=" + id + ", user_id=" + user_id + ", booking_id=" + booking_id + ", amount=" + amount + ", statusId=" + statusId + ", transaction_id=" + transaction_id + ", created_at=" + created_at + ", updated_at=" + updated_at + ", bank_code=" + bank_code + ", method=" + method + '}';
     }
 
 }

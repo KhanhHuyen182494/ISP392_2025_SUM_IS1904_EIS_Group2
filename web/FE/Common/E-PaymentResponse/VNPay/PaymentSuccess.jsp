@@ -204,7 +204,7 @@
                                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                                     <span class="text-gray-600">Payment Date:</span>
                                     <span class="font-medium">
-                                        <fmt:formatDate value="<%= new java.util.Date() %>" pattern="dd/MM/yyyy HH:mm:ss" />
+                                        <fmt:formatDate value="${p.updated_at}" pattern="dd/MM/yyyy HH:mm:ss" />
                                     </span>
                                 </div>
                             </div>

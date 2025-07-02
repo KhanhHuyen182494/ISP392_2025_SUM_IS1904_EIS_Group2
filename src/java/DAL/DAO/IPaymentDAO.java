@@ -17,4 +17,7 @@ public interface IPaymentDAO {
     
     //ADD
     public boolean addPayment(Payment p);
+    
+    //UPDATE
+    public boolean updatePayment(Payment p);
 }

@@ -86,4 +86,42 @@ public class PaymentDAO extends BaseDao implements IPaymentDAO {
         return p;
     }
 
+    @Override
+    public boolean updatePayment(Payment p) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`payment`
+                     SET
+                     `status_id` = ?,
+                     `method` = ?,
+                     `transaction_id` = ?,
+                     `bank_code` = ?,
+                     `updated_at` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, p.getStatusId());
+            ps.setString(2, p.getMethod());
+            ps.setString(3, p.getTransaction_id());
+            ps.setString(4, p.getBank_code());
+            ps.setTimestamp(5, p.getUpdated_at());
+            ps.setString(6, p.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
 }

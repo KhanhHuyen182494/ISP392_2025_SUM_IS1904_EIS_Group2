@@ -69,9 +69,9 @@ public class PaymentController extends BaseAuthorization {
             pm.setStatusId(31);
 
             pmDao.addPayment(p);
-            session.setAttribute("bookIdPayment", paymentId);
+            session.setAttribute("bookIdPayment", bookId);
         } else {
-            session.setAttribute("bookIdPayment", p.getId());
+            session.setAttribute("bookIdPayment", bookId);
         }
 
         String vnp_Version = "2.1.0";
