@@ -39,22 +39,22 @@ public class VNPayReturnController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
     }
 
     protected void HandleSuccessPayment(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        //Update booking status, room
     }
 
     protected void HandleCancelPayment(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
     }
-    
+
     protected void HandleTimeoutPayment(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
     }
 
 }
