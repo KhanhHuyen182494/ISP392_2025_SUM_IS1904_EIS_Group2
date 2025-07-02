@@ -590,12 +590,13 @@
                 $('#downloadPdfBtn, #downloadPdfBtn2').on('click', function () {
                     const button = $(this);
                     const originalHtml = button.html();
+                    const bookId = '${b.id}';
 
                     button.html('<i class="fas fa-spinner fa-spin mr-2"></i>Generating PDF...');
                     button.prop('disabled', true);
 
                     setTimeout(() => {
-                        const contractId = 'BK-' + b.id + '-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" />';
+                        const contractId = 'BK-' + bookId + '-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" />';
                         const filename = `Contract_` + contractId + `.pdf`;
 
                         Swal.fire({
