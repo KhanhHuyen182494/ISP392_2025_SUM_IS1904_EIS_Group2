@@ -159,7 +159,7 @@
                                             <option value="${pt.id}">${pt.name}</option>
                                         </c:when>
                                         <c:otherwise>
-                                            <c:if test="${pt.id != 3 and pt.id != 2}">
+                                            <c:if test="${pt.id != 3 and pt.id != 2 and pt.id != 5}">
                                                 <option value="${pt.id}" ${pt.id == 4 ? 'selected' : ''}>${pt.name}</option>
                                             </c:if>
                                         </c:otherwise>
@@ -354,15 +354,15 @@
 //                        } else if (isWholeHouse == false) {
 //                            $('#roomSection').show();
 
-                            $.ajax({
-                                url: `${pageContext.request.contextPath}/homestay/room/get`,
-                                type: 'GET',
-                                dataType: 'json',
-                                data: {homestayId: selectedHomestay},
-                                beforeSend: function () {
-                                    $('#roomSelect').html('<option value="">Loading rooms...</option>');
-                                },
-                                success: function (response) {
+                        $.ajax({
+                            url: `${pageContext.request.contextPath}/homestay/room/get`,
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {homestayId: selectedHomestay},
+                            beforeSend: function () {
+                                $('#roomSelect').html('<option value="">Loading rooms...</option>');
+                            },
+                            success: function (response) {
 //                                    let roomOptions = '<option value="">Leave room blank to post about homestay</option>';
 //
 //                                    if (response.rooms && response.rooms.length > 0) {
@@ -373,16 +373,16 @@
 //                                        roomOptions = '<option value="">No rooms available</option>';
 //                                    }
 
-                                    selectedHomestayData = response.homestay;
-                                    displayHomestayPreview(response.homestay);
+                                selectedHomestayData = response.homestay;
+                                displayHomestayPreview(response.homestay);
 
 //                                    $('#roomSelect').html(roomOptions);
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error('Error fetching rooms:', error);
-                                    $('#roomSelect').html('<option value="">Error loading rooms</option>');
-                                }
-                            });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching rooms:', error);
+                                $('#roomSelect').html('<option value="">Error loading rooms</option>');
+                            }
+                        });
 //                        }
                     } else {
                         $('#roomSection').hide();

@@ -108,7 +108,7 @@
             <!-- Progress Bar -->
             <div class="mb-8">
                 <div class="flex items-center justify-center">
-                    <div class="flex items-center w-full max-w-2xl">
+                    <div class="flex items-center w-full max-w-7xl">
                         <!-- Step 1 -->
                         <div class="flex items-center flex-1">
                             <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
@@ -123,7 +123,7 @@
                             <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                                 2
                             </div>
-                            <div class="ml-2 text-sm font-medium text-blue-600">Contract Review</div>
+                            <div class="ml-2 text-sm font-medium text-blue-600">Booking Options</div>
                         </div>
                         <!-- Connector -->
                         <div class="flex-1 h-1 bg-gray-300 mx-4"></div>
@@ -131,6 +131,15 @@
                         <div class="flex items-center flex-1">
                             <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-semibold">
                                 3
+                            </div>
+                            <div class="ml-2 text-sm font-medium text-gray-500">Contract Preview</div>
+                        </div>
+                        <!-- Connector -->
+                        <div class="flex-1 h-1 bg-gray-300 mx-4"></div>
+                        <!-- Step 4 -->
+                        <div class="flex items-center flex-1">
+                            <div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-semibold">
+                                4
                             </div>
                             <div class="ml-2 text-sm font-medium text-gray-500">Payment</div>
                         </div>
@@ -531,40 +540,19 @@
                             </div>
                         </div>
 
-                        <!-- Payment Methods -->
-                        <div class="mb-6">
-                            <h4 class="font-medium text-gray-900 mb-3">Payment Method</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                    <input type="radio" name="paymentMethod" value="vnpay" class="mr-3" checked>
-                                    <img src="${pageContext.request.contextPath}/Asset/Common/Payment/vnpay.png" alt="VNPay" class="w-8 h-8 mr-3">
-                                    <span class="font-medium">VNPay</span>
-                                </label>
-                                <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                    <input type="radio" name="paymentMethod" value="momo" class="mr-3">
-                                    <img src="${pageContext.request.contextPath}/Asset/Common/Payment/momo.png" alt="MoMo" class="w-8 h-8 mr-3">
-                                    <span class="font-medium">MoMo</span>
-                                </label>
-                                <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                    <input type="radio" name="paymentMethod" value="bank" class="mr-3">
-                                    <i class="fas fa-university text-blue-500 w-8 text-center mr-3"></i>
-                                    <span class="font-medium">Bank Transfer</span>
-                                </label>
-                            </div>
-                        </div>
-
                         <!-- Action Buttons -->
                         <div class="space-y-3">
-                            <form action="${pageContext.request.contextPath}/booking/contract/get" method="GET">
+                            <form action="${pageContext.request.contextPath}/booking/contract/preview" method="POST">
                                 <!-- Include all booking data -->
-                                <input type="hidden" name="homestayId" value="${bookingData.homestay.id}">
-                                <input type="hidden" name="bookingType" value="${bookingData.bookingType}">
-                                <c:if test="${not empty bookingData.selectedRoom}">
-                                    <input type="hidden" name="selectedRoom" value="${bookingData.selectedRoom.id}">
+                                <input type="hidden" name="homestayId" value="${b.homestay.id}">
+                                <input type="hidden" name="bookingType" value="${b.homestay.is_whole_house == true ? 'whole' : 'room'}">
+                                <c:if test="${not empty b.room.id}">
+                                    <input type="hidden" name="selectedRoom" value="${b.room.id}">
                                 </c:if>
-                                <input type="hidden" name="checkIn" value="<fmt:formatDate value='${bookingData.checkInDate}' pattern='yyyy-MM-dd' />">
-                                <input type="hidden" name="checkOut" value="<fmt:formatDate value='${bookingData.checkOutDate}' pattern='yyyy-MM-dd' />">
-                                <input type="hidden" name="specialRequests" value="${bookingData.specialRequests}">
+                                <input type="hidden" name="checkIn" value="<fmt:formatDate value='${b.check_in}' pattern='yyyy-MM-dd' />">
+                                <input type="hidden" name="checkOut" value="<fmt:formatDate value='${b.checkout}' pattern='yyyy-MM-dd' />">
+                                <input type="hidden" name="specialRequests" value="${b.note}">
+                                <input type="hidden" name="bookId" value="${b.id}">
 
                                 <input type="hidden" name="representativeName" id="hiddenRepresentativeName">
                                 <input type="hidden" name="representativePhone" id="hiddenRepresentativePhone">
@@ -632,7 +620,6 @@
                 $('form').on('submit', function (e) {
                     const termsChecked = $('#agreeTerms').is(':checked');
                     const privacyChecked = $('#agreePrivacy').is(':checked');
-                    const paymentMethodSelected = $('input[name="paymentMethod"]:checked').val();
 
                     if (!termsChecked || !privacyChecked) {
                         e.preventDefault();
@@ -640,17 +627,6 @@
                             icon: 'warning',
                             title: 'Agreement Required',
                             text: 'Please agree to the terms and conditions and privacy policy to proceed.',
-                            confirmButtonColor: '#f97316'
-                        });
-                        return false;
-                    }
-
-                    if (!paymentMethodSelected) {
-                        e.preventDefault();
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Payment Method Required',
-                            text: 'Please select a payment method to proceed.',
                             confirmButtonColor: '#f97316'
                         });
                         return false;
@@ -801,14 +777,6 @@
                     button.html(originalText);
                     button.prop('disabled', false);
                 }
-
-                // Error handling for form submission
-                window.addEventListener('beforeunload', function (e) {
-                    if ($('#proceedPaymentBtn').prop('disabled') && $('#proceedPaymentBtn').html().includes('Processing')) {
-                        e.preventDefault();
-                        e.returnValue = 'Payment is being processed. Are you sure you want to leave?';
-                    }
-                });
 
                 function updateRepresentativeData() {
                     $('#hiddenRepresentativeName').val($('#representativeName').val());

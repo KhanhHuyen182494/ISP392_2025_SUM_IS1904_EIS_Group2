@@ -1,0 +1,2 @@
+[2025-07-02 09:06:27] [ERROR] java.sql.SQLException: Field 'method' doesn't have a default value
+[2025-07-02 09:13:02] [ERROR] java.sql.SQLException: Parameter index out of range (6 > number of parameters, which is 5).

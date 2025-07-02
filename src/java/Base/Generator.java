@@ -110,6 +110,10 @@ public class Generator {
     public static String generateBookingId() {
         return generate("BOOK", 36);
     }
+    
+    public static String generatePaymentId() {
+        return generate("PAYMENT", 36);
+    }
 
     public static void main(String[] args) {
         System.out.println(generatePassword(8));

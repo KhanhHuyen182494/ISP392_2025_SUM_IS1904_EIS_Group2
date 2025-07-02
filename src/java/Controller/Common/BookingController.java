@@ -9,6 +9,7 @@ import Model.Address;
 import Model.Booking;
 import Model.House;
 import Model.Media;
+import Model.Representative;
 import Model.Room;
 import Model.Status;
 import Model.User;
@@ -37,7 +38,7 @@ import java.util.logging.Logger;
     "/booking",
     "/booking/contract",
     "/booking/confirm",
-    "/booking/contract/get"
+    "/booking/contract/preview"
 })
 public class BookingController extends BaseAuthorization {
 
@@ -55,6 +56,8 @@ public class BookingController extends BaseAuthorization {
                 doGetBookingContract(request, response, user);
             case BASE_PATH + "/confirm" ->
                 doGetBookingDetail(request, response, user);
+            case BASE_PATH + "/contract/preview" ->
+                doGetContractPreview(request, response, user);
         }
     }
 
@@ -67,8 +70,8 @@ public class BookingController extends BaseAuthorization {
                 doPostBookingConfirm(request, response, user);
             case BASE_PATH + "/contract" ->
                 doPostBookingContract(request, response, user);
-            case BASE_PATH + "/contract/get" ->
-                doPostGetContract(request, response, user);
+            case BASE_PATH + "/contract/preview" ->
+                doPostGetContractPreview(request, response, user);
         }
     }
 
@@ -187,8 +190,61 @@ public class BookingController extends BaseAuthorization {
         }
     }
 
-    private void doPostGetContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+    private void doGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String bookId = request.getParameter("bookId");
+        
+        Booking b = bookDao.getBookingDetailById(bookId);
 
+        House h = hDao.getById(b.getHomestay().getId());
+        fullLoadHouseInfomation(h);
+
+        if (!h.isIs_whole_house()) {
+            Room r = roomDao.getById(b.getRoom().getId());
+            fullLoadRoomInfo(r);
+            b.setRoom(r);
+        }
+
+        b.setHomestay(h);
+
+        request.setAttribute("b", b);
+        request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
+    }
+    
+    private void doPostGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String bookId = request.getParameter("bookId");
+        String representativeName = request.getParameter("representativeName");
+        String representativePhone = request.getParameter("representativePhone");
+        String representativeEmail = request.getParameter("representativeEmail");
+        String representativeRelationship = request.getParameter("representativeRelationship");
+        String representativeNotes = request.getParameter("representativeNotes");
+
+        if (representativeName != null && !representativeName.isEmpty()) {
+            Representative rp = new Representative();
+            rp.setFull_name(representativeName);
+            rp.setPhone(representativePhone);
+            rp.setEmail(representativeEmail);
+            rp.setRelationship(representativeRelationship);
+            rp.setAdditional_notes(representativeNotes);
+
+            rpDao.addRepresentative(rp);
+        }
+
+        bookDao.updateBookingStatus(bookId, 9);
+        Booking b = bookDao.getBookingDetailById(bookId);
+
+        House h = hDao.getById(b.getHomestay().getId());
+        fullLoadHouseInfomation(h);
+
+        if (!h.isIs_whole_house()) {
+            Room r = roomDao.getById(b.getRoom().getId());
+            fullLoadRoomInfo(r);
+            b.setRoom(r);
+        }
+
+        b.setHomestay(h);
+
+        request.setAttribute("b", b);
+        request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
 
     private void doPostBookingConfirm(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -220,6 +276,7 @@ public class BookingController extends BaseAuthorization {
             h.setOwner(u);
             h.setMedias(medias);
             h.setAddress(a);
+            h.setOwner(u);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
@@ -233,6 +290,26 @@ public class BookingController extends BaseAuthorization {
             List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
 
             r.setMedias(mediaS);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+
+    private void fullLoadHouseInfomation(House h) {
+        try {
+            String hid = h.getId();
+
+            User u = uDao.getById(h.getOwner().getId());
+
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+
+            h.setMedias(medias);
+            h.setAddress(a);
+            h.setOwner(u);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");

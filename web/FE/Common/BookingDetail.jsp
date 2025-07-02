@@ -145,10 +145,12 @@
                         <p class="text-gray-600">Created on <fmt:formatDate value="${booking.created_at}" pattern="dd/MM/yyyy"/></p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="printBooking()" 
-                                class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            <i class="fas fa-download mr-1"></i>Download Contract
-                        </button>
+                        <c:if test="${booking.status.id == 9}">
+                            <button onclick="printBooking()" 
+                                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-download mr-1"></i>Download Contract
+                            </button>
+                        </c:if>
                     </div>
                 </div>
             </div>
