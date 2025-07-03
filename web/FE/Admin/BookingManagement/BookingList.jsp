@@ -348,7 +348,7 @@
                                             </c:choose>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-blue-500 hover:text-blue-900 transition-colors duration-200">View</a>
+                                            <a href="${pageContext.request.contextPath}/manage/booking/detail?bookId=${booking.id}" class="text-blue-500 hover:text-blue-900 transition-colors duration-200">View</a>
                                             <c:choose>
                                                 <c:when test="${(booking.status.id == 8 || booking.status.id == 9) and session.user.role.id == 3}">
                                                     <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Cancel</a>

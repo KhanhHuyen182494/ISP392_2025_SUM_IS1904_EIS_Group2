@@ -114,7 +114,34 @@ public class BookingManagementController extends BaseAuthorization {
     }
 
     protected void doGetBookingDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        request.getRequestDispatcher("../FE/Admin/UserManagement/UserList.jsp").forward(request, response);
+        String bookId = request.getParameter("bookId");
+
+        Booking b = bookDao.getBookingDetailById(bookId);
+
+        House h = hDao.getById(b.getHomestay().getId());
+        fullLoadHouseInfomation(h);
+
+        if (!h.isIs_whole_house()) {
+            Room r = roomDao.getById(b.getRoom().getId());
+            b.setRoom(r);
+        }
+
+        b.setHomestay(h);
+
+        User tenant = uDao.getById(b.getTenant().getId());
+        b.setTenant(tenant);
+        
+        if (user.getRole().getId() != 1) {
+            if (user.getRole().getId() == 3) {
+                if (!user.getId().equals(h.getOwner().getId())) {
+                    response.sendError(404);
+                    return;
+                }
+            }
+        }
+
+        request.setAttribute("booking", b);
+        request.getRequestDispatcher("/FE/Admin/BookingManagement/BookingDetail.jsp").forward(request, response);
     }
 
     private void fullLoadHouseInfomation(House h) {
