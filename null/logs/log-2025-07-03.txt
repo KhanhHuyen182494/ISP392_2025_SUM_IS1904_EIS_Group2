@@ -1,0 +1,1 @@
+[2025-07-03 12:03:22] [ERROR] com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation: Data too long for column 'bookId' at row 1

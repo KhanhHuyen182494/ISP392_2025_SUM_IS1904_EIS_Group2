@@ -6,10 +6,9 @@ package Controller.Common;
 
 import Model.Address;
 import Model.Booking;
+import Model.Contract;
 import Model.House;
-import Model.Media;
 import Model.Room;
-import Model.Status;
 import Model.User;
 import Utils.ContractPDFGenerator;
 import com.itextpdf.text.DocumentException;
@@ -23,8 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +66,16 @@ public class ContractController extends BaseAuthorization {
             ContractPDFGenerator cGenner = new ContractPDFGenerator();
 
             String bookId = request.getParameter("bookId");
+
+            Contract c = contractDao.getContractByBookingId(bookId);
+
+            if (c.getId() != null) {
+                jsonResponse.put("ok", true);
+                jsonResponse.put("path", request.getContextPath() + "/" + "Asset/Contract/" + c.getFilename());
+                out.print(gson.toJson(jsonResponse));
+                return;
+            }
+
             String filename = request.getParameter("filename");
 
             Booking b = bookDao.getBookingDetailById(bookId);
@@ -81,7 +91,6 @@ public class ContractController extends BaseAuthorization {
                 b.setRoom(r);
             }
 
-            // Generate to web-accessible folder
             String contractWebPath = "Asset/Contract/" + filename;
             String absoluteContractPath = request.getServletContext().getRealPath("/") + contractWebPath;
             String rootPathWithoutBuild = absoluteContractPath.replace("\\build", "");
@@ -101,6 +110,15 @@ public class ContractController extends BaseAuthorization {
                 log.error("Failed to copy contract file to deployed folder: " + copyEx);
             }
 
+            c = new Contract();
+            c.setId("Contract_BK-" + bookId);
+            c.setBookId(bookId);
+            c.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+            c.setFile_path(contractWebPath);
+            c.setFilename(filename);
+            
+            contractDao.addContract(c);
+            
             jsonResponse.put("ok", true);
             jsonResponse.put("path", request.getContextPath() + "/" + contractWebPath); // For browser use
             out.print(gson.toJson(jsonResponse));

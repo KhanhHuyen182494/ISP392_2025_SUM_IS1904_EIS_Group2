@@ -5,9 +5,11 @@ import Base.Logging;
 import DAL.AddressDAO;
 import DAL.BookingDAO;
 import DAL.CommentDAO;
+import DAL.ContractDAO;
 import DAL.DAO.IAddressDAO;
 import DAL.DAO.IBookingDAO;
 import DAL.DAO.ICommentDAO;
+import DAL.DAO.IContractDAO;
 import DAL.DAO.IHouseDAO;
 import DAL.DAO.IMediaDAO;
 import DAL.DAO.ILikeDAO;
@@ -70,6 +72,7 @@ public abstract class BaseAuthorization extends HttpServlet {
     public IBookingDAO bookDao;
     public IRepresentativeDAO rpDao;
     public IPaymentDAO pmDao;
+    public IContractDAO contractDao;
     public Logging log = new Logging();
     public Gson gson;
 
@@ -93,6 +96,7 @@ public abstract class BaseAuthorization extends HttpServlet {
         bookDao = new BookingDAO();
         rpDao = new RepresentativeDAO();
         pmDao = new PaymentDAO();
+        contractDao = new ContractDAO();
     }
 
     private User getUser(HttpServletRequest request) {
