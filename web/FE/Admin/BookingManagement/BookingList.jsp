@@ -244,7 +244,7 @@
                 <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                         <!-- Filters -->
-                        <form action="${pageContext.request.contextPath}/manage/user" method="GET">
+                        <form action="${pageContext.request.contextPath}/manage/booking" method="GET">
                             <div class="flex items-center space-x-4">
                                 <!-- Search Input -->
                                 <input name="keyword" value="${keyword}" type="text" 
@@ -257,15 +257,6 @@
                                     <option value="">All Status</option>
                                     <c:forEach items="${sList}" var="s">
                                         <option value="${s.id}" ${s.id == statusId ? 'selected' : ''}>${s.name}</option>
-                                    </c:forEach>
-                                </select>
-
-                                <!-- Role Select -->
-                                <select name="roleId" 
-                                        class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                                    <option value="">All Homestay</option>
-                                    <c:forEach items="${rList}" var="r">
-                                        <option value="${r.id}" ${r.id == roleId ? 'selected' : ''}>${r.name}</option>
                                     </c:forEach>
                                 </select>
 
@@ -307,68 +298,59 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <c:forEach var="user" items="${userList}">
+                                <c:forEach var="booking" items="${bookingList}">
                                     <tr class="hover:bg-gray-50 transition-colors duration-200">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <img class="h-10 w-10 rounded-full" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${user.avatar}" alt="">
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">${user.first_name} ${user.last_name}</div>
-                                                    <div class="text-sm text-gray-500">${user.email}</div>
-                                                </div>
-                                            </div>
+                                            <div class="text-sm font-medium text-gray-900"><p class="truncate">${booking.id}</p></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">${booking.tenant.first_name} ${booking.tenant.last_name}</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">${booking.homestay.name}</div>   
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <c:if test="${booking.homestay.is_whole_house == true}">
+                                                <div class="text-sm font-medium text-gray-900">Wholehouse Type</div>
+                                            </c:if>
+                                            <c:if test="${booking.homestay.is_whole_house == false}">
+                                                <div class="text-sm font-medium text-gray-900">${booking.room.name}</div>
+                                            </c:if>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <fmt:formatDate value="${booking.check_in}" pattern="dd/MM/yyyy"/>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <fmt:formatDate value="${booking.checkout}" pattern="dd/MM/yyyy"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <c:choose>
-                                                <c:when test="${user.role.id == 1}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Administrator</span>
+                                                <c:when test="${booking.status.id == 8}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.role.id == 2}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-white-100 text-white-800">Guest</span>
+                                                <c:when test="${booking.status.id == 9}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.role.id == 3}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">Homestay Owner</span>
+                                                <c:when test="${user.status.id == 10}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.role.id == 4}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Moderator</span>
+                                                <c:when test="${user.status.id == 11}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.role.id == 5}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Tenant</span>
-                                                </c:when>
-                                            </c:choose>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <fmt:formatDate value="${user.created_at}" pattern="dd/MM/yyyy"/>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <c:choose>
-                                                <c:when test="${user.status.id == 1}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                                                </c:when>
-                                                <c:when test="${user.status.id == 2}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">Inactive</span>
-                                                </c:when>
-                                                <c:when test="${user.status.id == 3}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-orange-800">Pending Verification</span>
-                                                </c:when>
-                                                <c:when test="${user.status.id == 4}">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Banned</span>
+                                                <c:when test="${user.status.id == 12}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">${booking.status.name}</span>
                                                 </c:when>
                                             </c:choose>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
+                                            <a href="#" class="text-blue-500 hover:text-blue-900 transition-colors duration-200">View</a>
                                             <c:choose>
-                                                <c:when test="${user.status.id == 4}">
-                                                    <a href="#" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</a>
+                                                <c:when test="${booking.status.id == 8 || booking.status.id == 9}">
+                                                    <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Cancel</a>
                                                 </c:when>
-                                                <c:otherwise>
-                                                    <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Ban</a>
-                                                </c:otherwise>
                                             </c:choose>
                                         </td>
                                     </tr>
@@ -390,8 +372,8 @@
                         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
                                 <p class="text-sm text-gray-700">
-                                    Showing <span class="font-medium">${(currentPage - 1) * 10 + 1}</span>
-                                    to <span class="font-medium">${(currentPage * 10 > totalCount) ? totalCount : (currentPage * 10)}</span>
+                                    Showing <span class="font-medium">${(currentPage - 1) * 7 + 1}</span>
+                                    to <span class="font-medium">${(currentPage * 7 > totalCount) ? totalCount : (currentPage * 7)}</span>
                                     of <span class="font-medium">${totalCount}</span> results
                                 </p>
                             </div>

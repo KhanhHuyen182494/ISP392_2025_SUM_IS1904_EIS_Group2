@@ -205,7 +205,7 @@
                                     </a>
                                 </c:if>
                                 <c:if test="${sessionScope.user.role.id == 3}">
-                                    <a href="${pageContext.request.contextPath}/manage/user">
+                                    <a href="${pageContext.request.contextPath}/manage/booking">
                                         <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                             House Onwer Panel
                                         </button>
