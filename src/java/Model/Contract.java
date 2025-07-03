@@ -4,6 +4,7 @@
  */
 package Model;
 
+import java.security.Timestamp;
 import java.sql.Date;
 
 /**
@@ -11,15 +12,12 @@ import java.sql.Date;
  * @author Huyen
  */
 public class Contract {
+
     private String id;
-    private Date start_date;
-    private Date expired_date;
-    private User owner;
-    private User tenant;
-    private double down_payment;
-    private Room room;
-    private House house;
-    private Status status;
+    private String filename;
+    private String file_path;
+    private Timestamp created_at;
+    private String bookId;
 
     public Contract() {
     }
@@ -32,69 +30,41 @@ public class Contract {
         this.id = id;
     }
 
-    public Date getStart_date() {
-        return start_date;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setStart_date(Date start_date) {
-        this.start_date = start_date;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
-    public Date getExpired_date() {
-        return expired_date;
+    public String getFile_path() {
+        return file_path;
     }
 
-    public void setExpired_date(Date expired_date) {
-        this.expired_date = expired_date;
+    public void setFile_path(String file_path) {
+        this.file_path = file_path;
     }
 
-    public User getOwner() {
-        return owner;
+    public Timestamp getCreated_at() {
+        return created_at;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setCreated_at(Timestamp created_at) {
+        this.created_at = created_at;
     }
 
-    public User getTenant() {
-        return tenant;
+    public String getBookId() {
+        return bookId;
     }
 
-    public void setTenant(User tenant) {
-        this.tenant = tenant;
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
     }
 
-    public double getDown_payment() {
-        return down_payment;
+    @Override
+    public String toString() {
+        return "Contract{" + "id=" + id + ", filename=" + filename + ", file_path=" + file_path + ", created_at=" + created_at + ", bookId=" + bookId + '}';
     }
 
-    public void setDown_payment(double down_payment) {
-        this.down_payment = down_payment;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public House getHouse() {
-        return house;
-    }
-
-    public void setHouse(House house) {
-        this.house = house;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-    
-    
 }

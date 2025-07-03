@@ -17,7 +17,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +54,8 @@ public class ContractController extends BaseAuthorization {
 
     }
 
-    protected void doGetGenerateContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+    protected void doGetGenerateContract(HttpServletRequest request, HttpServletResponse response, User user)
+            throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
@@ -64,11 +69,9 @@ public class ContractController extends BaseAuthorization {
             String filename = request.getParameter("filename");
 
             Booking b = bookDao.getBookingDetailById(bookId);
-
             User u = uDao.getById(b.getTenant().getId());
-            
             b.setTenant(u);
-            
+
             House h = hDao.getById(b.getHomestay().getId());
             fullLoadHouseInfomation(h);
             b.setHomestay(h);
@@ -78,15 +81,30 @@ public class ContractController extends BaseAuthorization {
                 b.setRoom(r);
             }
 
-            String realPath = request.getServletContext().getRealPath("");
-            String modifiedPath = realPath.replace("\\build\\web", "");
-            String contractPath = modifiedPath + "/Contract/" + filename;
+            // Generate to web-accessible folder
+            String contractWebPath = "Asset/Contract/" + filename;
+            String absoluteContractPath = request.getServletContext().getRealPath("/") + contractWebPath;
+            String rootPathWithoutBuild = absoluteContractPath.replace("\\build", "");
 
-            cGenner.generateContractPDF(b, contractPath);
+            cGenner.generateContractPDF(b, absoluteContractPath);
+
+            try (InputStream is = new FileInputStream(absoluteContractPath); OutputStream os = new FileOutputStream(rootPathWithoutBuild)) {
+
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = is.read(buffer)) > 0) {
+                    os.write(buffer, 0, length);
+                }
+
+            } catch (IOException copyEx) {
+                LOGGER.log(Level.WARNING, "Failed to copy contract file to deployed folder", copyEx);
+                log.error("Failed to copy contract file to deployed folder: " + copyEx);
+            }
 
             jsonResponse.put("ok", true);
-            jsonResponse.put("path", contractPath);
+            jsonResponse.put("path", request.getContextPath() + "/" + contractWebPath); // For browser use
             out.print(gson.toJson(jsonResponse));
+
         } catch (DocumentException | IOException e) {
             LOGGER.log(Level.WARNING, "Error during doGetGenerateContract process", e);
             log.error("Error during doGetGenerateContract process: " + e);
