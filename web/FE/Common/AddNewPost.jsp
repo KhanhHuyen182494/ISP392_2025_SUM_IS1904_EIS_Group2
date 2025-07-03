@@ -308,7 +308,7 @@
 
                                 if (response.homestays && response.homestays.length > 0) {
                                     response.homestays.forEach(function (homestay) {
-                                        let houseType = homestay.isWholeHouse ? 'Whole House' : 'Rooms';
+                                        let houseType = homestay.is_whole_house ? 'Whole House' : 'Rooms';
                                         let isWholeHose = homestay.is_whole_house;
                                         homestayOptions += `<option value="` + homestay.id + `" data-whole-house="` + isWholeHose + `">` + homestay.name + ` - ` + houseType + `</option>`;
                                     });
@@ -647,6 +647,38 @@
                             Swal.close();
                             if (response.ok) {
                                 showToast(response.message, 'success');
+
+                                Swal.fire({
+                                    title: 'Post success, continue post or go to feeds?',
+                                    imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                    imageWidth: 150,
+                                    imageHeight: 150,
+                                    imageAlt: 'Custom icon',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Continue',
+                                    cancelButtonText: 'Back to Newsfeed',
+                                    reverseButtons: false,
+                                    focusConfirm: true,
+                                    focusCancel: false,
+                                    customClass: {
+                                        popup: 'rounded-xl shadow-lg',
+                                        title: 'text-xl font-semibold',
+                                        confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                        actions: 'space-x-4'
+                                    },
+                                    buttonsStyling: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.href = '${pageContext.request.contextPath}/post';
+                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                        location.href = '${pageContext.request.contextPath}/feeds';
+                                    }
+                                });
+
+//                                setTimeout(function () {
+//                                    location.href = '${pageContext.request.contextPath}/feeds';
+//                                }, 2000);
                             } else {
                                 showToast(response.message, 'error');
                             }

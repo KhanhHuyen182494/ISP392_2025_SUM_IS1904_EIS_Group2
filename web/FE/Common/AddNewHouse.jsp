@@ -704,8 +704,8 @@
                                 return false;
                             }
 
-                            if (roomPosition.length > 20) {
-                                showToast('Room name for Room ' + roomNumber + ' max length is 20!', 'error');
+                            if (roomPosition.length > 30) {
+                                showToast('Room position for Room ' + roomNumber + ' max length is 30!', 'error');
                                 roomValid = false;
                                 return false;
                             }

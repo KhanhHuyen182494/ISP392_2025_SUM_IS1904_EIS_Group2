@@ -6,7 +6,6 @@ package Controller.Common;
 
 import Base.Generator;
 import Base.ImageUtil;
-import Model.Address;
 import Model.House;
 import Model.Media;
 import Model.Room;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  *
@@ -43,9 +41,9 @@ import java.util.logging.Level;
     "/room/delete"
 })
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1 MB
-        maxFileSize = 1024 * 1024 * 10, // 10 MB
-        maxRequestSize = 1024 * 1024 * 50 // 50 MB
+        fileSizeThreshold = 1024 * 1024 * 4, // 4MB
+        maxFileSize = 1024 * 1024 * 40, // 40MB
+        maxRequestSize = 1024 * 1024 * 200 // 200MB
 )
 public class RoomController extends BaseAuthorization {
 

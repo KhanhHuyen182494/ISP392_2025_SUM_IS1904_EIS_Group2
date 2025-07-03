@@ -25,9 +25,9 @@ import java.util.Map;
     "/change-cover"
 })
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10, // 10MB
-        maxRequestSize = 1024 * 1024 * 50 // 50MB
+        fileSizeThreshold = 1024 * 1024 * 4, // 4MB
+        maxFileSize = 1024 * 1024 * 40, // 40MB
+        maxRequestSize = 1024 * 1024 * 200 // 200MB
 )
 public class ImageController extends BaseAuthorization {
 

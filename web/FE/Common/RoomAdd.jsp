@@ -192,6 +192,12 @@
                 });
 
                 function addNewRoom() {
+                    
+                    if(roomCounter > 2){
+                        showToast('Maximum room add is 3!', 'error');
+                        return;
+                    }
+                    
                     roomCounter++;
                     $('#noRoomsMessage').hide();
                     
@@ -518,7 +524,7 @@
                                 showToast(response.message, 'success');
                                 // Reset form or redirect
                                 setTimeout(() => {
-                                    window.location.href = '/owner-house/detail?hid=' + homestayId;
+                                    window.location.href = '${pageContext.request.contextPath}/owner-house/detail?hid=' + homestayId;
                                 }, 2000);
                             } else {
                                 showToast(response.message, 'error');
