@@ -34,9 +34,9 @@ import java.util.Map;
  */
 @WebServlet(name = "PostController", urlPatterns = {"/post"})
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1 MB
-        maxFileSize = 1024 * 1024 * 10, // 10 MB
-        maxRequestSize = 1024 * 1024 * 50 // 50 MB
+        fileSizeThreshold = 1024 * 1024 * 4, // 1 MB
+        maxFileSize = 1024 * 1024 * 40, // 10 MB
+        maxRequestSize = 1024 * 1024 * 200 // 50 MB
 )
 public class PostController extends BaseAuthorization {
 
@@ -136,39 +136,49 @@ public class PostController extends BaseAuthorization {
                 p.setHouse(h);
 
                 if (pDao.add(p)) {
-                    int countFileName = 0;
-                    int trueCountFileName = fileNames.size();
 
-                    for (String fileName : fileNames) {
-                        Media m = new Media();
-                        Status mediaS = new Status();
-                        mediaS.setId(21);
+                    if (fileNames.isEmpty()) {
+                        // No images to upload, post creation successful
+                        jsonResponse.put("ok", true);
+                        jsonResponse.put("message", "Post success!");
+                        out.print(gson.toJson(jsonResponse));
+                        out.flush();
+                        return;
+                    } else {
+                        int countFileName = 0;
+                        int trueCountFileName = fileNames.size();
 
-                        m.setId(fileName);
-                        m.setObject_type("Post");
-                        m.setObject_id(postId);
-                        m.setMedia_type("image");
-                        m.setPath(fileName);
-                        m.setStatus(mediaS);
-                        m.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
-                        m.setOwner(user);
+                        for (String fileName : fileNames) {
+                            Media m = new Media();
+                            Status mediaS = new Status();
+                            mediaS.setId(21);
 
-                        if (mDao.addMedia(m)) {
-                            countFileName++;
-                        } else {
-                            jsonResponse.put("ok", false);
-                            jsonResponse.put("message", "Failed to save image, please contact admin!");
-                            out.print(gson.toJson(jsonResponse));
-                            out.flush();
-                            return;
-                        }
+                            m.setId(fileName);
+                            m.setObject_type("Post");
+                            m.setObject_id(postId);
+                            m.setMedia_type("image");
+                            m.setPath(fileName);
+                            m.setStatus(mediaS);
+                            m.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+                            m.setOwner(user);
 
-                        if (countFileName == trueCountFileName) {
-                            jsonResponse.put("ok", true);
-                            jsonResponse.put("message", "Post success!");
-                            out.print(gson.toJson(jsonResponse));
-                            out.flush();
-                            return;
+                            if (mDao.addMedia(m)) {
+                                countFileName++;
+                            } else {
+                                jsonResponse.put("ok", false);
+                                jsonResponse.put("message", "Failed to save image, please contact admin!");
+                                out.print(gson.toJson(jsonResponse));
+                                out.flush();
+                                return;
+                            }
+
+                            if (countFileName == trueCountFileName) {
+                                jsonResponse.put("ok", true);
+                                jsonResponse.put("message", "Post success!");
+                                out.print(gson.toJson(jsonResponse));
+                                out.flush();
+                                return;
+                            }
                         }
                     }
                 } else {

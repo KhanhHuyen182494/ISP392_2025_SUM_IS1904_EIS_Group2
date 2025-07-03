@@ -192,6 +192,12 @@
                 });
 
                 function addNewRoom() {
+                    
+                    if(roomCounter > 2){
+                        showToast('Maximum room add is 3!', 'error');
+                        return;
+                    }
+                    
                     roomCounter++;
                     $('#noRoomsMessage').hide();
                     

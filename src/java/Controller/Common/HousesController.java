@@ -48,9 +48,9 @@ import java.util.logging.Logger;
     "/owner-house/detail"
 })
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1 MB
-        maxFileSize = 1024 * 1024 * 10, // 10 MB
-        maxRequestSize = 1024 * 1024 * 50 // 50 MB
+        fileSizeThreshold = 1024 * 1024 * 4, // 4 MB
+        maxFileSize = 1024 * 1024 * 40, // 40 MB
+        maxRequestSize = 1024 * 1024 * 200 // 200 MB
 )
 public class HousesController extends BaseAuthorization {
 

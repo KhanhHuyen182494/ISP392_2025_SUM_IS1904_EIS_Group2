@@ -308,7 +308,7 @@
 
                                 if (response.homestays && response.homestays.length > 0) {
                                     response.homestays.forEach(function (homestay) {
-                                        let houseType = homestay.isWholeHouse ? 'Whole House' : 'Rooms';
+                                        let houseType = homestay.is_whole_house ? 'Whole House' : 'Rooms';
                                         let isWholeHose = homestay.is_whole_house;
                                         homestayOptions += `<option value="` + homestay.id + `" data-whole-house="` + isWholeHose + `">` + homestay.name + ` - ` + houseType + `</option>`;
                                     });
@@ -647,6 +647,9 @@
                             Swal.close();
                             if (response.ok) {
                                 showToast(response.message, 'success');
+                                setTimeout(function () {
+                                    location.href = '${pageContext.request.contextPath}/feeds';
+                                }, 2000);
                             } else {
                                 showToast(response.message, 'error');
                             }
