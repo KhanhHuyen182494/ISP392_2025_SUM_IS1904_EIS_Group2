@@ -192,7 +192,7 @@ public class BookingController extends BaseAuthorization {
 
     private void doGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String bookId = request.getParameter("bookId");
-        
+
         Booking b = bookDao.getBookingDetailById(bookId);
 
         House h = hDao.getById(b.getHomestay().getId());
@@ -209,7 +209,7 @@ public class BookingController extends BaseAuthorization {
         request.setAttribute("b", b);
         request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
-    
+
     private void doPostGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String bookId = request.getParameter("bookId");
         String representativeName = request.getParameter("representativeName");

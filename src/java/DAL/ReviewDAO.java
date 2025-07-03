@@ -32,7 +32,7 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
 
         Timestamp from = Timestamp.valueOf("2025-01-01 00:00:00");
         Timestamp to = Timestamp.valueOf("2025-12-31 23:59:59");
-        
+
         User u = new User();
         u.setId("U-ab0c71c0b2fa412ea760eeb459dfab6e");
 
@@ -133,7 +133,38 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
 
     @Override
     public boolean add(Review t) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO `fuhousefinder_homestay`.`review`
+                     (`id`, `star`, `content`, `created_at`, `status_id`, `user_id`, `homestay_id`, `room_id`)
+                     VALUES
+                     (?, ?, ?, ?, ?, ?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, t.getId());
+            ps.setInt(2, t.getStar());
+            ps.setString(3, t.getContent());
+            ps.setTimestamp(4, t.getCreated_at());
+            ps.setInt(5, t.getStatus().getId());
+            ps.setString(6, t.getOwner().getId());
+            ps.setString(7, t.getHomestay().getId());
+            ps.setString(8, t.getRoom().getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
     @Override

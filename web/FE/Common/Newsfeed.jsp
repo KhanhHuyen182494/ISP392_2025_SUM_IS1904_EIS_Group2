@@ -1504,6 +1504,7 @@
                                                         });
                                                     }
                                                 });
+                                                
                                                 function showToast(message, type = 'success') {
                                                     Toastify({
                                                         text: message,

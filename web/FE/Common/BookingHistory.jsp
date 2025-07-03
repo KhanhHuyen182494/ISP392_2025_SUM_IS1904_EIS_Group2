@@ -322,6 +322,21 @@
                                                     </button>
                                                 </a>
                                             </c:if>
+                                            <c:if test="${booking.status.id == 11 || booking.status.id == 12}">
+                                                <form action="${pageContext.request.contextPath}/booking/contract/preview" method="GET">
+                                                    <input type="hidden" name="bookId" value="${booking.id}" />
+                                                    <button type="submit" class="text-green-600 hover:text-green-900 transition" title="Confirm">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="${pageContext.request.contextPath}/review/add" method="GET">
+                                                    <input type="hidden" name="bookId" value="${booking.id}" />
+                                                    <button type="submit" class="text-green-600 hover:text-green-900 transition" title="Confirm">
+                                                        <!--<i class="fa-solid fa-star"></i>-->
+                                                        <i class="fa-regular fa-star text-yellow-600 hover:text-yellow-900 transition"></i>
+                                                    </button>
+                                                </form>
+                                            </c:if>
                                             <c:if test="${booking.status.id == 9}">
                                                 <form action="${pageContext.request.contextPath}/booking/contract/preview" method="GET">
                                                     <input type="hidden" name="bookId" value="${booking.id}" />

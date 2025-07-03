@@ -158,7 +158,7 @@
                     </h2>
                     <div class="space-y-3">
                         <c:choose>
-                            <c:when test="${booking.status.id != 8}">
+                            <c:when test="${booking.status.id != 8 and not empty booking.representative.full_name}">
                                 <div class="flex flex-col sm:flex-row sm:items-center">
                                     <img src="${pageContext.request.contextPath}/Asset/Common/Avatar/default-avatar.jpg" 
                                          alt="Booker" class="w-16 h-16 rounded-full object-cover mb-3 sm:mb-0 sm:mr-4 mx-auto sm:mx-0">
@@ -192,7 +192,7 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="flex justify-center items-center rounded-lg">
-                                    <p class="text-center text-gray-600">You have not confirmed this booking yet!</p>
+                                    <p class="text-center text-gray-600">If this booking have representative, it will appear here, if it not appear, maybe you have not confirm this booking's contract yet or this booking does not have representative person!</p>
                                 </div>
                             </c:otherwise>
                         </c:choose>
