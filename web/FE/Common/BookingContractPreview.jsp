@@ -596,7 +596,7 @@
                     button.prop('disabled', true);
 
                     setTimeout(() => {
-                        const contractId = 'BK-' + bookId + '-<fmt:formatDate value="${b.created_at}" pattern="yyyyMMdd" />';
+                        const contractId = 'BK-' + bookId;
                         const filename = `Contract_` + contractId + `.pdf`;
 
                         $.ajax({
@@ -607,7 +607,13 @@
                                 filename: filename
                             },
                             success: function (response) {
-                                window.open(response.path + '.pdf');
+                                const link = document.createElement('a');
+                                link.href = response.path;
+                                link.download = '';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+//                                console.log(response.path);
                             }
                         });
 

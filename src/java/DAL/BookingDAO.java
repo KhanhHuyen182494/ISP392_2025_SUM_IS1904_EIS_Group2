@@ -14,6 +14,7 @@ import Model.Status;
 import Model.User;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,20 +30,19 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         BookingDAO b = new BookingDAO();
 
         try {
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 //
 //            // Sample inputs
 //            int roomId = 101; // Replace with a real room ID
 //            Date checkIn = new Date(sdf.parse("2025-07-10").getTime());
-//            Date checkOut = new Date(sdf.parse("2025-07-15").getTime());
+            Date checkOut = new Date(sdf.parse("2025-07-15").getTime());
 //
 //            boolean available = b.isHouseAvailable("HOUSE-0d45ce91ef7e4457a520b26ec27100", checkIn, checkOut);
 //
-//            User u = new User();
-//            u.setId("U-2bbd072d35884688ae41aa716475b5fa");
+            User u = new User();
+            u.setId("U-87fbb6d15ad548318110b60b797f84da");
 
-            System.out.println(b.getBookingDetailById("BOOK-403e00a2bbe9410e92f6a908b36ff71"));
-
+//            System.out.println(b.getListBookingHomestayOwnerManage(u, 10, 0, null, "Thời gian X", null, null, null));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -153,7 +153,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
 
             ps.setInt(1, statusId);
             ps.setString(2, bookingId);
-            
+
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -458,6 +458,219 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         }
 
         return b;
+    }
+
+    @Override
+    public List<Booking> getListBookingHomestayOwnerManage(User u, int limit, int offset, String keyword, Date date, Integer statusId) {
+        List<Booking> bList = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+        SELECT 
+            b.*, s.name as StatusName
+        FROM
+            fuhousefinder_homestay.booking b
+            JOIN homestay h ON b.homestay_id = h.id
+            JOIN status s ON s.id = b.status_id
+            LEFT JOIN room r ON r.id = b.room_id
+            JOIN `User` us ON us.id = b.tenant_id
+        WHERE h.owner_id = ? 
+    """);
+
+        List<Object> params = new ArrayList<>();
+        params.add(u.getId());
+
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append("""
+            AND (
+                h.name LIKE ? OR 
+                r.name LIKE ? OR 
+                CONCAT_WS(' ', us.first_name, us.last_name) LIKE ?
+            )
+        """);
+            String kw = "%" + keyword + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        if (date != null) {
+            sql.append(" AND DATE(b.created_at) = ? ");
+            params.add(new java.sql.Date(date.getTime()));
+        }
+
+        if (statusId != null) {
+            sql.append(" AND b.status_id = ? ");
+            params.add(statusId);
+        }
+
+        sql.append(" ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
+        params.add(limit);
+        params.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String string) {
+                    ps.setString(i + 1, string);
+                } else if (param instanceof Integer integer) {
+                    ps.setInt(i + 1, integer);
+                } else if (param instanceof java.sql.Date sqlDate) {
+                    ps.setDate(i + 1, sqlDate);
+                } else {
+                    ps.setObject(i + 1, param);
+                }
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Booking b = new Booking();
+
+                b.setId(rs.getString("id"));
+
+                User tenant = new User();
+                tenant.setId(rs.getString("tenant_id"));
+                b.setTenant(tenant);
+
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+                b.setHomestay(h);
+
+                Room r = new Room();
+                r.setId(rs.getString("room_id"));
+                b.setRoom(r);
+
+                b.setCheck_in(rs.getDate("check_in"));
+                b.setCheckout(rs.getDate("check_out"));
+                b.setTotal_price(rs.getDouble("total_price"));
+                b.setDeposit(rs.getDouble("deposit"));
+                b.setService_fee(rs.getDouble("service_fee"));
+                b.setCleaning_fee(rs.getDouble("cleaning_fee"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+                b.setStatus(s);
+
+                b.setCreated_at(rs.getTimestamp("created_at"));
+                b.setNote(rs.getString("note"));
+
+                bList.add(b);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching paginated homestay owner bookings with filters: " + e);
+        }
+
+        return bList;
+    }
+
+    @Override
+    public List<Booking> getListBookingAdminManage(int limit, int offset, String keyword, Date date, Integer statusId) {
+        List<Booking> bList = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+        SELECT 
+            b.*, s.name as StatusName
+        FROM
+            fuhousefinder_homestay.booking b
+            JOIN homestay h ON b.homestay_id = h.id
+            JOIN status s ON s.id = b.status_id
+            LEFT JOIN room r ON r.id = b.room_id
+            JOIN `User` us ON us.id = b.tenant_id
+        WHERE 1 = 1
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append("""
+            AND (
+                h.name LIKE ? OR 
+                r.name LIKE ? OR 
+                CONCAT_WS(' ', us.first_name, us.last_name) LIKE ?
+            )
+        """);
+            String kw = "%" + keyword + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        if (date != null) {
+            sql.append(" AND DATE(b.created_at) = ? ");
+            params.add(new java.sql.Date(date.getTime()));
+        }
+
+        if (statusId != null) {
+            sql.append(" AND b.status_id = ? ");
+            params.add(statusId);
+        }
+
+        sql.append(" ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
+        params.add(limit);
+        params.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String string) {
+                    ps.setString(i + 1, string);
+                } else if (param instanceof Integer integer) {
+                    ps.setInt(i + 1, integer);
+                } else if (param instanceof java.sql.Date sqlDate) {
+                    ps.setDate(i + 1, sqlDate);
+                } else {
+                    ps.setObject(i + 1, param);
+                }
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Booking b = new Booking();
+
+                b.setId(rs.getString("id"));
+
+                User tenant = new User();
+                tenant.setId(rs.getString("tenant_id"));
+                b.setTenant(tenant);
+
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+                b.setHomestay(h);
+
+                Room r = new Room();
+                r.setId(rs.getString("room_id"));
+                b.setRoom(r);
+
+                b.setCheck_in(rs.getDate("check_in"));
+                b.setCheckout(rs.getDate("check_out"));
+                b.setTotal_price(rs.getDouble("total_price"));
+                b.setDeposit(rs.getDouble("deposit"));
+                b.setService_fee(rs.getDouble("service_fee"));
+                b.setCleaning_fee(rs.getDouble("cleaning_fee"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+                b.setStatus(s);
+
+                b.setCreated_at(rs.getTimestamp("created_at"));
+                b.setNote(rs.getString("note"));
+
+                bList.add(b);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching paginated homestay owner bookings with filters: " + e);
+        }
+
+        return bList;
     }
 
 }

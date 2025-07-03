@@ -6,6 +6,7 @@ package DAL.DAO;
 
 import Model.Booking;
 import Model.User;
+import java.sql.Timestamp;
 import java.sql.Date;
 import java.util.List;
 
@@ -24,6 +25,12 @@ public interface IBookingDAO {
             String houseName, Date fromDate, Date toDate, Integer statusId);
 
     public Booking getBookingDetailById(String bookId);
+
+    public List<Booking> getListBookingHomestayOwnerManage(User u, int limit, int offset,
+            String keyword, Date date, Integer statusId);
+
+    public List<Booking> getListBookingAdminManage(int limit, int offset,
+            String keyword, Date date, Integer statusId);
 
     //ADD
     public boolean addBooking(Booking b);

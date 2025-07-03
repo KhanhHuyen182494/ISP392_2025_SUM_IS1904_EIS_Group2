@@ -4,12 +4,6 @@
     Author     : Hien
 --%>
 
-<%-- 
-    Document   : BookingContract
-    Created on : Jun 30, 2025, 5:58:16 PM
-    Author     : Hien
---%>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>

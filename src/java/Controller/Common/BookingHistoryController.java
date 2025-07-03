@@ -50,7 +50,7 @@ public class BookingHistoryController extends BaseAuthorization {
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-
+        
     }
 
     private void doGetBookingHistory(HttpServletRequest request, HttpServletResponse response, User user)
