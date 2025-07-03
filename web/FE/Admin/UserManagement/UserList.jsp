@@ -141,26 +141,26 @@
                                         </div>-->
 
                     <!-- Booking Management -->
-                    <!--                    <div class="mb-6">
-                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Booking Management</h3>
-                                            <div class="space-y-2">
-                                                <a href="${pageContext.request.contextPath}/manage/booking" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-calendar-check w-5"></i>
-                                                    <span>All Bookings</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/booking/disputes" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-exclamation-triangle w-5"></i>
-                                                    <span>Disputes</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/booking/refunds" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-undo w-5"></i>
-                                                    <span>Refunds</span>
-                                                </a>
-                                            </div>
-                                        </div>-->
+                    <div class="mb-6">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Booking Management</h3>
+                        <div class="space-y-2">
+                            <a href="${pageContext.request.contextPath}/manage/booking" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-calendar-check w-5"></i>
+                                <span>All Bookings</span>
+                            </a>
+<!--                            <a href="${pageContext.request.contextPath}/manage/booking/disputes" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-exclamation-triangle w-5"></i>
+                                <span>Disputes</span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/manage/booking/refunds" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-undo w-5"></i>
+                                <span>Refunds</span>
+                            </a>-->
+                        </div>
+                    </div>
 
                     <!-- Financial Management -->
                     <!--                    <div class="mb-6">

@@ -97,21 +97,23 @@
                         <h2 class="text-lg font-semibold text-gray-800 mb-6">Homestay Owner Panel</h2>
                     </c:if>
 
-                    <!--                    <div class="mb-6">
-                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">User Management</h3>
-                                            <div class="space-y-2">
-                                                <a href="${pageContext.request.contextPath}/manage/user" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
-                                                    <i class="fas fa-users w-5"></i>
-                                                    <span>All Users</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/user/permissions" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-shield-alt w-5"></i>
-                                                    <span>Permissions</span>
-                                                </a>
-                                            </div>
-                                        </div>-->
+                    <c:if test="${sessionScope.user.role.id == 1}">
+                        <div class="mb-6">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">User Management</h3>
+                            <div class="space-y-2">
+                                <a href="${pageContext.request.contextPath}/manage/user" 
+                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                    <i class="fas fa-users w-5"></i>
+                                    <span>All Users</span>
+                                </a>
+<!--                                <a href="${pageContext.request.contextPath}/manage/user/permissions" 
+                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                    <i class="fas fa-shield-alt w-5"></i>
+                                    <span>Permissions</span>
+                                </a>-->
+                            </div>
+                        </div>
+                    </c:if>
 
                     <!-- Homestay Management -->
                     <!--                    <div class="mb-6">
@@ -348,7 +350,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <a href="#" class="text-blue-500 hover:text-blue-900 transition-colors duration-200">View</a>
                                             <c:choose>
-                                                <c:when test="${booking.status.id == 8 || booking.status.id == 9}">
+                                                <c:when test="${(booking.status.id == 8 || booking.status.id == 9) and session.user.role.id == 3}">
                                                     <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Cancel</a>
                                                 </c:when>
                                             </c:choose>

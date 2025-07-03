@@ -29,6 +29,9 @@ public interface IBookingDAO {
     public List<Booking> getListBookingHomestayOwnerManage(User u, int limit, int offset,
             String keyword, Date date, Integer statusId);
 
+    public List<Booking> getListBookingAdminManage(int limit, int offset,
+            String keyword, Date date, Integer statusId);
+
     //ADD
     public boolean addBooking(Booking b);
 
