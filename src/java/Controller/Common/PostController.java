@@ -198,7 +198,7 @@ public class PostController extends BaseAuthorization {
 
                 Status s = new Status();
                 s.setId(14);
-                
+
                 p.setStatus(s);
 
                 if (pDao.add(p)) {

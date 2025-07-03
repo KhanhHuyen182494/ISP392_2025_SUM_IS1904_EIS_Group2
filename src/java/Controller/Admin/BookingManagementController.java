@@ -130,7 +130,7 @@ public class BookingManagementController extends BaseAuthorization {
 
         User tenant = uDao.getById(b.getTenant().getId());
         b.setTenant(tenant);
-        
+
         if (user.getRole().getId() != 1) {
             if (user.getRole().getId() == 3) {
                 if (!user.getId().equals(h.getOwner().getId())) {

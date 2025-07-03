@@ -114,6 +114,10 @@ public class Generator {
     public static String generatePaymentId() {
         return generate("PAYMENT", 36);
     }
+    
+    public static String generateReviewId() {
+        return generate("REVIEW", 36);
+    }
 
     public static void main(String[] args) {
         System.out.println(generatePassword(8));

@@ -116,9 +116,9 @@ public class ContractController extends BaseAuthorization {
             c.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
             c.setFile_path(contractWebPath);
             c.setFilename(filename);
-            
+
             contractDao.addContract(c);
-            
+
             jsonResponse.put("ok", true);
             jsonResponse.put("path", request.getContextPath() + "/" + contractWebPath); // For browser use
             out.print(gson.toJson(jsonResponse));
