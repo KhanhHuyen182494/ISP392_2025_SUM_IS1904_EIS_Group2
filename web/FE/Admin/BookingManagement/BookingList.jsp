@@ -1,7 +1,7 @@
 <%-- 
-    Document   : UserList
-    Created on : Jun 30, 2025, 8:26:39 AM
-    Author     : Huyen
+    Document   : BookingList
+    Created on : Jul 3, 2025, 2:32:29 PM
+    Author     : nongducdai
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>User List</title>
+        <title>Booking List</title>
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -90,33 +90,28 @@
             <!-- Admin Sidebar -->
             <aside class="bg-white shadow-lg w-64 min-h-screen sticky top-20 z-40">
                 <nav class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-6">Admin Panel</h2>
+                    <c:if test="${sessionScope.user.role.id == 1}">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-6">Admin Panel</h2>
+                    </c:if>
+                    <c:if test="${sessionScope.user.role.id == 3}">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-6">Homestay Owner Panel</h2>
+                    </c:if>
 
-                    <!-- Dashboard -->
                     <!--                    <div class="mb-6">
-                                            <a href="${pageContext.request.contextPath}/admin/dashboard" 
-                                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                <i class="fas fa-tachometer-alt w-5"></i>
-                                                <span class="font-medium">Dashboard</span>
-                                            </a>
+                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">User Management</h3>
+                                            <div class="space-y-2">
+                                                <a href="${pageContext.request.contextPath}/manage/user" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
+                                                    <i class="fas fa-users w-5"></i>
+                                                    <span>All Users</span>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manage/user/permissions" 
+                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                                    <i class="fas fa-shield-alt w-5"></i>
+                                                    <span>Permissions</span>
+                                                </a>
+                                            </div>
                                         </div>-->
-
-                    <!-- User Management -->
-                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">User Management</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/user" 
-                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
-                                <i class="fas fa-users w-5"></i>
-                                <span>All Users</span>
-                            </a>
-<!--                            <a href="${pageContext.request.contextPath}/manage/user/permissions" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-shield-alt w-5"></i>
-                                <span>Permissions</span>
-                            </a>-->
-                        </div>
-                    </div>
 
                     <!-- Homestay Management -->
                     <!--                    <div class="mb-6">
@@ -141,26 +136,26 @@
                                         </div>-->
 
                     <!-- Booking Management -->
-                    <!--                    <div class="mb-6">
-                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Booking Management</h3>
-                                            <div class="space-y-2">
-                                                <a href="${pageContext.request.contextPath}/manage/booking" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-calendar-check w-5"></i>
-                                                    <span>All Bookings</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/booking/disputes" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-exclamation-triangle w-5"></i>
-                                                    <span>Disputes</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/booking/refunds" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-undo w-5"></i>
-                                                    <span>Refunds</span>
-                                                </a>
-                                            </div>
-                                        </div>-->
+                    <div class="mb-6">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Booking Management</h3>
+                        <div class="space-y-2">
+                            <a href="${pageContext.request.contextPath}/manage/booking" 
+                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
+                                <i class="fas fa-calendar-check w-5"></i>
+                                <span>All Bookings</span>
+                            </a>
+<!--                            <a href="${pageContext.request.contextPath}/manage/booking/disputes" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-exclamation-triangle w-5"></i>
+                                <span>Disputes</span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/manage/booking/refunds" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-undo w-5"></i>
+                                <span>Refunds</span>
+                            </a>-->
+                        </div>
+                    </div>
 
                     <!-- Financial Management -->
                     <!--                    <div class="mb-6">
@@ -228,71 +223,22 @@
             <!-- Main Content -->
             <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8">
                 <!-- Dashboard Header -->
-                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
-                    <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
-                        User Management
-                    </h1>
-                    <p class="text-gray-600">Manage and monitor all users in FUHF homestay booking system</p>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-3xl font-bold text-blue-600">${countTotalUser}</p>
-                                <p class="text-gray-600 text-sm font-medium">Total Users</p>
-                            </div>
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                                </svg>
-                            </div>
-                        </div>
+                <c:if test="${sessionScope.user.role.id == 1}">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+                            Booking Management (Admin)
+                        </h1>
+                        <p class="text-gray-600">Manage and monitor all bookings in FUHF homestay booking system</p>
                     </div>
-
-                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-3xl font-bold text-green-600">${countActive}</p>
-                                <p class="text-gray-600 text-sm font-medium">Active Users</p>
-                            </div>
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                        </div>
+                </c:if>
+                <c:if test="${sessionScope.user.role.id == 3}">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+                            Booking Management (Homestay Owner)
+                        </h1>
+                        <p class="text-gray-600">Manage and monitor your bookings in FUHF homestay booking system</p>
                     </div>
-
-                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-3xl font-bold text-yellow-600">${countNew}</p>
-                                <p class="text-gray-600 text-sm font-medium">New Today</p>
-                            </div>
-                            <div class="bg-yellow-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-3xl font-bold text-red-600">${countBanUser}</p>
-                                <p class="text-gray-600 text-sm font-medium">Banned Users</p>
-                            </div>
-                            <div class="bg-red-100 p-3 rounded-full">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </c:if>
 
                 <!-- Filters and Actions -->
                 <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
@@ -317,14 +263,14 @@
                                 <!-- Role Select -->
                                 <select name="roleId" 
                                         class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                                    <option value="">All Role</option>
+                                    <option value="">All Homestay</option>
                                     <c:forEach items="${rList}" var="r">
                                         <option value="${r.id}" ${r.id == roleId ? 'selected' : ''}>${r.name}</option>
                                     </c:forEach>
                                 </select>
 
                                 <!-- Date Input -->
-                                <input name="joinDate" type="date" value="${joinDate}"
+                                <input name="date" type="date" value="${date}"
                                        class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
 
                                 <!-- Action Buttons -->
@@ -350,10 +296,13 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booking ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Homestay</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checkin</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checkout</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Join Date</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -391,6 +340,9 @@
                                                 </c:when>
                                             </c:choose>
                                         </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <fmt:formatDate value="${user.created_at}" pattern="dd/MM/yyyy"/>
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <c:choose>
                                                 <c:when test="${user.status.id == 1}">
@@ -406,9 +358,6 @@
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Banned</span>
                                                 </c:when>
                                             </c:choose>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <fmt:formatDate value="${user.created_at}" pattern="dd/MM/yyyy"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
