@@ -598,7 +598,7 @@
                                         Comment
                                     </button>
                                     <button class="col-span-3 bg-white-500 hover:bg-blue-500 hover:text-white border-[1px] border-blue-600 text-blue-600 py-3 rounded-lg font-medium transition-colors"
-                                            data-post-share-id="${post.id}">
+                                            data-post-share-id="${not empty post.parent_post.id ? post.parent_post.id : post.id}">
                                         <i class="fas fa-comments mr-2"></i>
                                         Share
                                     </button>
@@ -1420,10 +1420,12 @@
                                                         }
                                                     });
                                                 };
+
                                                 $('button:contains("Share")').each(function () {
                                                     const postId = $(this).closest('.card-hover').find('button[data-post-share-id]').first().data('post-id');
                                                     $(this).attr('data-post-share-id', postId);
                                                 });
+
                                                 $(document).on('click', 'button:contains("Share")', function () {
                                                     let user = '${sessionScope.user_id}';
                                                     if (user.trim() === '') {
@@ -1504,7 +1506,7 @@
                                                         });
                                                     }
                                                 });
-                                                
+
                                                 function showToast(message, type = 'success') {
                                                     Toastify({
                                                         text: message,
