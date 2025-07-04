@@ -8,6 +8,7 @@ import Model.Address;
 import Model.Booking;
 import Model.House;
 import Model.Media;
+import Model.Payment;
 import Model.Room;
 import Model.Status;
 import Model.User;
@@ -50,7 +51,7 @@ public class BookingHistoryController extends BaseAuthorization {
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        
+
     }
 
     private void doGetBookingHistory(HttpServletRequest request, HttpServletResponse response, User user)
@@ -113,6 +114,7 @@ public class BookingHistoryController extends BaseAuthorization {
         String bookId = request.getParameter("bookId");
 
         Booking b = bookDao.getBookingDetailById(bookId);
+        Payment p = pmDao.getPaymentByBookingId(bookId);
 
         if (!user.getId().equals(b.getTenant().getId())) {
             response.sendError(404);
@@ -130,6 +132,7 @@ public class BookingHistoryController extends BaseAuthorization {
 
         b.setHomestay(h);
 
+        request.setAttribute("payment", p);
         request.setAttribute("booking", b);
         request.getRequestDispatcher("../FE/Common/BookingDetail.jsp").forward(request, response);
     }

@@ -491,25 +491,27 @@
                         <div class="border-t pt-4 space-y-3">
                             <!-- Payment Methods -->
                             <div class="mb-6">
-                                <form action="${pageContext.request.contextPath}/payment" method="POST">
-                                    <h4 class="font-medium text-gray-900 mb-3">Payment Method</h4>
-                                    <input type="hidden" name="deposit" value="${b.deposit}" />
-                                    <input type="hidden" name="bookId" value="${b.id}" />
-                                    <div class="space-y-2 mb-2">
-                                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                            <input type="radio" name="paymentMethod" value="vnpay" class="mr-3" checked>
-                                            <img src="${pageContext.request.contextPath}/Asset/Common/Payment/vnpay.jfif" alt="VNPay" class="w-8 h-8 mr-3 rounded-[50%]">
-                                            <span class="font-medium">VNPay</span>
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <button type="submit" 
-                                                id="proceedPaymentBtn"
-                                                class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                                            Pay 
-                                        </button>
-                                    </div>
-                                </form>
+                                <c:if test="${b.status.id == 9}">
+                                    <form action="${pageContext.request.contextPath}/payment" method="POST">
+                                        <h4 class="font-medium text-gray-900 mb-3">Payment Method</h4>
+                                        <input type="hidden" name="deposit" value="${b.deposit}" />
+                                        <input type="hidden" name="bookId" value="${b.id}" />
+                                        <div class="space-y-2 mb-2">
+                                            <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                                <input type="radio" name="paymentMethod" value="vnpay" class="mr-3" checked>
+                                                <img src="${pageContext.request.contextPath}/Asset/Common/Payment/vnpay.jfif" alt="VNPay" class="w-8 h-8 mr-3 rounded-[50%]">
+                                                <span class="font-medium">VNPay</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <button type="submit" 
+                                                    id="proceedPaymentBtn"
+                                                    class="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                                                Pay 
+                                            </button>
+                                        </div>
+                                    </form>
+                                </c:if>
                             </div>
 
                             <button id="downloadPdfBtn2" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">

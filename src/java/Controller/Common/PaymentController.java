@@ -67,7 +67,7 @@ public class PaymentController extends BaseAuthorization {
             pm.setBooking_id(bookId);
             pm.setUser_id(user.getId());
             pm.setStatusId(31);
-            pm.setMethod("VNPay");
+            pm.setMethod("vnpay");
 
             pmDao.addPayment(pm);
             session.setAttribute("bookIdPayment", bookId);

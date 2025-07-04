@@ -151,7 +151,11 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
             ps.setInt(5, t.getStatus().getId());
             ps.setString(6, t.getOwner().getId());
             ps.setString(7, t.getHomestay().getId());
-            ps.setString(8, t.getRoom().getId());
+            if (t.getRoom() != null) {
+                ps.setString(8, t.getRoom().getId());
+            } else {
+                ps.setString(8, null);
+            }
 
             return ps.executeUpdate() > 0;
 

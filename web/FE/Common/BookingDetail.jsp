@@ -403,19 +403,18 @@
                     </h2>
 
                     <c:choose>
-                        <c:when test="${booking.status.id == 9}">
-
+                        <c:when test="${booking.status.id != 8}">
+                            <a href="${pageContext.request.contextPath}/booking/contract/preview?bookId=${booking.id}">
+                                <button onclick="generateContract(${booking.id})" 
+                                        class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-medium transition-colors mt-4 w-full sm:w-auto">
+                                    Go to Contract
+                                </button>
+                            </a>
                         </c:when>
                         <c:otherwise>
                             <div class="text-center py-8">
                                 <i class="fas fa-file-contract text-gray-400 text-4xl mb-4"></i>
                                 <p class="text-gray-500 text-lg">No contract available for this booking</p>
-                                <c:if test="${sessionScope.user.role.id == 1}">
-                                    <button onclick="generateContract(${booking.id})" 
-                                            class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-medium transition-colors mt-4 w-full sm:w-auto">
-                                        <i class="fas fa-plus mr-2"></i>Generate Contract
-                                    </button>
-                                </c:if>
                             </div>
                         </c:otherwise>
                     </c:choose>
@@ -427,107 +426,107 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                        function signContract(contractId) {
-                                            Swal.fire({
-                                                title: 'Sign Contract',
-                                                text: 'Are you sure you want to sign this contract? This action cannot be undone.',
-                                                icon: 'question',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#16a34a',
-                                                cancelButtonColor: '#dc2626',
-                                                confirmButtonText: 'Yes, Sign Contract',
-                                                cancelButtonText: 'Cancel'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    $.ajax({
-                                                        url: '${pageContext.request.contextPath}/contract/sign',
-                                                        type: 'POST',
-                                                        data: {contractId: contractId},
-                                                        success: function (response) {
-                                                            if (response.success) {
-                                                                Swal.fire({
-                                                                    title: 'Success!',
-                                                                    text: 'Contract has been signed successfully.',
-                                                                    icon: 'success'
-                                                                }).then(() => {
-                                                                    location.reload();
-                                                                });
-                                                            } else {
-                                                                Swal.fire({
-                                                                    title: 'Error!',
-                                                                    text: response.message || 'Failed to sign contract.',
-                                                                    icon: 'error'
-                                                                });
-                                                            }
-                                                        },
-                                                        error: function () {
+                                    function signContract(contractId) {
+                                        Swal.fire({
+                                            title: 'Sign Contract',
+                                            text: 'Are you sure you want to sign this contract? This action cannot be undone.',
+                                            icon: 'question',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#16a34a',
+                                            cancelButtonColor: '#dc2626',
+                                            confirmButtonText: 'Yes, Sign Contract',
+                                            cancelButtonText: 'Cancel'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '${pageContext.request.contextPath}/contract/sign',
+                                                    type: 'POST',
+                                                    data: {contractId: contractId},
+                                                    success: function (response) {
+                                                        if (response.success) {
+                                                            Swal.fire({
+                                                                title: 'Success!',
+                                                                text: 'Contract has been signed successfully.',
+                                                                icon: 'success'
+                                                            }).then(() => {
+                                                                location.reload();
+                                                            });
+                                                        } else {
                                                             Swal.fire({
                                                                 title: 'Error!',
-                                                                text: 'An error occurred while signing the contract.',
+                                                                text: response.message || 'Failed to sign contract.',
                                                                 icon: 'error'
                                                             });
                                                         }
-                                                    });
-                                                }
-                                            });
-                                        }
-
-                                        function generateContract(bookingId) {
-                                            Swal.fire({
-                                                title: 'Generate Contract',
-                                                text: 'Generate a new contract for this booking?',
-                                                icon: 'question',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#ea580c',
-                                                cancelButtonColor: '#dc2626',
-                                                confirmButtonText: 'Generate',
-                                                cancelButtonText: 'Cancel'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    $.ajax({
-                                                        url: '${pageContext.request.contextPath}/contract/generate',
-                                                        type: 'POST',
-                                                        data: {bookingId: bookingId},
-                                                        success: function (response) {
-                                                            if (response.success) {
-                                                                Swal.fire({
-                                                                    title: 'Success!',
-                                                                    text: 'Contract has been generated successfully.',
-                                                                    icon: 'success'
-                                                                }).then(() => {
-                                                                    location.reload();
-                                                                });
-                                                            } else {
-                                                                Swal.fire({
-                                                                    title: 'Error!',
-                                                                    text: response.message || 'Failed to generate contract.',
-                                                                    icon: 'error'
-                                                                });
-                                                            }
-                                                        },
-                                                        error: function () {
-                                                            Swal.fire({
-                                                                title: 'Error!',
-                                                                text: 'An error occurred while generating the contract.',
-                                                                icon: 'error'
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        }
-
-                                        $(document).ready(function () {
-                                            $('.search-focus').focus(function () {
-                                                $(this).addClass('ring-2 ring-blue-500');
-                                                $('.icon-search-focus').addClass('text-blue-500');
-                                            });
-
-                                            $('.search-focus').blur(function () {
-                                                $(this).removeClass('ring-2 ring-blue-500');
-                                                $('.icon-search-focus').removeClass('text-blue-500');
-                                            });
+                                                    },
+                                                    error: function () {
+                                                        Swal.fire({
+                                                            title: 'Error!',
+                                                            text: 'An error occurred while signing the contract.',
+                                                            icon: 'error'
+                                                        });
+                                                    }
+                                                });
+                                            }
                                         });
+                                    }
+
+                                    function generateContract(bookingId) {
+                                        Swal.fire({
+                                            title: 'Generate Contract',
+                                            text: 'Generate a new contract for this booking?',
+                                            icon: 'question',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#ea580c',
+                                            cancelButtonColor: '#dc2626',
+                                            confirmButtonText: 'Generate',
+                                            cancelButtonText: 'Cancel'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '${pageContext.request.contextPath}/contract/generate',
+                                                    type: 'POST',
+                                                    data: {bookingId: bookingId},
+                                                    success: function (response) {
+                                                        if (response.success) {
+                                                            Swal.fire({
+                                                                title: 'Success!',
+                                                                text: 'Contract has been generated successfully.',
+                                                                icon: 'success'
+                                                            }).then(() => {
+                                                                location.reload();
+                                                            });
+                                                        } else {
+                                                            Swal.fire({
+                                                                title: 'Error!',
+                                                                text: response.message || 'Failed to generate contract.',
+                                                                icon: 'error'
+                                                            });
+                                                        }
+                                                    },
+                                                    error: function () {
+                                                        Swal.fire({
+                                                            title: 'Error!',
+                                                            text: 'An error occurred while generating the contract.',
+                                                            icon: 'error'
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+
+                                    $(document).ready(function () {
+                                        $('.search-focus').focus(function () {
+                                            $(this).addClass('ring-2 ring-blue-500');
+                                            $('.icon-search-focus').addClass('text-blue-500');
+                                        });
+
+                                        $('.search-focus').blur(function () {
+                                            $(this).removeClass('ring-2 ring-blue-500');
+                                            $('.icon-search-focus').removeClass('text-blue-500');
+                                        });
+                                    });
         </script>
     </body>
 </html>

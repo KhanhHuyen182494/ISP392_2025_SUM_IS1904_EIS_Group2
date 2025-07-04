@@ -156,7 +156,14 @@
                                 <c:forEach items="${requestScope.ptList}" var="pt">
                                     <c:choose>
                                         <c:when test="${sessionScope.user.role.id == 1}">
-                                            <option value="${pt.id}">${pt.name}</option>
+                                            <c:if test="${pt.id != 2 and pt.id != 5 and pt.id != 1}">
+                                                <option value="${pt.id}" ${pt.id == 4 ? 'selected' : ''}>${pt.name}</option>
+                                            </c:if>
+                                        </c:when>
+                                        <c:when test="${sessionScope.user.role.id == 5}">
+                                            <c:if test="${pt.id != 3 and pt.id != 2 and pt.id != 5 and pt.id != 1}">
+                                                <option value="${pt.id}" ${pt.id == 4 ? 'selected' : ''}>${pt.name}</option>
+                                            </c:if>
                                         </c:when>
                                         <c:otherwise>
                                             <c:if test="${pt.id != 3 and pt.id != 2 and pt.id != 5}">
