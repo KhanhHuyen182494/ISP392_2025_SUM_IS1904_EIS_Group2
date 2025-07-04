@@ -87,6 +87,7 @@ public class PaymentDAO extends BaseDao implements IPaymentDAO {
                 p.setBooking_id(rs.getString("booking_id"));
                 p.setAmount(rs.getDouble("amount"));
                 p.setStatusId(rs.getInt("status_id"));
+                p.setMethod(rs.getString("method"));
             }
 
         } catch (SQLException e) {

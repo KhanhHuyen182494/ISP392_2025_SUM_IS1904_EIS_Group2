@@ -100,6 +100,7 @@ public class VNPayReturnController extends HttpServlet {
         double amount = Double.parseDouble(vnp_Amount) / 100;
 
         Payment p = pmDao.getPaymentByBookingId(bookingId);
+        bookDao.updateBookingStatus(bookingId, 34);
 
         if (p != null && p.getId() != null) {
             p.setBank_code(vnp_BankCode);
@@ -127,18 +128,91 @@ public class VNPayReturnController extends HttpServlet {
             request.setAttribute("booking", b);
             request.setAttribute("p", p);
             request.getRequestDispatcher("/FE/Common/E-PaymentResponse/VNPay/PaymentSuccess.jsp").forward(request, response);
-        } else {
         }
     }
 
     protected void HandleCancelPayment(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String bookingId = (String) request.getSession(false).getAttribute("bookIdPayment");
+        String vnp_Amount = request.getParameter("vnp_Amount");
+        String vnp_BankCode = request.getParameter("vnp_BankCode");
+        String vnp_TransactionNo = request.getParameter("vnp_TransactionNo");
+        String vnp_PayDate = request.getParameter("vnp_PayDate");
 
+        double amount = Double.parseDouble(vnp_Amount) / 100;
+
+        Payment p = pmDao.getPaymentByBookingId(bookingId);
+//        bookDao.updateBookingStatus(bookingId, 27);
+
+        if (p != null && p.getId() != null) {
+            p.setBank_code(vnp_BankCode);
+            p.setTransaction_id(vnp_TransactionNo);
+            p.setStatusId(33);
+            p.setUpdated_at(Timestamp.valueOf(LocalDateTime.now()));
+
+            pmDao.updatePayment(p);
+
+            Booking b = bookDao.getBookingDetailById(bookingId);
+
+            House h = hDao.getById(b.getHomestay().getId());
+            fullLoadHouseInfomation(h);
+
+            if (!h.isIs_whole_house()) {
+                Room r = roomDao.getById(b.getRoom().getId());
+                fullLoadRoomInfo(r);
+                b.setRoom(r);
+            }
+
+            b.setHomestay(h);
+
+            request.getSession(false).removeAttribute("bookIdPayment");
+
+            request.setAttribute("booking", b);
+            request.setAttribute("p", p);
+            request.getRequestDispatcher("/FE/Common/E-PaymentResponse/VNPay/PaymentCancle.jsp").forward(request, response);
+        }
     }
 
     protected void HandleTimeoutPayment(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String bookingId = (String) request.getSession(false).getAttribute("bookIdPayment");
+        String vnp_Amount = request.getParameter("vnp_Amount");
+        String vnp_BankCode = request.getParameter("vnp_BankCode");
+        String vnp_TransactionNo = request.getParameter("vnp_TransactionNo");
+        String vnp_PayDate = request.getParameter("vnp_PayDate");
 
+        double amount = Double.parseDouble(vnp_Amount) / 100;
+
+        Payment p = pmDao.getPaymentByBookingId(bookingId);
+//        bookDao.updateBookingStatus(bookingId, 27);
+
+        if (p != null && p.getId() != null) {
+            p.setBank_code(vnp_BankCode);
+            p.setTransaction_id(vnp_TransactionNo);
+            p.setStatusId(35);
+            p.setUpdated_at(Timestamp.valueOf(LocalDateTime.now()));
+
+            pmDao.updatePayment(p);
+
+            Booking b = bookDao.getBookingDetailById(bookingId);
+
+            House h = hDao.getById(b.getHomestay().getId());
+            fullLoadHouseInfomation(h);
+
+            if (!h.isIs_whole_house()) {
+                Room r = roomDao.getById(b.getRoom().getId());
+                fullLoadRoomInfo(r);
+                b.setRoom(r);
+            }
+
+            b.setHomestay(h);
+
+            request.getSession(false).removeAttribute("bookIdPayment");
+
+            request.setAttribute("booking", b);
+            request.setAttribute("p", p);
+            request.getRequestDispatcher("/FE/Common/E-PaymentResponse/VNPay/PaymentTimeout.jsp").forward(request, response);
+        }
     }
 
     private void fullLoadRoomInfo(Room r) {

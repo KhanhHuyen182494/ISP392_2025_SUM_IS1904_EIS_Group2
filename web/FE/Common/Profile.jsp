@@ -337,13 +337,13 @@
                             </a>
                         </c:if>
                         <a href="${pageContext.request.contextPath}/review">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-star"></i>
                                 View Your's Reviews
                             </button>
                         </a>
                         <a href="${pageContext.request.contextPath}/booking/history">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                            <button class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-book"></i>
                                 View Your's Booking History
                             </button>
@@ -1183,25 +1183,33 @@
 
                                                 function createReviewHtml(review) {
                                                     const stars = generateStarRating(review.Star);
+
                                                     return `
                                                         <div class="review-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
                                                                 <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                                    <img class="w-12 h-12 rounded-full object-cover" src=${pageContext.request.contextPath}/Asset/Common/Avatar/` + review.owner.avatar + ` 
+                                                                    <img class="w-12 h-12 rounded-full object-cover" src="` + '${pageContext.request.contextPath}' + `/Asset/Common/Avatar/` + review.owner.avatar + `" 
                                                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                                                                     <i class="fas fa-user text-white text-sm" style="display: none;"></i>
                                                                 </div>
-                                                                <div class="flex-1">
+                                                                <div class="flex-1 min-w-0">
                                                                     <div class="flex items-center justify-between mb-2">
                                                                         <div class="flex items-center gap-3">
-                                                                            <a href="${pageContext.request.contextPath}/profile?uid=` + review.owner.id + `" class="font-semibold text-gray-800">` + review.owner.first_name + ` ` + review.owner.last_name + `</a>
+                                                                            <a href="` + '${pageContext.request.contextPath}' + `/profile?uid=` + review.owner.id + `" class="font-semibold text-gray-800">` + review.owner.first_name + ` ` + review.owner.last_name + `</a>
                                                                             <div class="star-rating flex">
                                                                                 ` + stars + `
                                                                             </div>
                                                                         </div>
-                                                                        <span class="text-xs text-gray-500">` + review.created_at + ` </span>
+                                                                        <span class="text-xs text-gray-500">` + review.created_at + `</span>
                                                                     </div>
-                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + review.content + `</p>
+                                                                    <p class="text-gray-700 text-sm leading-relaxed" style="
+                                                                        display: -webkit-box;
+                                                                        -webkit-line-clamp: 4;
+                                                                        -webkit-box-orient: vertical;
+                                                                        overflow: hidden;
+                                                                        word-wrap: break-word;
+                                                                        hyphens: auto;
+                                                                    ">` + review.content + `</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1839,6 +1847,49 @@
                                                 if (clickedIndex !== -1) {
                                                     openImageCarousel(clickedIndex, postElement);
                                                 }
+                                            }
+
+                                            function showChangePassword() {
+                                                Swal.fire({
+                                                    title: 'Caution',
+                                                    html: 'We’ll send a email with a OTP code expired in <b><span class="text-red-500">5 mins</span></b> for you to change password! Do you want to continue change password?',
+                                                    imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                    imageWidth: 150,
+                                                    imageHeight: 150,
+                                                    imageAlt: 'Custom icon',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Yes',
+                                                    cancelButtonText: 'Cancel',
+                                                    reverseButtons: true,
+                                                    focusConfirm: false,
+                                                    focusCancel: false,
+                                                    customClass: {
+                                                        popup: 'rounded-xl shadow-lg',
+                                                        title: 'text-xl font-semibold',
+                                                        confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                        actions: 'space-x-4'
+                                                    },
+                                                    buttonsStyling: false
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $.ajax({
+                                                            url: '${pageContext.request.contextPath}/send-otp',
+                                                            type: 'GET',
+                                                            beforeSend: function (xhr) {
+                                                                showLoading();
+                                                            },
+                                                            success: function (response) {
+                                                                Swal.close();
+                                                                if (response.ok == true) {
+                                                                    location.href = '${pageContext.request.contextPath}/get-verify-otp';
+                                                                }
+                                                            }
+                                                        });
+                                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                        Swal.close();
+                                                    }
+                                                });
                                             }
         </script>
     </body>

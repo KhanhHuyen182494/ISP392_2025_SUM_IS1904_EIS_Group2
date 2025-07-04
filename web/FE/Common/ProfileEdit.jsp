@@ -636,6 +636,49 @@
                                     stopOnFocus: true
                                 }).showToast();
                             }
+
+                            function showChangePassword() {
+                                Swal.fire({
+                                    title: 'Caution',
+                                    html: 'We’ll send a email with a OTP code expired in <b><span class="text-red-500">5 mins</span></b> for you to change password! Do you want to continue change password?',
+                                    imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                    imageWidth: 150,
+                                    imageHeight: 150,
+                                    imageAlt: 'Custom icon',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Yes',
+                                    cancelButtonText: 'Cancel',
+                                    reverseButtons: true,
+                                    focusConfirm: false,
+                                    focusCancel: false,
+                                    customClass: {
+                                        popup: 'rounded-xl shadow-lg',
+                                        title: 'text-xl font-semibold',
+                                        confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                        cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                        actions: 'space-x-4'
+                                    },
+                                    buttonsStyling: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            url: '${pageContext.request.contextPath}/send-otp',
+                                            type: 'GET',
+                                            beforeSend: function (xhr) {
+                                                showLoading();
+                                            },
+                                            success: function (response) {
+                                                Swal.close();
+                                                if (response.ok == true) {
+                                                    location.href = '${pageContext.request.contextPath}/get-verify-otp';
+                                                }
+                                            }
+                                        });
+                                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                        Swal.close();
+                                    }
+                                });
+                            }
         </script>
     </body>
 </html>

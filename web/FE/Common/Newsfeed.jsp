@@ -1031,25 +1031,33 @@
 
                                                 function createReviewHtml(review) {
                                                     const stars = generateStarRating(review.Star);
+
                                                     return `
                                                         <div class="review-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
                                                                 <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                                    <img class="w-12 h-12 rounded-full object-cover" src=${pageContext.request.contextPath}/Asset/Common/Avatar/` + review.owner.avatar + ` 
+                                                                    <img class="w-12 h-12 rounded-full object-cover" src="` + '${pageContext.request.contextPath}' + `/Asset/Common/Avatar/` + review.owner.avatar + `" 
                                                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                                                                     <i class="fas fa-user text-white text-sm" style="display: none;"></i>
                                                                 </div>
-                                                                <div class="flex-1">
+                                                                <div class="flex-1 min-w-0">
                                                                     <div class="flex items-center justify-between mb-2">
                                                                         <div class="flex items-center gap-3">
-                                                                            <a href="${pageContext.request.contextPath}/profile?uid=` + review.owner.id + `" class="font-semibold text-gray-800">` + review.owner.first_name + ` ` + review.owner.last_name + `</a>
+                                                                            <a href="` + '${pageContext.request.contextPath}' + `/profile?uid=` + review.owner.id + `" class="font-semibold text-gray-800">` + review.owner.first_name + ` ` + review.owner.last_name + `</a>
                                                                             <div class="star-rating flex">
                                                                                 ` + stars + `
                                                                             </div>
                                                                         </div>
-                                                                        <span class="text-xs text-gray-500">` + review.created_at + ` </span>
+                                                                        <span class="text-xs text-gray-500">` + review.created_at + `</span>
                                                                     </div>
-                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + review.content + `</p>
+                                                                    <p class="text-gray-700 text-sm leading-relaxed" style="
+                                                                        display: -webkit-box;
+                                                                        -webkit-line-clamp: 4;
+                                                                        -webkit-box-orient: vertical;
+                                                                        overflow: hidden;
+                                                                        word-wrap: break-word;
+                                                                        hyphens: auto;
+                                                                    ">` + review.content + `</p>
                                                                 </div>
                                                             </div>
                                                         </div>

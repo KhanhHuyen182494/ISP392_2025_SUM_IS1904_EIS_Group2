@@ -406,8 +406,8 @@
                                 <!-- Review Content -->
                                 <div class="mb-4">
                                     <h4 class="font-medium text-gray-800 mb-2">Review Content:</h4>
-                                    <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
-                                        <p class="text-gray-700 leading-relaxed">${review.content}</p>
+                                    <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400 max-h-48 overflow-auto">
+                                        <p class="text-gray-700 leading-relaxed break-words whitespace-pre-wrap">${review.content}</p>
                                     </div>
                                 </div>
 
@@ -420,9 +420,9 @@
                                     </div>
 
                                     <div class="flex gap-2">
-                                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
-                                            <i class="fas fa-eye mr-1"></i>View Details
-                                        </button>
+                                        <!--                                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
+                                                                                    <i class="fas fa-eye mr-1"></i>View Details
+                                                                                </button>-->
                                         <c:if test="${sessionScope.user.role.id == 1 || sessionScope.user.role.id == 3}">
                                             <button class="text-green-600 hover:text-green-800 text-sm font-medium transition-colors">
                                                 <i class="fas fa-edit mr-1"></i>Edit

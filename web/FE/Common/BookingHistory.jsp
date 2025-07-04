@@ -299,7 +299,12 @@
                                                 </span>
                                             </c:when>
                                             <c:when test="${booking.status.id == 12}">
-                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-green-800">
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                    ${booking.status.name}
+                                                </span>
+                                            </c:when>
+                                            <c:when test="${booking.status.id == 34}">
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                                                     ${booking.status.name}
                                                 </span>
                                             </c:when>
@@ -342,6 +347,21 @@
                                                     <input type="hidden" name="bookId" value="${booking.id}" />
                                                     <button type="submit" class="text-green-600 hover:text-green-900" title="Confirm">
                                                         <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            </c:if>
+                                            <c:if test="${booking.status.id == 34}">
+                                                <form action="${pageContext.request.contextPath}/booking/contract/preview" method="GET">
+                                                    <input type="hidden" name="bookId" value="${booking.id}" />
+                                                    <button type="submit" class="text-green-600 hover:text-green-900" title="Confirm">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="${pageContext.request.contextPath}/review/add" method="GET">
+                                                    <input type="hidden" name="bookId" value="${booking.id}" />
+                                                    <button type="submit" class="text-green-600 hover:text-green-900 transition" title="Confirm">
+                                                        <!--<i class="fa-solid fa-star"></i>-->
+                                                        <i class="fa-regular fa-star text-yellow-600 hover:text-yellow-900 transition"></i>
                                                     </button>
                                                 </form>
                                             </c:if>
