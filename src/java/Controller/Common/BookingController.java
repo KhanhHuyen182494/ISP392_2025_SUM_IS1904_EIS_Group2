@@ -160,13 +160,23 @@ public class BookingController extends BaseAuthorization {
             Room r = new Room();
 
             if (bookingType.equals("room")) {
+
+                boolean isValid = bookDao.isRoomAvailable(bookingId, checkin, checkout);
+
+                if (!isValid) {
+                    responseData.put("ok", false);
+                    responseData.put("message", "This room is booked this date!");
+                    out.print(gson.toJson(responseData));
+                    return;
+                }
+
                 r.setId(selectedRoomParam);
             } else if (bookingType.equals("whole")) {
                 boolean isValid = bookDao.isHouseAvailable(homestayId, checkin, checkout);
                 r.setId(null);
                 if (!isValid) {
                     responseData.put("ok", false);
-                    responseData.put("message", "This room is booked this date!");
+                    responseData.put("message", "This house is booked this date!");
                     out.print(gson.toJson(responseData));
                     return;
                 }
