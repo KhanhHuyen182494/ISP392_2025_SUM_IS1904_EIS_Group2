@@ -283,10 +283,19 @@
                                 </c:if>
 
                                 <c:if test="${booking.status.id == 9}">
-                                    <button onclick="doPayment('${booking.id}')" 
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                                        <i class="fas fa-sign-in-alt mr-1"></i>Continue Payment
-                                    </button>
+                                    <form action="${pageContext.request.contextPath}/payment" method="POST">
+                                        <h4 class="font-medium text-gray-900 mb-3">Payment Method</h4>
+                                        <input type="hidden" name="deposit" value="${booking.deposit}" />
+                                        <input type="hidden" name="bookId" value="${booking.id}" />
+                                        <input type="hidden" name="paymentMethod" value="vnpay" />
+                                        <div>
+                                            <button type="submit" 
+                                                    id="proceedPaymentBtn"
+                                                    class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                                                Continue Payment
+                                            </button>
+                                        </div>
+                                    </form>
                                 </c:if>
 
                                 <c:if test="${booking.status.id == 12}">
