@@ -115,12 +115,12 @@ public class ReviewsController extends BaseAuthorization {
 
             rList = rDao.getReviewsForHouseOwnerPaging(hidList, star, keyword, createdFrom, roomId, LIMIT, offset);
 
-            totalCount = rDao.getReviewsForHouseOwnerPaging(hidList, star, keyword, createdFrom, roomId, LIMIT, offset).size();
+            totalCount = rDao.getReviewsForHouseOwnerPaging(hidList, star, keyword, createdFrom, roomId, Integer.MAX_VALUE, 0).size();
             totalPages = (int) Math.ceil((double) totalCount / LIMIT);
         } else if (user.getRole().getId() == 5) {
             rList = rDao.getReviewsForTenantPaging(user, star, keyword, createdFrom, roomId, LIMIT, offset);
 
-            totalCount = rDao.getReviewsForTenantPaging(user, star, keyword, createdFrom, roomId, LIMIT, offset).size();
+            totalCount = rDao.getReviewsForTenantPaging(user, star, keyword, createdFrom, roomId, Integer.MAX_VALUE, 0).size();
             totalPages = (int) Math.ceil((double) totalCount / LIMIT);
         }
 
@@ -178,7 +178,7 @@ public class ReviewsController extends BaseAuthorization {
             r.setOwner(user);
             r.setStatus(s);
             r.setHomestay(h);
-            
+
             if (roomId != null && !roomId.isEmpty()) {
                 Room room = new Room();
                 room.setId(roomId);
