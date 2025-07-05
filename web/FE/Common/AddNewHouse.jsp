@@ -629,6 +629,16 @@
                         return;
                     }
 
+                    if (homestayName.length > 40) {
+                        showToast("Homestay name must be less than 40 characters.", "error");
+                        return;
+                    }
+
+                    if (homestayDescription.length > 100) {
+                        showToast("Description must be less than 100 characters.", "error");
+                        return;
+                    }
+
                     // Validate homestay images
                     const homestayImages = $('#homestayImageInput')[0].files;
                     if (!homestayImages || homestayImages.length === 0) {

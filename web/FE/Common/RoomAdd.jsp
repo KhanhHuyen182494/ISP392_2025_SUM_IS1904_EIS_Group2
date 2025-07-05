@@ -121,7 +121,7 @@
                         <i class="fa-solid fa-arrow-left mr-2"></i>
                         Go back
                     </a>
-                    
+
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <i class="fas fa-door-open text-2xl mr-3"></i>
@@ -145,7 +145,7 @@
                         <div class="relative">
                             <select name="homestayId" id="homestayId" ${not empty hid ? 'disabled' : ''}
                                     class="w-full px-4 py-4 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-300 appearance-none">
-                                    <option value="">Select Homestay</option>
+                                <option value="">Select Homestay</option>
                                 <c:forEach items="${houses}" var="h">
                                     <option value="${h.id}" ${not empty hid and h.id == hid ? 'selected' : ''}>${h.name}</option>
                                 </c:forEach>
@@ -184,71 +184,62 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-            $(document).ready(function () {
-                let roomCounter = 0;
+                        $(document).ready(function () {
+                        let roomCounter = 0;
+                                $('#addRoomBtn').click(function () {
+                        addNewRoom();
+                        });
+                                function addNewRoom() {
 
-                $('#addRoomBtn').click(function () {
-                    addNewRoom();
-                });
+                                if (roomCounter > 2){
+                                showToast('Maximum room add is 3!', 'error');
+                                        return;
+                                }
 
-                function addNewRoom() {
-                    
-                    if(roomCounter > 2){
-                        showToast('Maximum room add is 3!', 'error');
-                        return;
-                    }
-                    
-                    roomCounter++;
-                    $('#noRoomsMessage').hide();
-                    
-                    let rtsString = '${rts}';
-                    let rstaString = '${roomStatuses}';
-
-                    let roomTypes = [];
-                    let roomStatuses = [];
-                    const matchesRoomType = rtsString.match(/RoomType\{id=(\d+), name=([^}]+)\}/g);
-                    const matchesRoomStatus = rstaString.match(/Status\{id=(\d+), name=([^,]+), category=([^\}]+)\}/g);
-
-                    if (matchesRoomType) {
-                        matchesRoomType.forEach(match => {
-                            const idMatch = match.match(/id=(\d+)/);
-                            const nameMatch = match.match(/name=([^}]+)/);
-
-                            if (idMatch && nameMatch) {
+                                roomCounter++;
+                                        $('#noRoomsMessage').hide();
+                                        let rtsString = '${rts}';
+                                        let rstaString = '${roomStatuses}';
+                                        let roomTypes = [];
+                                        let roomStatuses = [];
+                                        const matchesRoomType = rtsString.match(/RoomType\{id=(\d+), name=([^}]+)\}/g);
+                                        const matchesRoomStatus = rstaString.match(/Status\{id=(\d+), name=([^,]+), category=([^\}]+)\}/g);
+                                        if (matchesRoomType) {
+                                matchesRoomType.forEach(match => {
+                                const idMatch = match.match(/id=(\d+)/);
+                                        const nameMatch = match.match(/name=([^}]+)/);
+                                        if (idMatch && nameMatch) {
                                 roomTypes.push({
-                                    id: parseInt(idMatch[1]),
-                                    name: nameMatch[1]
+                                id: parseInt(idMatch[1]),
+                                        name: nameMatch[1]
                                 });
-                            }
-                        });
-                    }
+                                }
+                                });
+                                }
 
-                    if (matchesRoomStatus) {
-                        matchesRoomStatus.forEach(match => {
-                            const statusRegex = /Status\{id=(\d+), name=([^,]+), category=([^\}]+)\}/;
-                            const statusMatch = match.match(statusRegex);
-
-                            if (statusMatch) {
+                                if (matchesRoomStatus) {
+                                matchesRoomStatus.forEach(match => {
+                                const statusRegex = /Status\{id=(\d+), name=([^,]+), category=([^\}]+)\}/;
+                                        const statusMatch = match.match(statusRegex);
+                                        if (statusMatch) {
                                 roomStatuses.push({
-                                    id: parseInt(statusMatch[1]),
-                                    name: statusMatch[2].trim(),
-                                    category: statusMatch[3].trim()
+                                id: parseInt(statusMatch[1]),
+                                        name: statusMatch[2].trim(),
+                                        category: statusMatch[3].trim()
                                 });
-                            }
-                        });
-                    }
+                                }
+                                });
+                                }
 
-                    let roomTypeOptions = '<option value="">Select Room Type</option>';
-                    roomTypes.forEach(type => {
-                        roomTypeOptions += `<option value="` + type.id + `">` + type.name + `</option>`;
-                    });
-
-                    let roomStatusOptions = '<option value="">Select Room Status</option>';
-                    roomStatuses.forEach(status => {
-                        roomStatusOptions += `<option value="` + status.id + `">` + status.name + `</option>`;
-                    });
-
-                    const roomHtml = `
+                                let roomTypeOptions = '<option value="">Select Room Type</option>';
+                                        roomTypes.forEach(type => {
+                                        roomTypeOptions += `<option value="` + type.id + `">` + type.name + `</option>`;
+                                            });
+                                l et roomStatusOpti o ns = '<option value="">Select RoomStatus</option>';
+                                roomStatuses.forEach(status => {
+                                roomStatusOptions += `<option value="` + status.id + `">` + status.name + `</option>`;
+                                });
+                                const roomHtml = `
                         <div class="room-item bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200 shadow-lg" data-room="` + roomCounter + `">
                             <div class="flex justify-between items-center mb-6">
                                 <h4 class="text-xl font-semibold text-gray-800 flex items-center">
@@ -339,32 +330,28 @@
                             </div>
                         </div>
                     `;
-    
-                    $('#roomsContainer').append(roomHtml);
-                }
+                                $('#roomsContainer').append(roomHtml);
+                        }
 
-                // Remove room functionality
-                $(document).on('click', '.remove-room-btn', function () {
-                    $(this).closest('.room-item').remove();
-                    if ($('.room-item').length === 0) {
+                        // Remove room functionality
+                        $(document).on('click', '.remove-room-btn', function () {
+                        $(this).closest('.room-item').remove();
+                                if ($('.room-item').length === 0) {
                         $('#noRoomsMessage').show();
-                    }
-                });
-
-                // Room image upload
-                $(document).on('click', '.room-upload-box', function () {
-                    const roomNumber = $(this).data('room');
-                    $('#roomImageInput' + roomNumber).click();
-                });
-
-                $(document).on('change', 'input[name*="[images]"]', function () {
-                    const roomNumber = $(this).closest('.room-item').data('room');
-                    handleImagePreview(this, `.room-image-preview[data-room="` + roomNumber + `"]`);
-                });
-
-                function handleImagePreview(input, previewContainer) {
-                    if (!validateImages(input)) {
-                        input.value = '';
+                        }
+                        });
+                                // Room image upload
+                                $(document).on('click', '.room-upload-box', function () {
+                        const roomNumber = $(this).data('room');
+                                $('#roomImageInput' + roomNumber).click();
+                        });
+                                $(document).on('change', 'input[name*="[images]"]', function () {
+                        const roomNumber = $(this).closest('.room-item').data('room');
+                                handleImagePreview(this, `.room-image-preview[data-room="` + roomNumber + `"]`);
+                        });
+                                function handleImagePreview(input, previewContainer) {
+                                if (!validateImages(input)) {
+                 input.value = '';
                         return;
                     }
 
@@ -461,7 +448,7 @@
                             return false;
                         }
 
-                        if (roomPosition.length > 20) {
+                        if (roomPosition.length > 30) {
                             showToast(`Room position for Room ` + roomNumber + ` exceeds 20 characters!`, 'error');
                             roomValid = false;
                             return false;

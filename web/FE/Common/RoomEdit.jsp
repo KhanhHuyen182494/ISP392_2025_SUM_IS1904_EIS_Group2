@@ -370,7 +370,7 @@
                                     <input id="position" name="position" type="text" value="${r.room_position}" 
                                            class="form-input" required placeholder="Enter room position" />
                                 </div>
-                                           
+
                                 <!-- Room Max Guest -->
                                 <div>
                                     <label for="maxGuest" class="block text-lg font-semibold text-gray-700 mb-2">
@@ -378,8 +378,8 @@
                                         Max Guest *
                                     </label>
                                     <input id="maxGuest" name="maxGuest" type="number" min="1" max="10" required value="${r.max_guests}"
-                                        class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all duration-300"
-                                        placeholder="Max guests..." />
+                                           class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all duration-300"
+                                           placeholder="Max guests..." />
                                 </div>
 
                                 <!-- Type -->
@@ -751,8 +751,8 @@
                                                            showToast("Description must be less than 100 characters.", "error");
                                                            return false;
                                                        }
-                                                       
-                                                       if (position.length > 20) {
+
+                                                       if (position.length > 30) {
                                                            showToast("Position must be less than 20 characters.", "error");
                                                            return false;
                                                        }
