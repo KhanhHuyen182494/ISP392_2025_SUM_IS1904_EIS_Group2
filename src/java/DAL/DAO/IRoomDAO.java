@@ -23,4 +23,7 @@ public interface IRoomDAO extends IBaseUUID<Room> {
 
     //Add
     public boolean addMultipleRoom(List<Room> r);
+    
+    //Update
+    public boolean updateRoomStatus(String roomId, String homestayId, int statusId);
 }

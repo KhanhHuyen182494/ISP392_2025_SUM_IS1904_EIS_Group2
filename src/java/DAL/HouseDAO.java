@@ -506,4 +506,34 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
         return hIdList;
     }
 
+    @Override
+    public boolean updateHomestayStatus(String homestayId, int statusId) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`homestay`
+                     SET
+                     `status_id` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, statusId);
+            ps.setString(2, homestayId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("Error in updateHomestayStatus: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
 }

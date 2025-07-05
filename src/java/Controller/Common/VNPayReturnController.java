@@ -117,8 +117,10 @@ public class VNPayReturnController extends HttpServlet {
 
             if (!h.isIs_whole_house()) {
                 Room r = roomDao.getById(b.getRoom().getId());
-                fullLoadRoomInfo(r);
                 b.setRoom(r);
+                roomDao.updateRoomStatus(r.getId(), h.getId(), 30);
+            } else {
+                hDao.updateHomestayStatus(h.getId(), 36);
             }
 
             b.setHomestay(h);
@@ -159,7 +161,6 @@ public class VNPayReturnController extends HttpServlet {
 
             if (!h.isIs_whole_house()) {
                 Room r = roomDao.getById(b.getRoom().getId());
-                fullLoadRoomInfo(r);
                 b.setRoom(r);
             }
 
@@ -201,7 +202,6 @@ public class VNPayReturnController extends HttpServlet {
 
             if (!h.isIs_whole_house()) {
                 Room r = roomDao.getById(b.getRoom().getId());
-                fullLoadRoomInfo(r);
                 b.setRoom(r);
             }
 

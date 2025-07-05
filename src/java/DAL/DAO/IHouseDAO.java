@@ -30,9 +30,11 @@ public interface IHouseDAO extends IBaseUUID<House> {
             int limit);
 
     public List<String> getListIdByOwner(User u);
-    
+
     //Add
     //Delete
     //Update
+    public boolean updateHomestayStatus(String homestayId, int statusId);
+
     //Search
 }

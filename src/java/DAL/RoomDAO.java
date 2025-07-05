@@ -391,9 +391,46 @@ public class RoomDAO extends BaseDao implements IRoomDAO {
 
         } catch (SQLException e) {
             logger.error("Error in getAllRoomAvailable: " + e.getMessage());
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
         }
 
         return rList;
+    }
+
+    @Override
+    public boolean updateRoomStatus(String roomId, String homestayId, int statusId) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`room`
+                     SET
+                     `status_id` = ?
+                     WHERE `id` = ? AND `homestay_id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, statusId);
+            ps.setString(2, roomId);
+            ps.setString(3, homestayId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("Error in updateRoomStatus: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
 }
