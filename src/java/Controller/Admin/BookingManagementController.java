@@ -5,7 +5,6 @@
 package Controller.Admin;
 
 import Controller.Common.BaseAuthorization;
-import Controller.Common.HousesController;
 import Model.Address;
 import Model.Booking;
 import Model.House;
@@ -34,7 +33,7 @@ import java.util.logging.Logger;
 })
 public class BookingManagementController extends BaseAuthorization {
 
-    private static final Logger LOGGER = Logger.getLogger(HousesController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BookingManagementController.class.getName());
     private static final String BASE_PATH = "/manage/booking";
     private static final int LIMIT = 7;
 

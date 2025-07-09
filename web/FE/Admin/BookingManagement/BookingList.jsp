@@ -182,26 +182,26 @@
                                         </div>-->
 
                     <!-- Content Management -->
-                    <!--                    <div class="mb-6">
-                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
-                                            <div class="space-y-2">
-                                                <a href="${pageContext.request.contextPath}/manage/reviews" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-star w-5"></i>
-                                                    <span>Reviews</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/messages" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-comments w-5"></i>
-                                                    <span>Messages</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/notifications" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-bell w-5"></i>
-                                                    <span>Notifications</span>
-                                                </a>
-                                            </div>
-                                        </div>-->
+                    <div class="mb-6">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
+                        <div class="space-y-2">
+<!--                            <a href="${pageContext.request.contextPath}/manage/reviews" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-star w-5"></i>
+                                <span>Reviews</span>
+                            </a>-->
+                            <a href="${pageContext.request.contextPath}/manage/post" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-pen-to-square w-5"></i>
+                                <span>All Posts</span>
+                            </a>
+<!--                            <a href="${pageContext.request.contextPath}/manage/notifications" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-bell w-5"></i>
+                                <span>Notifications</span>
+                            </a>-->
+                        </div>
+                    </div>
 
                     <!-- System Settings -->
                     <!--                    <div class="mb-6">
@@ -336,14 +336,17 @@
                                                 <c:when test="${booking.status.id == 9}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.status.id == 10}">
+                                                <c:when test="${booking.status.id == 10}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.status.id == 11}">
+                                                <c:when test="${booking.status.id == 11}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${booking.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${user.status.id == 12}">
+                                                <c:when test="${booking.status.id == 12}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">${booking.status.name}</span>
+                                                </c:when>
+                                                <c:when test="${booking.status.id == 34}">
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${booking.status.name}</span>
                                                 </c:when>
                                             </c:choose>
                                         </td>
