@@ -139,16 +139,16 @@
 
                     <!-- Status and Type Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-<!--                        <div class="border-2 border-gray-200 rounded-lg p-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                            <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <c:forEach items="${requestScope.sList}" var="s">
-                                    <c:if test="${s.id != 15}">
-                                        <option value="${s.id}" ${s.id == 14 ? 'selected' : ''}>${s.name}</option>
-                                    </c:if>
-                                </c:forEach>
-                            </select>
-                        </div>-->
+                        <!--                        <div class="border-2 border-gray-200 rounded-lg p-4">
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                                    <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <c:forEach items="${requestScope.sList}" var="s">
+                            <c:if test="${s.id != 15}">
+                                <option value="${s.id}" ${s.id == 14 ? 'selected' : ''}>${s.name}</option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
+                </div>-->
 
                         <div class="border-2 border-gray-200 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
@@ -259,6 +259,9 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
+            let validFiles = [];
+            let fileIndexCounter = 0;
+            
             $(document).ready(function () {
                 let selectedHomestayData = null;
 
@@ -353,14 +356,6 @@
                     console.log('Is whole house:', isWholeHouse);
 
                     if (selectedHomestay) {
-                        // Fetch homestay details including media
-//                        fetchHomestayDetails(selectedHomestay);
-
-//                        if (isWholeHouse == true) {
-//                            $('#roomSection').hide();
-//                        } else if (isWholeHouse == false) {
-//                            $('#roomSection').show();
-
                         $.ajax({
                             url: `${pageContext.request.contextPath}/homestay/room/get`,
                             type: 'GET',
@@ -370,27 +365,14 @@
                                 $('#roomSelect').html('<option value="">Loading rooms...</option>');
                             },
                             success: function (response) {
-//                                    let roomOptions = '<option value="">Leave room blank to post about homestay</option>';
-//
-//                                    if (response.rooms && response.rooms.length > 0) {
-//                                        response.rooms.forEach(function (room) {
-//                                            roomOptions += `<option value="` + room.id + `">` + room.name + ` - ` + room.roomType.name + `</option>`;
-//                                        });
-//                                    } else {
-//                                        roomOptions = '<option value="">No rooms available</option>';
-//                                    }
-
                                 selectedHomestayData = response.homestay;
                                 displayHomestayPreview(response.homestay);
-
-//                                    $('#roomSelect').html(roomOptions);
                             },
                             error: function (xhr, status, error) {
                                 console.error('Error fetching rooms:', error);
                                 $('#roomSelect').html('<option value="">Error loading rooms</option>');
                             }
                         });
-//                        }
                     } else {
                         $('#roomSection').hide();
                         $('#roomSelect').html('<option value="">Select a room</option>');
@@ -404,16 +386,6 @@
                     if (homestay.medias && homestay.medias.length > 0) {
                         let mediaHtml = '';
                         homestay.medias.forEach(function (media) {
-//                            mediaHtml += `
-//                                <div class="relative">
-//                                    <img src="${pageContext.request.contextPath}/Asset/Common/Media/` + media.url + `" 
-//                                         class="homestay-media-image rounded-lg border-2 border-green-200" 
-//                                         alt="Homestay Media">
-//                                    <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
-//                                        <i class="fas fa-home mr-1"></i>Auto
-//                                    </div>
-//                                </div>
-//                            `;
                             mediaHtml += `
                                 <div class="relative">
                                     <img src="${pageContext.request.contextPath}/Asset/Common/House/` + media.path + `" 
@@ -490,20 +462,30 @@
                 // Handle image preview
                 $('#imageInput').change(function () {
                     const files = this.files;
+
+                    // Clear preview and reset arrays
                     $('#imagePreview').empty();
+                    validFiles = [];
+                    fileIndexCounter = 0;
 
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
                         if (file.type.startsWith('image/')) {
+                            const fileObj = {
+                                file: file,
+                                index: fileIndexCounter++
+                            };
+                            validFiles.push(fileObj);
+
                             const reader = new FileReader();
                             reader.onload = function (e) {
                                 $('#imagePreview').append(
-                                        '<div class="relative">' +
+                                        '<div class="relative" data-file-index="' + fileObj.index + '">' +
                                         '<img src="' + e.target.result + '" class="preview-image rounded-lg border-2 border-gray-200">' +
                                         '<div class="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">' +
                                         '<i class="fas fa-user mr-1"></i>User' +
                                         '</div>' +
-                                        '<button type="button" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" onclick="$(this).parent().remove()">' +
+                                        '<button type="button" class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" onclick="removeImage(' + fileObj.index + ')">' +
                                         '<i class="fas fa-times"></i>' +
                                         '</button>' +
                                         '</div>'
@@ -591,7 +573,7 @@
                     }
 
                     let imageInput = document.getElementById('imageInput');
-                    let imageFiles = imageInput.files;
+                    let imageFiles = validFiles.map(f => f.file);
 
                     if (imageFiles.length > 0) {
                         const maxSize = 10 * 1024 * 1024;
@@ -708,6 +690,20 @@
                     }).showToast();
                 }
             });
+
+            function removeImage(index) {
+                validFiles = validFiles.filter(file => file.index !== index);
+                $('[data-file-index="' + index + '"]').remove();
+                updateFileInput();
+            }
+
+            function updateFileInput() {
+                const dt = new DataTransfer();
+                validFiles.forEach(file => {
+                    dt.items.add(file.file);
+                });
+                document.getElementById('imageInput').files = dt.files;
+            }
         </script>
     </body>
 </html>

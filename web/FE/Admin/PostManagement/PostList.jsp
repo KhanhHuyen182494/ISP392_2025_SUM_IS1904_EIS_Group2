@@ -387,7 +387,7 @@
                                                 <c:when test="${p.status.id == 20}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-orange-800">${p.status.name}</span>
                                                 </c:when>
-                                                <c:when test="${p.status.id == 37}">
+                                                <c:when test="${p.status.id == 37 || p.status.id == 38}">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">${p.status.name}</span>
                                                 </c:when>
                                             </c:choose>
