@@ -1,8 +1,9 @@
+package Controller.Admin;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 import Controller.Common.BaseAuthorization;
 import Model.House;
 import Model.Post;
@@ -18,6 +19,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -50,7 +52,28 @@ public class PostManagementController extends BaseAuthorization {
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String path = request.getServletPath();
 
+        switch (path) {
+            case BASE_PATH + "/update" ->
+                doPostUpdatePost(request, response, user);
+        }
+    }
+
+    protected void doPostUpdatePost(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String type = request.getParameter("typeUpdate");
+        String postId = request.getParameter("postId");
+
+        switch (type) {
+            case "reject" -> {
+                pDao.updatePostStatus(postId, 38);
+                response.sendRedirect("/fuhousefinder/manage/post");
+            }
+            case "approve" -> {
+                pDao.updatePostStatus(postId, 14);
+                response.sendRedirect("/fuhousefinder/manage/post");
+            }
+        }
     }
 
     protected void doGetPostList(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -100,7 +123,15 @@ public class PostManagementController extends BaseAuthorization {
 
         int totalPages = (int) Math.ceil((double) totalCount / LIMIT);
 
+        Map<String, Integer> counts = pDao.getPostCounts();
+        int publishedCount = counts.get("published");
+        int newTodayCount = counts.get("newToday");
+        int rejectedCount = counts.get("rejected");
+
         request.setAttribute("totalCount", totalCount);
+        request.setAttribute("publishedCount", publishedCount);
+        request.setAttribute("newTodayCount", newTodayCount);
+        request.setAttribute("rejectedCount", rejectedCount);
         request.setAttribute("pList", pList);
         request.setAttribute("sList", sList);
         request.setAttribute("tList", tList);
@@ -118,7 +149,36 @@ public class PostManagementController extends BaseAuthorization {
     }
 
     protected void doGetPostDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String postId = request.getParameter("pid");
 
+        if (postId == null || postId.isEmpty()) {
+            response.sendError(404);
+            return;
+        }
+
+        Post p = pDao.getPostDetailManage(postId);
+
+        User u = uDao.getById(p.getOwner().getId());
+
+        Status ownerStatus = sDao.getStatusById(u.getStatus().getId());
+        Status postStatus = sDao.getStatusById(p.getStatus().getId());
+        u.setStatus(ownerStatus);
+        p.setStatus(postStatus);
+
+        PostType pt = ptDao.getPostTypeById(p.getPost_type().getId());
+
+        p.setOwner(u);
+        p.setPost_type(pt);
+
+        int countTotalOwnerPost = pDao.getPostCountForOwner("", p.getOwner().getId());
+        int countRejectOwnerPost = pDao.getPostCountForOwner("Rejected", p.getOwner().getId());
+        int countPublishedOwnerPost = pDao.getPostCountForOwner("Published", p.getOwner().getId());
+
+        request.setAttribute("countTotalOwnerPost", countTotalOwnerPost);
+        request.setAttribute("countRejectOwnerPost", countRejectOwnerPost);
+        request.setAttribute("countPublishedOwnerPost", countPublishedOwnerPost);
+        request.setAttribute("p", p);
+        request.getRequestDispatcher("/FE/Admin/PostManagement/PostDetail.jsp").forward(request, response);
     }
 
 }

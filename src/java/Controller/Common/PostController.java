@@ -63,12 +63,12 @@ public class PostController extends BaseAuthorization {
         try {
             if (typeWork.equalsIgnoreCase("post")) {
                 // Get form parameters
-                String status = request.getParameter("status");
+//                String status = request.getParameter("status");
                 String type = request.getParameter("type");
                 String content = request.getParameter("content");
                 String homestay = request.getParameter("homestay");
 
-                int statusId = Integer.parseInt(status);
+//                int statusId = Integer.parseInt(status);
                 int postTypeId = Integer.parseInt(type);
 
                 // Validate required fields
@@ -123,7 +123,13 @@ public class PostController extends BaseAuthorization {
                 House h = new House();
                 h.setId(homestay);
                 Status s = new Status();
-                s.setId(statusId);
+
+                if (user.getRole().getId() == 1 || user.getRole().getId() == 4) {
+                    s.setId(14);
+                } else {
+                    s.setId(37);
+                }
+
                 PostType pt = new PostType();
                 pt.setId(postTypeId);
 

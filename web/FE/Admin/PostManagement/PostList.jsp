@@ -198,11 +198,11 @@
                                 <i class="fas fa-pen-to-square w-5"></i>
                                 <span>All Posts</span>
                             </a>
-<!--                            <a href="${pageContext.request.contextPath}/manage/notifications" 
+                            <a href="${pageContext.request.contextPath}/manage/post/control" 
                                class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
                                 <i class="fas fa-bell w-5"></i>
-                                <span>Notifications</span>
-                            </a>-->
+                                <span>Posts Control</span>
+                            </a>
                         </div>
                     </div>
 
@@ -240,7 +240,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-blue-600">${countTotalUser}</p>
+                                <p class="text-3xl font-bold text-blue-600">${totalCount}</p>
                                 <p class="text-gray-600 text-sm font-medium">Total Posts</p>
                             </div>
                             <div class="bg-blue-100 p-3 rounded-full">
@@ -252,8 +252,8 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-green-600">${countActive}</p>
-                                <p class="text-gray-600 text-sm font-medium">Active Post</p>
+                                <p class="text-3xl font-bold text-green-600">${publishedCount}</p>
+                                <p class="text-gray-600 text-sm font-medium">Published Post</p>
                             </div>
                             <div class="bg-green-100 p-3 rounded-full">
                                 <i class="fa-solid fa-check text-green-600"></i>
@@ -264,7 +264,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-yellow-600">${countNew}</p>
+                                <p class="text-3xl font-bold text-yellow-600">${newTodayCount}</p>
                                 <p class="text-gray-600 text-sm font-medium">New Today</p>
                             </div>
                             <div class="bg-yellow-100 p-3 rounded-full">
@@ -276,7 +276,7 @@
                     <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-red-600">${countBanUser}</p>
+                                <p class="text-3xl font-bold text-red-600">${rejectedCount}</p>
                                 <p class="text-gray-600 text-sm font-medium">Reject Post</p>
                             </div>
                             <div class="bg-red-100 p-3 rounded-full">
@@ -351,9 +351,6 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -368,9 +365,6 @@
                                 <c:forEach var="p" items="${pList}">
                                     <tr class="hover:bg-gray-50 transition-colors duration-200">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <img class="h-10 w-10 rounded-full" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${p.owner.avatar}" alt="">
                                                 <div class="ml-4">
@@ -380,7 +374,7 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            ${p.content}
+                                            ${fn:length(p.content) > 100 ? fn:substring(p.content, 0, 100).concat('...') : p.content}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <c:choose>
@@ -420,17 +414,38 @@
                                                 Not yet
                                             </c:if>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
-                                            <c:choose>
-                                                <c:when test="${user.status.id == 4}">
-                                                    <a href="#" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Ban</a>
-                                                </c:otherwise>
-                                            </c:choose>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex items-center space-x-2">
+                                                <a href="${pageContext.request.contextPath}/manage/post/detail?pid=${p.id}"
+                                                   class="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2 bg-gray-100 hover:bg-gray-200 rounded">
+                                                    Detail
+                                                </a>
+                                                <c:if test="${p.status.id == 37}">
+                                                    <form action="${pageContext.request.contextPath}/manage/post/update" method="POST">
+                                                        <input type="hidden" name="typeUpdate" value="approve" />
+                                                        <input type="hidden" name="postId" value="${p.id}" />
+                                                        <button class="text-green-600 hover:text-green-900 transition p-2 bg-green-100 hover:bg-green-200 rounded">
+                                                            Approve
+                                                        </button>
+                                                    </form>
+                                                    <form action="${pageContext.request.contextPath}/manage/post/update" method="POST">
+                                                        <input type="hidden" name="typeUpdate" value="reject" />
+                                                        <input type="hidden" name="postId" value="${p.id}" />
+                                                        <button class="text-red-600 hover:text-red-900 transition p-2 bg-red-100 hover:bg-red-200 rounded">
+                                                            Reject
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                                <c:if test="${p.status.id == 38}">
+                                                    <form action="${pageContext.request.contextPath}/manage/post/update" method="POST">
+                                                        <input type="hidden" name="typeUpdate" value="approve" />
+                                                        <input type="hidden" name="postId" value="${p.id}" />
+                                                        <button class="text-red-600 hover:text-red-900 transition p-2 bg-red-100 hover:bg-red-200 rounded">
+                                                            Re-Approve
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                            </div>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -442,10 +457,10 @@
                     <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                         <div class="flex-1 flex justify-between sm:hidden">
                             <c:if test="${currentPage > 1}">
-                                <a href="?page=${currentPage - 1}&keyword=${keyword}&statusId=${statusId}&roleId=${roleId}&joinDate=<fmt:formatDate value='${joinDate}' pattern='yyyy-MM-dd'/>" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+                                <a href="?page=${currentPage - 1}&keyword=${keyword}&statusId=${statusId}&typeId=${typeId}&hId=${hId}&createdAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>&updatedAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
                             </c:if>
                             <c:if test="${currentPage < totalPages}">
-                                <a href="?page=${currentPage + 1}&keyword=${keyword}&statusId=${statusId}&roleId=${roleId}&joinDate=<fmt:formatDate value='${joinDate}' pattern='yyyy-MM-dd'/>" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+                                <a href="?page=${currentPage + 1}&keyword=${keyword}&statusId=${statusId}&typeId=${typeId}&hId=${hId}&createdAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>&updatedAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
                             </c:if>
                         </div>
                         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
@@ -459,18 +474,18 @@
                             <div>
                                 <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                                     <c:if test="${currentPage > 1}">
-                                        <a href="?page=${currentPage - 1}&keyword=${keyword}&statusId=${statusId}&roleId=${roleId}&joinDate=<fmt:formatDate value='${joinDate}' pattern='yyyy-MM-dd'/>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Previous</a>
+                                        <a href="?page=${currentPage - 1}&keyword=${keyword}&statusId=${statusId}&typeId=${typeId}&hId=${hId}&createdAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>&updatedAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Previous</a>
                                     </c:if>
 
                                     <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <a href="?page=${i}&keyword=${keyword}&statusId=${statusId}&roleId=${roleId}&joinDate=<fmt:formatDate value='${joinDate}' pattern='yyyy-MM-dd'/>"
+                                        <a href="?page=${i}&keyword=${keyword}&statusId=${statusId}&typeId=${typeId}&hId=${hId}&createdAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>&updatedAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>"
                                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${i == currentPage ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}">
                                             ${i}
                                         </a>
                                     </c:forEach>
 
                                     <c:if test="${currentPage < totalPages}">
-                                        <a href="?page=${currentPage + 1}&keyword=${keyword}&statusId=${statusId}&roleId=${roleId}&joinDate=<fmt:formatDate value='${joinDate}' pattern='yyyy-MM-dd'/>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Next</a>
+                                        <a href="?page=${currentPage + 1}&keyword=${keyword}&statusId=${statusId}&typeId=${typeId}&hId=${hId}&createdAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>&updatedAt=<fmt:formatDate value='${createdAt}' pattern='yyyy-MM-dd'/>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Next</a>
                                     </c:if>
                                 </nav>
                             </div>
@@ -484,33 +499,7 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                    // Simple interactivity for demo purposes
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        // Handle checkbox selections
-                                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                                        checkboxes.forEach(checkbox => {
-                                            checkbox.addEventListener('change', function () {
-                                                if (this.checked) {
-                                                    this.closest('tr')?.classList.add('bg-blue-50');
-                                                } else {
-                                                    this.closest('tr')?.classList.remove('bg-blue-50');
-                                                }
-                                            });
-                                        });
 
-                                        // Handle action buttons
-                                        const actionButtons = document.querySelectorAll('button');
-                                        actionButtons.forEach(button => {
-                                            button.addEventListener('click', function (e) {
-                                                if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
-                                                    e.preventDefault();
-                                                    const action = this.textContent.trim();
-                                                    const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
-                                                    alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
-                                                }
-                                            });
-                                        });
-                                    });
         </script>
     </body>
 </html>

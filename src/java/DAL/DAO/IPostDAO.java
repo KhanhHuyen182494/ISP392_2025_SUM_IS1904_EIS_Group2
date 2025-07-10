@@ -9,6 +9,7 @@ import Model.Post;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -23,7 +24,23 @@ public interface IPostDAO extends IBaseUUID<Post> {
 
     public List<Post> getPaginatedManagePost(String keyword, Integer statusId, Integer typeId, String homestayId, Date createdDate, Date updatedDate, int limit, int offset);
 
+    public Map<String, Integer> getPostCounts();
+
+    public int getTotalPostCount();
+
+    public int getPublishedPostCount();
+
+    public int getNewTodayPostCount();
+
+    public int getRejectedPostCount();
+
+    public Post getPostDetailManage(String postId);
+
+    public int getPostCountForOwner(String countType, String uid);
+
     //Update
+    public boolean updatePostStatus(String postId, int statusId);
+
     //Delete
     //Add
 }

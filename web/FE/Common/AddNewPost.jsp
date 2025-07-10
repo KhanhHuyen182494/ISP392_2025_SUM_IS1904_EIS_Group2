@@ -139,7 +139,7 @@
 
                     <!-- Status and Type Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                        <div class="border-2 border-gray-200 rounded-lg p-4">
+<!--                        <div class="border-2 border-gray-200 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                             <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <c:forEach items="${requestScope.sList}" var="s">
@@ -148,7 +148,7 @@
                                     </c:if>
                                 </c:forEach>
                             </select>
-                        </div>
+                        </div>-->
 
                         <div class="border-2 border-gray-200 rounded-lg p-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>

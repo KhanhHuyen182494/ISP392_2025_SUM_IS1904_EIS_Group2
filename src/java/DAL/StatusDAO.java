@@ -16,39 +16,39 @@ import java.util.List;
  * @author Tam
  */
 public class StatusDAO extends BaseDao implements IStatusDAO {
-    
+
     private Logging logger = new Logging();
-    
+
     public static void main(String[] args) {
         StatusDAO sDao = new StatusDAO();
         System.out.println(sDao.getAllStatusByCategory("post"));
     }
-    
+
     @Override
     public List<Status> getAllStatusByCategory(String category) {
         List<Status> sList = new ArrayList<>();
         String sql = """
                      SELECT * FROM status WHERE category = ?;
                      """;
-        
+
         try {
             con = dbc.getConnection();
             ps = con.prepareStatement(sql);
-            
+
             ps.setString(1, category);
-            
+
             rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 Status s = new Status();
-                
+
                 s.setId(rs.getInt("id"));
                 s.setName(rs.getString("name"));
                 s.setCategory(category);
-                
+
                 sList.add(s);
             }
-            
+
         } catch (SQLException e) {
             logger.error("" + e);
         } finally {
@@ -58,18 +58,46 @@ public class StatusDAO extends BaseDao implements IStatusDAO {
                 logger.error("" + ex);
             }
         }
-        
+
         return sList;
     }
-    
+
     @Override
     public Status getStatusById(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Status s = new Status();
+        String sql = """
+                     SELECT * FROM fuhousefinder_homestay.status WHERE id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, id);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                s.setId(rs.getInt("id"));
+                s.setName(rs.getString("name"));
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return s;
     }
-    
+
     @Override
     public Status getStatusByName(String name) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
 }

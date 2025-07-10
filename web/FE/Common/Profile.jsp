@@ -354,7 +354,7 @@
                                 Edit Profile
                             </button>
                         </a>
-                        <c:if test="${sessionScope.user.role.id == 3 or sessionScope.user.role.id == 5}">
+                        <c:if test="${sessionScope.user.role.id == 3 or sessionScope.user.role.id == 5 or sessionScope.user.role.id == 1}">
                             <a href="${pageContext.request.contextPath}/post">
                                 <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                     <i class="fas fa-plus"></i>
