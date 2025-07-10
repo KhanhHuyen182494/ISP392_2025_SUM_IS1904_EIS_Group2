@@ -423,11 +423,16 @@
                                         <div class="space-y-2 mb-4">
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-dollar-sign text-green-500"></i>
-                                                <span class="text-sm"><strong>Giá 1 đêm:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                                <c:if test="${post.house.is_whole_house == true}">
+                                                    <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / night</span>
+                                                </c:if>
+                                                <c:if test="${post.house.is_whole_house == false}">
+                                                    <span class="text-sm"><strong>Price per night:</strong> Different for each room</span>
+                                                </c:if>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <i class="fas fa-map-marker-alt text-red-500"></i>
-                                                <span class="text-sm"><strong>Địa chỉ:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
+                                                <span class="text-sm"><strong>Address:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
                                             </div>
                                         </div>
                                     </c:if>
@@ -837,9 +842,15 @@
 
                                             function book(button) {
                                                 const uid = '${sessionScope.user_id}';
+                                                const roleId = '${sessionScope.user.role.id}';
                                                 var hid = $(button).data("house-id");
 
                                                 if (uid || uid.trim()) {
+                                                    if (roleId == 3) {
+                                                        showToast('You are a house owner, you can not book a homestay!', 'error');
+                                                        return;
+                                                    }
+
                                                     location.href = '${pageContext.request.contextPath}/booking?hid=' + hid;
                                                 } else {
                                                     Swal.fire({
@@ -1695,6 +1706,31 @@
                                                 if (clickedIndex !== -1) {
                                                     openImageCarousel(clickedIndex, postElement);
                                                 }
+                                            }
+
+                                            function showToast(message, type = 'success') {
+                                                let backgroundColor;
+                                                if (type === "success") {
+                                                    backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
+                                                } else if (type === "error") {
+                                                    backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
+                                                } else if (type === "warning") {
+                                                    backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
+                                                } else if (type === "info") {
+                                                    backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
+                                                } else {
+                                                    backgroundColor = "#333"; // Default color (dark gray)
+                                                }
+
+                                                Toastify({
+                                                    text: message, // Dynamically set message
+                                                    duration: 2000,
+                                                    close: true,
+                                                    gravity: "top",
+                                                    position: "right",
+                                                    backgroundColor: backgroundColor, // Dynamically set background color
+                                                    stopOnFocus: true
+                                                }).showToast();
                                             }
         </script>
     </body>
