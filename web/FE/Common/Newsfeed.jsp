@@ -618,11 +618,13 @@
                     </c:otherwise>
                 </c:choose>
 
+                <div id="loadmoreitems"></div>
+
                 <!-- Load More Button -->
                 <c:choose>
-                    <c:when test="${not empty requestScope.posts}">
+                    <c:when test="${not empty canLoadMore and canLoadMore == true}">
                         <div class="text-center">
-                            <button class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-medium transition-all transform hover:scale-105">
+                            <button onclick="loadMore()" id="loadMoreBtn" class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-medium transition-all transform hover:scale-105">
                                 <i class="fas fa-plus mr-2"></i>
                                 Load More Posts
                             </button>
@@ -788,262 +790,262 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                            function toggleLike(button) {
-                                                const uid = '${sessionScope.user_id}';
-                                                if (uid || uid.trim()) {
-                                                    const likeCount = button.querySelector('.like-count');
-                                                    const currentCount = parseInt(likeCount.textContent);
-                                                    const pid = $(button).data('post-id');
-                                                    if (button.classList.contains('liked')) {
-                                                        // Unlike
-                                                        button.classList.remove('liked');
-                                                        likeCount.textContent = currentCount - 1;
-                                                        button.style.backgroundColor = 'white';
-                                                        button.style.color = '#3b82f6';
-                                                        sendLikeRequest(pid, 'unLike');
-                                                    } else {
-                                                        // Like
-                                                        button.classList.add('liked');
-                                                        likeCount.textContent = currentCount + 1;
-                                                        button.style.backgroundColor = '#3b82f6';
-                                                        button.style.color = 'white';
-                                                        sendLikeRequest(pid, 'like');
-                                                    }
-                                                } else {
-                                                    Swal.fire({
-                                                        title: 'You must login to use this feature',
-                                                        imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                        imageWidth: 150,
-                                                        imageHeight: 150,
-                                                        imageAlt: 'Custom icon',
-                                                        showCancelButton: true,
-                                                        confirmButtonText: 'Login now',
-                                                        cancelButtonText: 'Back to Newsfeed',
-                                                        reverseButtons: true,
-                                                        focusConfirm: false,
-                                                        focusCancel: false,
-                                                        customClass: {
-                                                            popup: 'rounded-xl shadow-lg',
-                                                            title: 'text-xl font-semibold',
-                                                            confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                            cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                            actions: 'space-x-4'
-                                                        },
-                                                        buttonsStyling: false
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            location.href = '${pageContext.request.contextPath}/login';
-                                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                            Swal.close();
-                                                        }
-                                                    });
-                                                }
+                                function toggleLike(button) {
+                                    const uid = '${sessionScope.user_id}';
+                                    if (uid || uid.trim()) {
+                                        const likeCount = button.querySelector('.like-count');
+                                        const currentCount = parseInt(likeCount.textContent);
+                                        const pid = $(button).data('post-id');
+                                        if (button.classList.contains('liked')) {
+                                            // Unlike
+                                            button.classList.remove('liked');
+                                            likeCount.textContent = currentCount - 1;
+                                            button.style.backgroundColor = 'white';
+                                            button.style.color = '#3b82f6';
+                                            sendLikeRequest(pid, 'unLike');
+                                        } else {
+                                            // Like
+                                            button.classList.add('liked');
+                                            likeCount.textContent = currentCount + 1;
+                                            button.style.backgroundColor = '#3b82f6';
+                                            button.style.color = 'white';
+                                            sendLikeRequest(pid, 'like');
+                                        }
+                                    } else {
+                                        Swal.fire({
+                                            title: 'You must login to use this feature',
+                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Custom icon',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Login now',
+                                            cancelButtonText: 'Back to Newsfeed',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                location.href = '${pageContext.request.contextPath}/login';
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                Swal.close();
                                             }
+                                        });
+                                    }
+                                }
 
-                                            function book(button) {
-                                                const uid = '${sessionScope.user_id}';
-                                                const roleId = '${sessionScope.user.role.id}';
-                                                var hid = $(button).data("house-id");
+                                function book(button) {
+                                    const uid = '${sessionScope.user_id}';
+                                    const roleId = '${sessionScope.user.role.id}';
+                                    var hid = $(button).data("house-id");
 
-                                                if (uid || uid.trim()) {
-                                                    if (roleId == 3) {
-                                                        showToast('You are a house owner, you can not book a homestay!', 'error');
-                                                        return;
-                                                    }
+                                    if (uid || uid.trim()) {
+                                        if (roleId == 3) {
+                                            showToast('You are a house owner, you can not book a homestay!', 'error');
+                                            return;
+                                        }
 
-                                                    location.href = '${pageContext.request.contextPath}/booking?hid=' + hid;
-                                                } else {
-                                                    Swal.fire({
-                                                        title: 'You must login to use this feature',
-                                                        imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                        imageWidth: 150,
-                                                        imageHeight: 150,
-                                                        imageAlt: 'Custom icon',
-                                                        showCancelButton: true,
-                                                        confirmButtonText: 'Login now',
-                                                        cancelButtonText: 'Back to Newsfeed',
-                                                        reverseButtons: true,
-                                                        focusConfirm: false,
-                                                        focusCancel: false,
-                                                        customClass: {
-                                                            popup: 'rounded-xl shadow-lg',
-                                                            title: 'text-xl font-semibold',
-                                                            confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                            cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                            actions: 'space-x-4'
-                                                        },
-                                                        buttonsStyling: false
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            location.href = '${pageContext.request.contextPath}/login';
-                                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                            Swal.close();
-                                                        }
-                                                    });
-                                                }
+                                        location.href = '${pageContext.request.contextPath}/booking?hid=' + hid;
+                                    } else {
+                                        Swal.fire({
+                                            title: 'You must login to use this feature',
+                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Custom icon',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Login now',
+                                            cancelButtonText: 'Back to Newsfeed',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                location.href = '${pageContext.request.contextPath}/login';
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                Swal.close();
                                             }
+                                        });
+                                    }
+                                }
 
-                                            function sendLikeRequest(postId, type) {
-                                                $.ajax({
-                                                    url: '${pageContext.request.contextPath}/feeds',
-                                                    type: 'POST',
-                                                    data: {
-                                                        pid: postId,
-                                                        type: type
-                                                    }
-                                                });
-                                            }
+                                function sendLikeRequest(postId, type) {
+                                    $.ajax({
+                                        url: '${pageContext.request.contextPath}/feeds',
+                                        type: 'POST',
+                                        data: {
+                                            pid: postId,
+                                            type: type
+                                        }
+                                    });
+                                }
 
-                                            $(document).ready(function () {
-                                                const modalReview = $('#reviewModal');
-                                                const modalHouseName = $('#modalHouseName');
-                                                const reviewContainer = $('#reviewContainer');
-                                                const loadingDiv = $('#reviewLoading');
-                                                const errorDiv = $('#reviewError');
-                                                const noReviewDiv = $('#noReview');
-                                                const loadMoreDiv = $('#loadMoreReview');
-                                                let currentHouseId = null;
-                                                let currentReviewPage = 1;
-                                                let isLoadingReview = false;
-                                                $('.view-review-btn').on('click', function () {
-                                                    const houseId = $(this).data('house-id');
-                                                    const houseName = $(this).data('house-name');
-                                                    currentHouseId = houseId;
-                                                    currentReviewPage = 1;
-                                                    modalHouseName.text(houseName);
-                                                    modalReview.addClass('active');
-                                                    $('body').addClass('overflow-hidden');
-                                                    loadReviews(houseId, 1, true);
-                                                });
-                                                // Close modal
-                                                $('#closeModalBtn').on('click', function (e) {
-                                                    closeModal();
-                                                });
-                                                modalReview.on('click', function (e) {
-                                                    if (e.target === this) {
-                                                        closeModal();
-                                                    }
-                                                });
-                                                modalReview.on('click', function (e) {
-                                                    if (!$(e.target).closest('.modal-content').length) {
-                                                        closeModal();
-                                                    }
-                                                });
-                                                // Retry loading reviews
-                                                $('#retryReview').on('click', function () {
-                                                    if (currentHouseId) {
-                                                        loadReviews(currentHouseId, 1, true);
-                                                    }
-                                                });
-                                                // Load more reviews
-                                                $('#loadMoreReviewBtn').on('click', function () {
-                                                    if (currentHouseId && !isLoadingReview) {
-                                                        loadReviews(currentHouseId, currentReviewPage + 1, false);
-                                                    }
-                                                });
-                                                // ESC key to close modal
-                                                $(document).on('keydown', function (e) {
-                                                    if (e.key === 'Escape' && modalReview.hasClass('active')) {
-                                                        closeModal();
-                                                    }
-                                                });
-                                                function closeModal() {
-                                                    modalReview.removeClass('active');
-                                                    $('body').removeClass('overflow-hidden');
-                                                    // Reset modal state after animation
-                                                    setTimeout(() => {
-                                                        resetModalState();
-                                                    }, 300);
-                                                }
+                                $(document).ready(function () {
+                                    const modalReview = $('#reviewModal');
+                                    const modalHouseName = $('#modalHouseName');
+                                    const reviewContainer = $('#reviewContainer');
+                                    const loadingDiv = $('#reviewLoading');
+                                    const errorDiv = $('#reviewError');
+                                    const noReviewDiv = $('#noReview');
+                                    const loadMoreDiv = $('#loadMoreReview');
+                                    let currentHouseId = null;
+                                    let currentReviewPage = 1;
+                                    let isLoadingReview = false;
+                                    $('.view-review-btn').on('click', function () {
+                                        const houseId = $(this).data('house-id');
+                                        const houseName = $(this).data('house-name');
+                                        currentHouseId = houseId;
+                                        currentReviewPage = 1;
+                                        modalHouseName.text(houseName);
+                                        modalReview.addClass('active');
+                                        $('body').addClass('overflow-hidden');
+                                        loadReviews(houseId, 1, true);
+                                    });
+                                    // Close modal
+                                    $('#closeModalBtn').on('click', function (e) {
+                                        closeModal();
+                                    });
+                                    modalReview.on('click', function (e) {
+                                        if (e.target === this) {
+                                            closeModal();
+                                        }
+                                    });
+                                    modalReview.on('click', function (e) {
+                                        if (!$(e.target).closest('.modal-content').length) {
+                                            closeModal();
+                                        }
+                                    });
+                                    // Retry loading reviews
+                                    $('#retryReview').on('click', function () {
+                                        if (currentHouseId) {
+                                            loadReviews(currentHouseId, 1, true);
+                                        }
+                                    });
+                                    // Load more reviews
+                                    $('#loadMoreReviewBtn').on('click', function () {
+                                        if (currentHouseId && !isLoadingReview) {
+                                            loadReviews(currentHouseId, currentReviewPage + 1, false);
+                                        }
+                                    });
+                                    // ESC key to close modal
+                                    $(document).on('keydown', function (e) {
+                                        if (e.key === 'Escape' && modalReview.hasClass('active')) {
+                                            closeModal();
+                                        }
+                                    });
+                                    function closeModal() {
+                                        modalReview.removeClass('active');
+                                        $('body').removeClass('overflow-hidden');
+                                        // Reset modal state after animation
+                                        setTimeout(() => {
+                                            resetModalState();
+                                        }, 300);
+                                    }
 
-                                                function resetModalState() {
+                                    function resetModalState() {
+                                        reviewContainer.empty();
+                                        loadingDiv.show();
+                                        errorDiv.addClass('hidden');
+                                        noReviewDiv.addClass('hidden');
+                                        loadMoreDiv.addClass('hidden');
+                                        currentHouseId = null;
+                                        currentReviewPage = 1;
+                                    }
+
+                                    function loadReviews(houseId, page, isNewLoad) {
+                                        if (isLoadingReview)
+                                            return;
+                                        isLoadingReview = true;
+                                        if (isNewLoad) {
+                                            //  S how loadi n g for new load
+                                            loadingDiv.show();
+                                            errorDiv.addClass('hidden');
+                                            noReviewDiv.addClass('hidden');
+                                            loadMoreDiv.addClass('hidden');
+                                            reviewContainer.empty();
+                                        } else {
+                                            // Show loading on load more button
+                                            $('#loadMoreReviewBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                        }
+
+                                        $.ajax({
+                                            url: '${pageContext.request.contextPath}/feedback/house',
+                                            method: 'GET',
+                                            data: {
+                                                houseId: houseId,
+                                                page: page,
+                                                limit: 5
+                                            },
+                                            success: function (response) {
+                                                loadingDiv.hide();
+                                                if (isNewLoad) {
                                                     reviewContainer.empty();
-                                                    loadingDiv.show();
+                                                }
+
+                                                if (response.reviews && response.reviews.length > 0) {
+                                                    appendReviews(response.reviews);
+                                                    currentReviewPage = page;
+                                                    // Show load more if there are more reviews
+                                                    if (response.hasMore) {
+                                                        loadMoreDiv.removeClass('hidden');
+                                                    } else {
+                                                        loadMoreDiv.addClass('hidden');
+                                                    }
+
                                                     errorDiv.addClass('hidden');
                                                     noReviewDiv.addClass('hidden');
+                                                } else if (isNewLoad) {
+                                                    // No reviews found
+                                                    noReviewDiv.removeClass('hidden');
+                                                    errorDiv.addClass('hidden');
                                                     loadMoreDiv.addClass('hidden');
-                                                    currentHouseId = null;
-                                                    currentReviewPage = 1;
                                                 }
-
-                                                function loadReviews(houseId, page, isNewLoad) {
-                                                    if (isLoadingReview)
-                                                        return;
-                                                    isLoadingReview = true;
-                                                    if (isNewLoad) {
-                                                        //  S how loadi n g for new load
-                                                        loadingDiv.show();
-                                                        errorDiv.addClass('hidden');
-                                                        noReviewDiv.addClass('hidden');
-                                                        loadMoreDiv.addClass('hidden');
-                                                        reviewContainer.empty();
-                                                    } else {
-                                                        // Show loading on load more button
-                                                        $('#loadMoreReviewBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
-                                                    }
-
-                                                    $.ajax({
-                                                        url: '${pageContext.request.contextPath}/feedback/house',
-                                                        method: 'GET',
-                                                        data: {
-                                                            houseId: houseId,
-                                                            page: page,
-                                                            limit: 5
-                                                        },
-                                                        success: function (response) {
-                                                            loadingDiv.hide();
-                                                            if (isNewLoad) {
-                                                                reviewContainer.empty();
-                                                            }
-
-                                                            if (response.reviews && response.reviews.length > 0) {
-                                                                appendReviews(response.reviews);
-                                                                currentReviewPage = page;
-                                                                // Show load more if there are more reviews
-                                                                if (response.hasMore) {
-                                                                    loadMoreDiv.removeClass('hidden');
-                                                                } else {
-                                                                    loadMoreDiv.addClass('hidden');
-                                                                }
-
-                                                                errorDiv.addClass('hidden');
-                                                                noReviewDiv.addClass('hidden');
-                                                            } else if (isNewLoad) {
-                                                                // No reviews found
-                                                                noReviewDiv.removeClass('hidden');
-                                                                errorDiv.addClass('hidden');
-                                                                loadMoreDiv.addClass('hidden');
-                                                            }
-                                                        },
-                                                        error: function (xhr, status, error) {
-                                                            console.error('Error loading reviews:', error);
-                                                            loadingDiv.hide();
-                                                            if (isNewLoad) {
-                                                                errorDiv.removeClass('hidden');
-                                                                noReviewDiv.addClass('hidden');
-                                                            } else {
-                                                                // Show error toast for load more
-                                                                showToast('Failed to load more reviews', 'error');
-                                                            }
-                                                        },
-                                                        complete: function () {
-                                                            isLoadingReview = false;
-                                                            $('#loadMoreReviewBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Reviews');
-                                                        }
-                                                    });
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error('Error loading reviews:', error);
+                                                loadingDiv.hide();
+                                                if (isNewLoad) {
+                                                    errorDiv.removeClass('hidden');
+                                                    noReviewDiv.addClass('hidden');
+                                                } else {
+                                                    // Show error toast for load more
+                                                    showToast('Failed to load more reviews', 'error');
                                                 }
+                                            },
+                                            complete: function () {
+                                                isLoadingReview = false;
+                                                $('#loadMoreReviewBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Reviews');
+                                            }
+                                        });
+                                    }
 
-                                                function appendReviews(reviews) {
-                                                    reviews.forEach(function (review) {
-                                                        const reviewHtml = createReviewHtml(review);
-                                                        reviewContainer.append(reviewHtml);
-                                                    });
-                                                }
+                                    function appendReviews(reviews) {
+                                        reviews.forEach(function (review) {
+                                            const reviewHtml = createReviewHtml(review);
+                                            reviewContainer.append(reviewHtml);
+                                        });
+                                    }
 
-                                                function createReviewHtml(review) {
-                                                    const stars = generateStarRating(review.Star);
+                                    function createReviewHtml(review) {
+                                        const stars = generateStarRating(review.Star);
 
-                                                    return `
+                                        return `
                                                         <div class="review-item p-4 border border-gray-200 rounded-xl bg-gray-50">
                                                             <div class="flex items-start gap-4">
                                                                 <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1073,262 +1075,262 @@
                                                             </div>
                                                         </div>
                                                     `;
-                                                }
+                                    }
 
-                                                function generateStarRating(rating) {
-                                                    let stars = '';
-                                                    for (let i = 1; i <= 5; i++) {
-                                                        if (i <= rating) {
-                                                            stars += '<i class="fas fa-star text-xs"></i>';
-                                                        } else {
-                                                            stars += '<i class="far fa-star text-xs"></i>';
-                                                        }
-                                                    }
-                                                    return stars;
-                                                }
+                                    function generateStarRating(rating) {
+                                        let stars = '';
+                                        for (let i = 1; i <= 5; i++) {
+                                            if (i <= rating) {
+                                                stars += '<i class="fas fa-star text-xs"></i>';
+                                            } else {
+                                                stars += '<i class="far fa-star text-xs"></i>';
+                                            }
+                                        }
+                                        return stars;
+                                    }
 
-                                                //Comment script section
-                                                const modalComment = $('#commentModal');
-                                                const modalCommentHouseName = $('#modalCommentHouseName');
-                                                const commentContainer = $('#commentContainer');
-                                                const commentLoadingDiv = $('#commentLoading');
-                                                const commentErrorDiv = $('#commentError');
-                                                const noCommentDiv = $('#noComment');
-                                                const loadMoreCommentDiv = $('#loadMoreComment');
-                                                const commentInput = $('#commentInput');
-                                                const submitCommentBtn = $('#submitCommentBtn');
-                                                let currentCommentPostId = null;
-                                                let currentCommentPage = 1;
-                                                let isLoadingComment = false;
-                                                let isSubmittingComment = false;
-                                                $('button:contains("Comment")').each(function () {
-                                                    const postId = $(this).closest('.card-hover').find('button[data-post-id]').first().data('post-id');
-                                                    $(this).attr('data-post-id', postId);
-                                                });
-                                                // Open Comment Modal
-                                                $(document).on('click', 'button:contains("Comment")', function () {
-                                                    const postId = $(this).data('post-id');
-                                                    const houseName = $(this).closest('.card-hover').find('h2').first().text().trim();
-                                                    if (!postId) {
-                                                        showToast('Unable to load comments', 'error');
-                                                        return;
-                                                    }
+                                    //Comment script section
+                                    const modalComment = $('#commentModal');
+                                    const modalCommentHouseName = $('#modalCommentHouseName');
+                                    const commentContainer = $('#commentContainer');
+                                    const commentLoadingDiv = $('#commentLoading');
+                                    const commentErrorDiv = $('#commentError');
+                                    const noCommentDiv = $('#noComment');
+                                    const loadMoreCommentDiv = $('#loadMoreComment');
+                                    const commentInput = $('#commentInput');
+                                    const submitCommentBtn = $('#submitCommentBtn');
+                                    let currentCommentPostId = null;
+                                    let currentCommentPage = 1;
+                                    let isLoadingComment = false;
+                                    let isSubmittingComment = false;
+                                    $('button:contains("Comment")').each(function () {
+                                        const postId = $(this).closest('.card-hover').find('button[data-post-id]').first().data('post-id');
+                                        $(this).attr('data-post-id', postId);
+                                    });
+                                    // Open Comment Modal
+                                    $(document).on('click', 'button:contains("Comment")', function () {
+                                        const postId = $(this).data('post-id');
+                                        const houseName = $(this).closest('.card-hover').find('h2').first().text().trim();
+                                        if (!postId) {
+                                            showToast('Unable to load comments', 'error');
+                                            return;
+                                        }
 
-                                                    currentCommentPostId = postId;
-                                                    currentCommentPage = 1;
-                                                    modalCommentHouseName.text(houseName);
-                                                    modalComment.addClass('active');
-                                                    $('body').addClass('overflow-hidden');
-                                                    loadComments(postId, 1, true);
-                                                });
-                                                // Close Comment Modal
-                                                $('#closeCommentModalBtn').on('click', function (e) {
-                                                    closeCommentModal();
-                                                });
-                                                modalComment.on('click', function (e) {
-                                                    if (e.target === this || !$(e.target).closest('.modal-content').length) {
-                                                        closeCommentModal();
-                                                    }
-                                                });
-                                                // Submit Comment
-                                                submitCommentBtn.on('click', function () {
-                                                    submitComment();
-                                                });
-                                                // Submit comment on Enter (Ctrl+Enter)
-                                                commentInput.on('keydown', function (e) {
-                                                    if (e.ctrlKey && e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        submitComment();
-                                                    }
-                                                });
-                                                // Enable/disable submit button based on input
-                                                commentInput.on('input', function () {
-                                                    const hasContent = $(this).val().trim().length > 0;
-                                                    submitCommentBtn.prop('disabled', !hasContent || isSubmittingComment);
-                                                });
-                                                // Retry loading comments
-                                                $('#retryComment').on('click', function () {
-                                                    if (currentCommentPostId) {
+                                        currentCommentPostId = postId;
+                                        currentCommentPage = 1;
+                                        modalCommentHouseName.text(houseName);
+                                        modalComment.addClass('active');
+                                        $('body').addClass('overflow-hidden');
+                                        loadComments(postId, 1, true);
+                                    });
+                                    // Close Comment Modal
+                                    $('#closeCommentModalBtn').on('click', function (e) {
+                                        closeCommentModal();
+                                    });
+                                    modalComment.on('click', function (e) {
+                                        if (e.target === this || !$(e.target).closest('.modal-content').length) {
+                                            closeCommentModal();
+                                        }
+                                    });
+                                    // Submit Comment
+                                    submitCommentBtn.on('click', function () {
+                                        submitComment();
+                                    });
+                                    // Submit comment on Enter (Ctrl+Enter)
+                                    commentInput.on('keydown', function (e) {
+                                        if (e.ctrlKey && e.key === 'Enter') {
+                                            e.preventDefault();
+                                            submitComment();
+                                        }
+                                    });
+                                    // Enable/disable submit button based on input
+                                    commentInput.on('input', function () {
+                                        const hasContent = $(this).val().trim().length > 0;
+                                        submitCommentBtn.prop('disabled', !hasContent || isSubmittingComment);
+                                    });
+                                    // Retry loading comments
+                                    $('#retryComment').on('click', function () {
+                                        if (currentCommentPostId) {
+                                            loadComments(currentCommentPostId, 1, true);
+                                        }
+                                    });
+                                    // Load more comments
+                                    $('#loadMoreCommentBtn').on('click', function () {
+                                        if (currentCommentPostId && !isLoadingComment) {
+                                            loadComments(currentCommentPostId, currentCommentPage + 1, false);
+                                        }
+                                    });
+                                    // ESC key to close comment modal
+                                    $(document).on('keydown', function (e) {
+                                        if (e.key === 'Escape' && modalComment.hasClass('active')) {
+                                            closeCommentModal();
+                                        }
+                                    });
+                                    function closeCommentModal() {
+                                        modalComment.removeClass('active');
+                                        $('body').removeClass('overflow-hidden');
+                                        // Reset modal state after animation
+                                        setTimeout(() => {
+                                            resetCommentModalState();
+                                        }, 300);
+                                    }
+
+                                    function resetCommentModalState() {
+                                        commentContainer.empty();
+                                        commentLoadingDiv.show();
+                                        commentErrorDiv.addClass('hidden');
+                                        noCommentDiv.addClass('hidden');
+                                        loadMoreCommentDiv.addClass('hidden');
+                                        commentInput.val('');
+                                        submitCommentBtn.prop('disabled', true);
+                                        currentCommentPostId = null;
+                                        currentCommentPage = 1;
+                                    }
+
+                                    function submitComment() {
+                                        const content = commentInput.val().trim();
+                                        const uid = '${sessionScope.user_id}';
+                                        if (!content) {
+                                            showToast('Please enter a comment', 'error');
+                                            return;
+                                        }
+
+                                        if (!uid) {
+                                            showToast('Please login to comment', 'error');
+                                            return;
+                                        }
+
+                                        if (isSubmittingComment)
+                                            return;
+                                        isSubmittingComment = true;
+                                        submitCommentBtn.prop('disabled', true);
+                                        submitCommentBtn.html('<div class="loading-spinner inline-block mr-2"></div>Posting...');
+                                        $.ajax({
+                                            url: '${pageContext.request.contextPath}/comment',
+                                            method: 'POST',
+                                            data: {
+                                                postId: currentCommentPostId,
+                                                content: content,
+                                                type: "add"
+                                            },
+                                            success: function (response) {
+                                                if (response.ok) {
+                                                    showToast(response.message ? response.message : 'Comment success!', 'success');
+                                                    commentInput.val('');
+                                                    // Add the new comment to the top of the list
+                                                    if (response.comment) {
+                                                        const newCommentHtml = createCommentHtml(response.comment);
+                                                        console.log(response.comment);
+                                                        commentContainer.prepend(newCommentHtml);
+                                                        noCommentDiv.addClass('hidden');
+                                                    } else {
                                                         loadComments(currentCommentPostId, 1, true);
                                                     }
-                                                });
-                                                // Load more comments
-                                                $('#loadMoreCommentBtn').on('click', function () {
-                                                    if (currentCommentPostId && !isLoadingComment) {
-                                                        loadComments(currentCommentPostId, currentCommentPage + 1, false);
-                                                    }
-                                                });
-                                                // ESC key to close comment modal
-                                                $(document).on('keydown', function (e) {
-                                                    if (e.key === 'Escape' && modalComment.hasClass('active')) {
-                                                        closeCommentModal();
-                                                    }
-                                                });
-                                                function closeCommentModal() {
-                                                    modalComment.removeClass('active');
-                                                    $('body').removeClass('overflow-hidden');
-                                                    // Reset modal state after animation
-                                                    setTimeout(() => {
-                                                        resetCommentModalState();
-                                                    }, 300);
+                                                } else {
+                                                    showToast(response.message || 'Failed to post comment', 'error');
+                                                }
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error('Error posting comment:', error);
+                                                showToast('Failed to post comment. Please try again.', 'error');
+                                            },
+                                            complete: function () {
+                                                isSubmittingComment = false;
+                                                submitCommentBtn.prop('disabled', commentInput.val().trim().length === 0);
+                                                submitCommentBtn.html('<i class="fas fa-paper-plane mr-2"></i>Post Comment');
+                                            }
+                                        });
+                                    }
+
+                                    function loadComments(postId, page, isNewLoad) {
+                                        if (isLoadingComment)
+                                            return;
+                                        isLoadingComment = true;
+                                        if (isNewLoad) {
+                                            // Show loading for new load
+                                            commentLoadingDiv.show();
+                                            commentErrorDiv.addClass('hidden');
+                                            noCommentDiv.addClass('hidden');
+                                            loadMoreCommentDiv.addClass('hidden');
+                                            commentContainer.empty();
+                                        } else {
+                                            // Show loading on load more button
+                                            $('#loadMoreCommentBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
+                                        }
+
+                                        $.ajax({
+                                            url: '${pageContext.request.contextPath}/comment',
+                                            method: 'GET',
+                                            data: {
+                                                postId: postId,
+                                                page: page,
+                                                limit: 10
+                                            },
+                                            success: function (response) {
+                                                commentLoadingDiv.hide();
+                                                if (isNewLoad) {
+                                                    commentContainer.empty();
                                                 }
 
-                                                function resetCommentModalState() {
-                                                    commentContainer.empty();
-                                                    commentLoadingDiv.show();
+                                                if (response.comments && response.comments.length > 0) {
+                                                    appendComments(response.comments);
+                                                    currentCommentPage = page;
+                                                    // Show load more if there are more comments
+                                                    if (response.hasMore) {
+                                                        loadMoreCommentDiv.removeClass('hidden');
+                                                    } else {
+                                                        loadMoreCommentDiv.addClass('hidden');
+                                                    }
+
                                                     commentErrorDiv.addClass('hidden');
                                                     noCommentDiv.addClass('hidden');
+                                                } else if (isNewLoad) {
+                                                    // No comments found
+                                                    noCommentDiv.removeClass('hidden');
+                                                    commentErrorDiv.addClass('hidden');
                                                     loadMoreCommentDiv.addClass('hidden');
-                                                    commentInput.val('');
-                                                    submitCommentBtn.prop('disabled', true);
-                                                    currentCommentPostId = null;
-                                                    currentCommentPage = 1;
                                                 }
-
-                                                function submitComment() {
-                                                    const content = commentInput.val().trim();
-                                                    const uid = '${sessionScope.user_id}';
-                                                    if (!content) {
-                                                        showToast('Please enter a comment', 'error');
-                                                        return;
-                                                    }
-
-                                                    if (!uid) {
-                                                        showToast('Please login to comment', 'error');
-                                                        return;
-                                                    }
-
-                                                    if (isSubmittingComment)
-                                                        return;
-                                                    isSubmittingComment = true;
-                                                    submitCommentBtn.prop('disabled', true);
-                                                    submitCommentBtn.html('<div class="loading-spinner inline-block mr-2"></div>Posting...');
-                                                    $.ajax({
-                                                        url: '${pageContext.request.contextPath}/comment',
-                                                        method: 'POST',
-                                                        data: {
-                                                            postId: currentCommentPostId,
-                                                            content: content,
-                                                            type: "add"
-                                                        },
-                                                        success: function (response) {
-                                                            if (response.ok) {
-                                                                showToast(response.message ? response.message : 'Comment success!', 'success');
-                                                                commentInput.val('');
-                                                                // Add the new comment to the top of the list
-                                                                if (response.comment) {
-                                                                    const newCommentHtml = createCommentHtml(response.comment);
-                                                                    console.log(response.comment);
-                                                                    commentContainer.prepend(newCommentHtml);
-                                                                    noCommentDiv.addClass('hidden');
-                                                                } else {
-                                                                    loadComments(currentCommentPostId, 1, true);
-                                                                }
-                                                            } else {
-                                                                showToast(response.message || 'Failed to post comment', 'error');
-                                                            }
-                                                        },
-                                                        error: function (xhr, status, error) {
-                                                            console.error('Error posting comment:', error);
-                                                            showToast('Failed to post comment. Please try again.', 'error');
-                                                        },
-                                                        complete: function () {
-                                                            isSubmittingComment = false;
-                                                            submitCommentBtn.prop('disabled', commentInput.val().trim().length === 0);
-                                                            submitCommentBtn.html('<i class="fas fa-paper-plane mr-2"></i>Post Comment');
-                                                        }
-                                                    });
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error('Error loading comments:', error);
+                                                commentLoadingDiv.hide();
+                                                if (isNewLoad) {
+                                                    commentErrorDiv.removeClass('hidden');
+                                                    noCommentDiv.addClass('hidden');
+                                                } else {
+                                                    // Show error toast for load more
+                                                    showToast('Failed to load more comments', 'error');
                                                 }
+                                            },
+                                            complete: function () {
+                                                isLoadingComment = false;
+                                                $('#loadMoreCommentBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Comments');
+                                            }
+                                        });
+                                    }
 
-                                                function loadComments(postId, page, isNewLoad) {
-                                                    if (isLoadingComment)
-                                                        return;
-                                                    isLoadingComment = true;
-                                                    if (isNewLoad) {
-                                                        // Show loading for new load
-                                                        commentLoadingDiv.show();
-                                                        commentErrorDiv.addClass('hidden');
-                                                        noCommentDiv.addClass('hidden');
-                                                        loadMoreCommentDiv.addClass('hidden');
-                                                        commentContainer.empty();
-                                                    } else {
-                                                        // Show loading on load more button
-                                                        $('#loadMoreCommentBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
-                                                    }
+                                    function appendComments(comments) {
+                                        comments.forEach(function (comment) {
+                                            const commentHtml = createCommentHtml(comment);
+                                            commentContainer.append(commentHtml);
+                                        });
+                                    }
 
-                                                    $.ajax({
-                                                        url: '${pageContext.request.contextPath}/comment',
-                                                        method: 'GET',
-                                                        data: {
-                                                            postId: postId,
-                                                            page: page,
-                                                            limit: 10
-                                                        },
-                                                        success: function (response) {
-                                                            commentLoadingDiv.hide();
-                                                            if (isNewLoad) {
-                                                                commentContainer.empty();
-                                                            }
+                                    function createCommentHtml(comment) {
+                                        const isCurrentUser = comment.owner && comment.owner.id == '${sessionScope.user_id}';
+                                        const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
+                                        const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
+                                        const ownerId = comment.owner ? comment.owner.id : '';
+                                        let deleteButton = '';
+                                        if (isCurrentUser) {
+                                            deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(`' + comment.id + '`)">' +
+                                                    '<i class="fas fa-trash mr-1"></i>' +
+                                                    'Delete' +
+                                                    '</button>';
+                                        }
 
-                                                            if (response.comments && response.comments.length > 0) {
-                                                                appendComments(response.comments);
-                                                                currentCommentPage = page;
-                                                                // Show load more if there are more comments
-                                                                if (response.hasMore) {
-                                                                    loadMoreCommentDiv.removeClass('hidden');
-                                                                } else {
-                                                                    loadMoreCommentDiv.addClass('hidden');
-                                                                }
-
-                                                                commentErrorDiv.addClass('hidden');
-                                                                noCommentDiv.addClass('hidden');
-                                                            } else if (isNewLoad) {
-                                                                // No comments found
-                                                                noCommentDiv.removeClass('hidden');
-                                                                commentErrorDiv.addClass('hidden');
-                                                                loadMoreCommentDiv.addClass('hidden');
-                                                            }
-                                                        },
-                                                        error: function (xhr, status, error) {
-                                                            console.error('Error loading comments:', error);
-                                                            commentLoadingDiv.hide();
-                                                            if (isNewLoad) {
-                                                                commentErrorDiv.removeClass('hidden');
-                                                                noCommentDiv.addClass('hidden');
-                                                            } else {
-                                                                // Show error toast for load more
-                                                                showToast('Failed to load more comments', 'error');
-                                                            }
-                                                        },
-                                                        complete: function () {
-                                                            isLoadingComment = false;
-                                                            $('#loadMoreCommentBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Comments');
-                                                        }
-                                                    });
-                                                }
-
-                                                function appendComments(comments) {
-                                                    comments.forEach(function (comment) {
-                                                        const commentHtml = createCommentHtml(comment);
-                                                        commentContainer.append(commentHtml);
-                                                    });
-                                                }
-
-                                                function createCommentHtml(comment) {
-                                                    const isCurrentUser = comment.owner && comment.owner.id == '${sessionScope.user_id}';
-                                                    const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
-                                                    const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
-                                                    const ownerId = comment.owner ? comment.owner.id : '';
-                                                    let deleteButton = '';
-                                                    if (isCurrentUser) {
-                                                        deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(`' + comment.id + '`)">' +
-                                                                '<i class="fas fa-trash mr-1"></i>' +
-                                                                'Delete' +
-                                                                '</button>';
-                                                    }
-
-                                                    if (isCurrentUser) {
-                                                        return `
+                                        if (isCurrentUser) {
+                                            return `
                                                                 <div class="comment-item p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" data-comment-id="` + comment.id + `">
                                                                     <div class="flex items-start gap-3">
                                                                         <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1356,8 +1358,8 @@
                                                                     </div>
                                                                 </div>
                                                             `;
-                                                    } else {
-                                                        return `
+                                        } else {
+                                            return `
                                                                 <div class="comment-item p-4 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors" data-comment-id="` + comment.id + `">
                                                                     <div class="flex items-start gap-3">
                                                                         <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1383,195 +1385,195 @@
                                                                     </div>
                                                                 </div>
                                                             `;
-                                                    }
-                                                }
+                                        }
+                                    }
 
-                                                // Global function for deleting comments
-                                                window.deleteComment = function (commentId) {
-                                                    Swal.fire({
-                                                        title: 'Delete comment ?',
-                                                        html: 'This action can not be undo, please sure you have make decision!',
-                                                        imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                        imageWidth: 150,
-                                                        imageHeight: 150,
-                                                        imageAlt: 'Custom icon',
-                                                        showCancelButton: true,
-                                                        confirmButtonText: 'Delete',
-                                                        cancelButtonText: 'Cancel',
-                                                        reverseButtons: true,
-                                                        focusConfirm: false,
-                                                        focusCancel: false,
-                                                        customClass: {
-                                                            popup: 'rounded-xl shadow-lg',
-                                                            title: 'text-xl font-semibold',
-                                                            confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                            cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                            actions: 'space-x-4'
-                                                        },
-                                                        buttonsStyling: false
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            $.ajax({
-                                                                url: '${pageContext.request.contextPath}/comment',
-                                                                method: 'POST',
-                                                                data: {commentId: commentId, type: "delete"},
-                                                                success: function (response) {
-                                                                    if (response.ok) {
-                                                                        showToast('Comment deleted successfully', 'success');
-                                                                        // Remove the comment from the DOM
-                                                                        $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
-                                                                            $(this).remove();
-                                                                            // Show no comments message if container is empty
-                                                                            if (commentContainer.children().length === 0) {
-                                                                                noCommentDiv.removeClass('hidden');
-                                                                            }
-                                                                        });
-                                                                    } else {
-                                                                        showToast(response.message || 'Failed to delete comment', 'error');
-                                                                    }
-                                                                },
-                                                                error: function () {
-                                                                    showToast('Failed to delete comment', 'error');
+                                    // Global function for deleting comments
+                                    window.deleteComment = function (commentId) {
+                                        Swal.fire({
+                                            title: 'Delete comment ?',
+                                            html: 'This action can not be undo, please sure you have make decision!',
+                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Custom icon',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Delete',
+                                            cancelButtonText: 'Cancel',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $.ajax({
+                                                    url: '${pageContext.request.contextPath}/comment',
+                                                    method: 'POST',
+                                                    data: {commentId: commentId, type: "delete"},
+                                                    success: function (response) {
+                                                        if (response.ok) {
+                                                            showToast('Comment deleted successfully', 'success');
+                                                            // Remove the comment from the DOM
+                                                            $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
+                                                                $(this).remove();
+                                                                // Show no comments message if container is empty
+                                                                if (commentContainer.children().length === 0) {
+                                                                    noCommentDiv.removeClass('hidden');
                                                                 }
                                                             });
-                                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                            Swal.close();
+                                                        } else {
+                                                            showToast(response.message || 'Failed to delete comment', 'error');
                                                         }
-                                                    });
-                                                };
-
-                                                $('button:contains("Share")').each(function () {
-                                                    const postId = $(this).closest('.card-hover').find('button[data-post-share-id]').first().data('post-id');
-                                                    $(this).attr('data-post-share-id', postId);
-                                                });
-
-                                                $(document).on('click', 'button:contains("Share")', function () {
-                                                    let user = '${sessionScope.user_id}';
-                                                    if (user.trim() === '') {
-                                                        Swal.fire({
-                                                            title: 'You must login to use this feature',
-                                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                            imageWidth: 150,
-                                                            imageHeight: 150,
-                                                            imageAlt: 'Custom icon',
-                                                            showCancelButton: true,
-                                                            confirmButtonText: 'Login now',
-                                                            cancelButtonText: 'Back to Newsfeed',
-                                                            reverseButtons: true,
-                                                            focusConfirm: false,
-                                                            focusCancel: false,
-                                                            customClass: {
-                                                                popup: 'rounded-xl shadow-lg',
-                                                                title: 'text-xl font-semibold',
-                                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                                actions: 'space-x-4'
-                                                            },
-                                                            buttonsStyling: false
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) {
-                                                                location.href = '${pageContext.request.contextPath}/login';
-                                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                                Swal.close();
-                                                            }
-                                                        });
-                                                    } else {
-                                                        let sharePost = $(this).data('post-share-id');
-                                                        Swal.fire({
-                                                            title: 'Wanna share this post?',
-                                                            html: 'Say something about this post or leave blank?',
-                                                            input: 'text',
-                                                            inputPlaceholder: 'Add a message...',
-                                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                            imageWidth: 150,
-                                                            imageHeight: 150,
-                                                            imageAlt: 'Custom icon',
-                                                            showCancelButton: true,
-                                                            confirmButtonText: 'Share',
-                                                            cancelButtonText: 'Cancel',
-                                                            reverseButtons: true,
-                                                            focusConfirm: false,
-                                                            focusCancel: false,
-                                                            customClass: {
-                                                                popup: 'rounded-xl shadow-lg',
-                                                                title: 'text-xl font-semibold',
-                                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                                actions: 'space-x-4'
-                                                            },
-                                                            buttonsStyling: false
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) {
-                                                                const inputValue = result.value;
-                                                                $.ajax({
-                                                                    url: '${pageContext.request.contextPath}/post',
-                                                                    type: 'POST',
-                                                                    data: {
-                                                                        typeWork: 'share',
-                                                                        postId: sharePost,
-                                                                        content: inputValue
-                                                                    }
-                                                                    , success: function (response) {
-                                                                        if (response.ok) {
-                                                                            showToast(response.message);
-                                                                        } else {
-                                                                            showToast(response.message, 'error');
-                                                                        }
-                                                                    }
-                                                                });
-                                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                                Swal.close();
-                                                            }
-                                                        });
+                                                    },
+                                                    error: function () {
+                                                        showToast('Failed to delete comment', 'error');
                                                     }
                                                 });
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                Swal.close();
+                                            }
+                                        });
+                                    };
 
-                                                function showToast(message, type = 'success') {
-                                                    Toastify({
-                                                        text: message,
-                                                        duration: 3000,
-                                                        gravity: "top",
-                                                        position: "right",
-                                                        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
-                                                        stopOnFocus: true
-                                                    }).showToast();
+                                    $('button:contains("Share")').each(function () {
+                                        const postId = $(this).closest('.card-hover').find('button[data-post-share-id]').first().data('post-id');
+                                        $(this).attr('data-post-share-id', postId);
+                                    });
+
+                                    $(document).on('click', 'button:contains("Share")', function () {
+                                        let user = '${sessionScope.user_id}';
+                                        if (user.trim() === '') {
+                                            Swal.fire({
+                                                title: 'You must login to use this feature',
+                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                imageWidth: 150,
+                                                imageHeight: 150,
+                                                imageAlt: 'Custom icon',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Login now',
+                                                cancelButtonText: 'Back to Newsfeed',
+                                                reverseButtons: true,
+                                                focusConfirm: false,
+                                                focusCancel: false,
+                                                customClass: {
+                                                    popup: 'rounded-xl shadow-lg',
+                                                    title: 'text-xl font-semibold',
+                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                    actions: 'space-x-4'
+                                                },
+                                                buttonsStyling: false
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    location.href = '${pageContext.request.contextPath}/login';
+                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                    Swal.close();
                                                 }
                                             });
-
-                                            // Store current post's images and slide index
-                                            let currentPostImages = [];
-                                            let currentSlideIndex = 0;
-
-                                            function getPostImagesData(postElement) {
-                                                const imageDataContainer = postElement.querySelector('#imageDataContainer');
-                                                if (!imageDataContainer)
-                                                    return [];
-
-                                                const imageElements = imageDataContainer.querySelectorAll('.image-data');
-                                                const imagesData = [];
-
-                                                imageElements.forEach(element => {
-                                                    imagesData.push({
-                                                        path: element.getAttribute('data-path'),
-                                                        type: element.getAttribute('data-type'),
-                                                        fullPath: element.getAttribute('data-full-path')
+                                        } else {
+                                            let sharePost = $(this).data('post-share-id');
+                                            Swal.fire({
+                                                title: 'Wanna share this post?',
+                                                html: 'Say something about this post or leave blank?',
+                                                input: 'text',
+                                                inputPlaceholder: 'Add a message...',
+                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                imageWidth: 150,
+                                                imageHeight: 150,
+                                                imageAlt: 'Custom icon',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Share',
+                                                cancelButtonText: 'Cancel',
+                                                reverseButtons: true,
+                                                focusConfirm: false,
+                                                focusCancel: false,
+                                                customClass: {
+                                                    popup: 'rounded-xl shadow-lg',
+                                                    title: 'text-xl font-semibold',
+                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                    actions: 'space-x-4'
+                                                },
+                                                buttonsStyling: false
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    const inputValue = result.value;
+                                                    $.ajax({
+                                                        url: '${pageContext.request.contextPath}/post',
+                                                        type: 'POST',
+                                                        data: {
+                                                            typeWork: 'share',
+                                                            postId: sharePost,
+                                                            content: inputValue
+                                                        }
+                                                        , success: function (response) {
+                                                            if (response.ok) {
+                                                                showToast(response.message);
+                                                            } else {
+                                                                showToast(response.message, 'error');
+                                                            }
+                                                        }
                                                     });
-                                                });
+                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                    Swal.close();
+                                                }
+                                            });
+                                        }
+                                    });
 
-                                                return imagesData;
-                                            }
+                                    function showToast(message, type = 'success') {
+                                        Toastify({
+                                            text: message,
+                                            duration: 3000,
+                                            gravity: "top",
+                                            position: "right",
+                                            backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
+                                            stopOnFocus: true
+                                        }).showToast();
+                                    }
+                                });
 
-                                            function openImageCarousel(clickedIndex, postElement) {
-                                                // Get images for this specific post
-                                                currentPostImages = getPostImagesData(postElement);
+                                // Store current post's images and slide index
+                                let currentPostImages = [];
+                                let currentSlideIndex = 0;
 
-                                                if (currentPostImages.length === 0)
-                                                    return;
+                                function getPostImagesData(postElement) {
+                                    const imageDataContainer = postElement.querySelector('#imageDataContainer');
+                                    if (!imageDataContainer)
+                                        return [];
 
-                                                currentSlideIndex = clickedIndex;
+                                    const imageElements = imageDataContainer.querySelectorAll('.image-data');
+                                    const imagesData = [];
 
-                                                // Create HTML for carousel
-                                                let carouselHtml = `
+                                    imageElements.forEach(element => {
+                                        imagesData.push({
+                                            path: element.getAttribute('data-path'),
+                                            type: element.getAttribute('data-type'),
+                                            fullPath: element.getAttribute('data-full-path')
+                                        });
+                                    });
+
+                                    return imagesData;
+                                }
+
+                                function openImageCarousel(clickedIndex, postElement) {
+                                    // Get images for this specific post
+                                    currentPostImages = getPostImagesData(postElement);
+
+                                    if (currentPostImages.length === 0)
+                                        return;
+
+                                    currentSlideIndex = clickedIndex;
+
+                                    // Create HTML for carousel
+                                    let carouselHtml = `
         <div class="image-carousel-container">
             <div class="carousel-wrapper">
                 <button class="carousel-nav prev-btn" onclick="changeSlide(-1)" ` + (currentPostImages.length <= 1 ? 'style="display: none;"' : '') + `>‹</button>
@@ -1586,19 +1588,19 @@
         </div>
     `;
 
-                                                Swal.fire({
-                                                    html: carouselHtml,
-                                                    showCloseButton: true,
-                                                    showConfirmButton: false,
-                                                    width: '90%',
-                                                    padding: '20px',
-                                                    customClass: {
-                                                        popup: 'carousel-popup'
-                                                    },
-                                                    didOpen: () => {
-                                                        // Add CSS styles
-                                                        const style = document.createElement('style');
-                                                        style.textContent = `
+                                    Swal.fire({
+                                        html: carouselHtml,
+                                        showCloseButton: true,
+                                        showConfirmButton: false,
+                                        width: '90%',
+                                        padding: '20px',
+                                        customClass: {
+                                            popup: 'carousel-popup'
+                                        },
+                                        didOpen: () => {
+                                            // Add CSS styles
+                                            const style = document.createElement('style');
+                                            style.textContent = `
                 .carousel-popup {
                     background: rgba(0, 0, 0, 0.9) !important;
                 }
@@ -1666,72 +1668,111 @@
                     font-size: 14px;
                 }
             `;
-                                                        document.head.appendChild(style);
-                                                    }
-                                                });
+                                            document.head.appendChild(style);
+                                        }
+                                    });
+                                }
+
+                                function changeSlide(direction) {
+                                    if (currentPostImages.length <= 1)
+                                        return;
+
+                                    currentSlideIndex += direction;
+
+                                    // Loop around
+                                    if (currentSlideIndex >= currentPostImages.length) {
+                                        currentSlideIndex = 0;
+                                    } else if (currentSlideIndex < 0) {
+                                        currentSlideIndex = currentPostImages.length - 1;
+                                    }
+
+                                    // Update image and counter
+                                    const carouselImage = document.getElementById('carousel-image');
+                                    const imageCounter = document.getElementById('image-counter');
+
+                                    if (carouselImage && imageCounter) {
+                                        carouselImage.src = currentPostImages[currentSlideIndex].fullPath;
+                                        imageCounter.textContent = currentSlideIndex + 1 + ` / ` + currentPostImages.length;
+                                    }
+                                }
+
+                                function showImageModal(imageSrc, type, postElement) {
+                                    // Get images for this specific post
+                                    const postImages = getPostImagesData(postElement);
+
+                                    // Find the index of the clicked image
+                                    const clickedIndex = postImages.findIndex(img =>
+                                        img.path === imageSrc && img.type === type
+                                    );
+
+                                    if (clickedIndex !== -1) {
+                                        openImageCarousel(clickedIndex, postElement);
+                                    }
+                                }
+
+                                function showToast(message, type = 'success') {
+                                    let backgroundColor;
+                                    if (type === "success") {
+                                        backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
+                                    } else if (type === "error") {
+                                        backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
+                                    } else if (type === "warning") {
+                                        backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
+                                    } else if (type === "info") {
+                                        backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
+                                    } else {
+                                        backgroundColor = "#333"; // Default color (dark gray)
+                                    }
+
+                                    Toastify({
+                                        text: message, // Dynamically set message
+                                        duration: 2000,
+                                        close: true,
+                                        gravity: "top",
+                                        position: "right",
+                                        backgroundColor: backgroundColor, // Dynamically set background color
+                                        stopOnFocus: true
+                                    }).showToast();
+                                }
+
+                                let currentPage = '${page}';
+                                let limit = '${limit}';
+                                let canLoadMore = '${canLoadMore}';
+
+                                function loadMore() {
+                                    // Check if we can load more
+                                    if (!canLoadMore) {
+                                        console.log('No more content to load');
+                                        return;
+                                    }
+
+                                    // Increment page for next request
+                                    currentPage++;
+
+                                    $.ajax({
+                                        url: '${pageContext.request.contextPath}/loadmorefeeds',
+                                        type: 'GET',
+                                        data: {
+                                            limit: limit,
+                                            page: currentPage
+                                        },
+                                        success: function (response) {
+                                            const tempDiv = $('<div>').html(response);
+                                            const newCanLoadMore = tempDiv.find('#canLoadMore').length > 0;
+
+                                            $('#loadmoreitems').append(response);
+
+                                            canLoadMore = newCanLoadMore;
+
+                                            if (!canLoadMore) {
+                                                $('#loadMoreBtn').hide();
                                             }
-
-                                            function changeSlide(direction) {
-                                                if (currentPostImages.length <= 1)
-                                                    return;
-
-                                                currentSlideIndex += direction;
-
-                                                // Loop around
-                                                if (currentSlideIndex >= currentPostImages.length) {
-                                                    currentSlideIndex = 0;
-                                                } else if (currentSlideIndex < 0) {
-                                                    currentSlideIndex = currentPostImages.length - 1;
-                                                }
-
-                                                // Update image and counter
-                                                const carouselImage = document.getElementById('carousel-image');
-                                                const imageCounter = document.getElementById('image-counter');
-
-                                                if (carouselImage && imageCounter) {
-                                                    carouselImage.src = currentPostImages[currentSlideIndex].fullPath;
-                                                    imageCounter.textContent = currentSlideIndex + 1 + ` / ` + currentPostImages.length;
-                                                }
-                                            }
-
-                                            function showImageModal(imageSrc, type, postElement) {
-                                                // Get images for this specific post
-                                                const postImages = getPostImagesData(postElement);
-
-                                                // Find the index of the clicked image
-                                                const clickedIndex = postImages.findIndex(img =>
-                                                    img.path === imageSrc && img.type === type
-                                                );
-
-                                                if (clickedIndex !== -1) {
-                                                    openImageCarousel(clickedIndex, postElement);
-                                                }
-                                            }
-
-                                            function showToast(message, type = 'success') {
-                                                let backgroundColor;
-                                                if (type === "success") {
-                                                    backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
-                                                } else if (type === "error") {
-                                                    backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
-                                                } else if (type === "warning") {
-                                                    backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
-                                                } else if (type === "info") {
-                                                    backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
-                                                } else {
-                                                    backgroundColor = "#333"; // Default color (dark gray)
-                                                }
-
-                                                Toastify({
-                                                    text: message, // Dynamically set message
-                                                    duration: 2000,
-                                                    close: true,
-                                                    gravity: "top",
-                                                    position: "right",
-                                                    backgroundColor: backgroundColor, // Dynamically set background color
-                                                    stopOnFocus: true
-                                                }).showToast();
-                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('Error loading more content:', error);
+                                        }
+                                    });
+                                }
         </script>
     </body>
 </html>
