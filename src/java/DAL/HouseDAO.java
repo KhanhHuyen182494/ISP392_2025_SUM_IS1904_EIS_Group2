@@ -166,7 +166,53 @@ public class HouseDAO extends BaseDao implements IHouseDAO {
 
     @Override
     public List<House> getAll() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        List<House> houses = new ArrayList<>();
+        String sql = """
+                     SELECT 
+                         h.*,
+                         s.name as StatusName
+                     FROM
+                         homestay h
+                             JOIN
+                         status s ON h.status_id = s.id
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                House h = new House();
+                h.setId(rs.getString("id"));
+                h.setName(rs.getString("name"));
+                h.setDescription(rs.getString("description"));
+                h.setStar(rs.getFloat("star"));
+                h.setIs_whole_house(rs.getBoolean("is_whole_house"));
+                h.setPrice_per_night(rs.getDouble("price_per_night"));
+
+                User u = new User();
+                u.setId(rs.getString("owner_id"));
+
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                s.setName(rs.getString("StatusName"));
+
+                Address a = new Address();
+                a.setId(rs.getInt("address_id"));
+
+                h.setAddress(a);
+                h.setOwner(u);
+                h.setStatus(s);
+
+                houses.add(h);
+            }
+
+        } catch (SQLException e) {
+        }
+
+        return houses;
     }
 
     @Override

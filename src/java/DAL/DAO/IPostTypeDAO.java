@@ -15,4 +15,6 @@ public interface IPostTypeDAO {
 
     //Get
     public List<PostType> getAllPostType();
+
+    public PostType getPostTypeById(int id);
 }

@@ -20,6 +20,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -31,7 +34,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
     public static void main(String[] args) {
         PostDAO pDao = new PostDAO();
-        System.out.println(pDao.getById("POST-684a9886ed8b42cd990fc621603af5c"));
+        System.out.println(pDao.updatePostStatus("POST-1c7c735686354762bf3b2c05f134837", 14));
     }
 
     @Override
@@ -230,7 +233,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
                                homestay h ON p.target_homestay_id = h.id
                                     JOIN
                                user u ON p.user_id = u.id
-                           WHERE 1=1
+                           WHERE p.status_id = 14
                            """;
         String countQuery = "SELECT COUNT(*) FROM post p WHERE 1=1";
 
@@ -326,6 +329,12 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
         } catch (SQLException e) {
             logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
         }
 
         dto.setItems(posts);
@@ -476,6 +485,12 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
         } catch (SQLException e) {
             logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
         }
 
         dto.setItems(posts);
@@ -487,6 +502,419 @@ public class PostDAO extends BaseDao implements IPostDAO {
         dto.setSort_by(sortBy);
 
         return dto;
+    }
+
+    @Override
+    public List<Post> getPaginatedManagePost(String keyword, Integer statusId, Integer typeId, String homestayId, Date createdDate, Date updatedDate, int limit, int offset) {
+        List<Post> pList = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT 
+                            p.*, s.name as StatusName, pt.name as PostTypeName
+                        FROM
+                            fuhousefinder_homestay.post p
+                            LEFT JOIN homestay h ON p.target_homestay_id = h.id
+                            JOIN status s ON s.id = p.status_id
+                            JOIN `User` u ON u.id = p.user_id
+                            JOIN post_type pt ON pt.id = p.post_type_id
+                        WHERE 1 = 1
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append("""
+            AND (
+                p.content LIKE ? OR 
+                CONCAT_WS(' ', u.first_name, u.last_name) LIKE ?
+            )
+        """);
+            String kw = "%" + keyword + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+
+        if (createdDate != null) {
+            sql.append(" AND DATE(p.created_at) = ? ");
+            params.add(new java.sql.Date(createdDate.getTime()));
+        }
+
+        if (updatedDate != null) {
+            sql.append(" AND DATE(p.updated_at) = ? ");
+            params.add(new java.sql.Date(updatedDate.getTime()));
+        }
+
+        if (statusId != null) {
+            sql.append(" AND p.status_id = ? ");
+            params.add(statusId);
+        }
+
+        if (typeId != null) {
+            sql.append(" AND p.post_type_id = ? ");
+            params.add(typeId);
+        }
+
+        if (homestayId != null && !homestayId.isEmpty()) {
+            sql.append(" AND p.target_homestay_id = ? ");
+            params.add(homestayId);
+        }
+
+        sql.append(" ORDER BY p.created_at DESC LIMIT ? OFFSET ? ");
+        params.add(limit);
+        params.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String string) {
+                    ps.setString(i + 1, string);
+                } else if (param instanceof Integer integer) {
+                    ps.setInt(i + 1, integer);
+                } else if (param instanceof java.sql.Date sqlDate) {
+                    ps.setDate(i + 1, sqlDate);
+                } else {
+                    ps.setObject(i + 1, param);
+                }
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Status psta = new Status();
+
+                Post p = new Post();
+                p.setId(rs.getString("id"));
+                p.setContent(rs.getString("content"));
+                p.setCreated_at(rs.getTimestamp("created_at"));
+                p.setUpdated_at(rs.getTimestamp("updated_at"));
+                p.setDeleted_at(rs.getTimestamp("deleted_at"));
+
+                House h = new House();
+                PostType pt = new PostType();
+
+                psta.setId(rs.getInt("status_id"));
+                psta.setName(rs.getString("StatusName"));
+                h.setId(rs.getString("target_homestay_id"));
+
+                p.setStatus(psta);
+                p.setHouse(h);
+
+                User owner = new User();
+                owner.setId(rs.getString("user_id"));
+
+                pt.setId(rs.getInt("post_type_id"));
+                pt.setName(rs.getString("PostTypeName"));
+
+                Post parent = new Post();
+                parent.setId(rs.getString("parent_post_id"));
+
+                p.setOwner(owner);
+                p.setPost_type(pt);
+                p.setParent_post(parent);
+
+                pList.add(p);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching getPaginatedManagePost with filters: " + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return pList;
+    }
+
+    public Map<String, Integer> getPostCounts() {
+        Map<String, Integer> counts = new HashMap<>();
+
+        // SQL query to get all counts in one query - no filters, all posts
+        String sql = """
+        SELECT 
+            COUNT(*) as total_count,
+            SUM(CASE WHEN s.name = 'Published' THEN 1 ELSE 0 END) as published_count,
+            SUM(CASE WHEN DATE(p.created_at) = CURDATE() THEN 1 ELSE 0 END) as new_today_count,
+            SUM(CASE WHEN s.name = 'Rejected' THEN 1 ELSE 0 END) as rejected_count
+        FROM
+            fuhousefinder_homestay.post p
+            JOIN status s ON s.id = p.status_id
+    """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                counts.put("total", rs.getInt("total_count"));
+                counts.put("published", rs.getInt("published_count"));
+                counts.put("newToday", rs.getInt("new_today_count"));
+                counts.put("rejected", rs.getInt("rejected_count"));
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching post counts: " + e);
+            // Return empty counts on error
+            counts.put("total", 0);
+            counts.put("published", 0);
+            counts.put("newToday", 0);
+            counts.put("rejected", 0);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return counts;
+    }
+
+    @Override
+    public int getTotalPostCount() {
+        return getPostCount(null);
+    }
+
+    @Override
+    public int getPublishedPostCount() {
+        return getPostCount("Published");
+    }
+
+    @Override
+    public int getNewTodayPostCount() {
+        return getPostCount("TODAY");
+    }
+
+    @Override
+    public int getRejectedPostCount() {
+        return getPostCount("Rejected");
+    }
+
+    private int getPostCount(String countType) {
+        StringBuilder sql = new StringBuilder("""
+        SELECT COUNT(*) as count
+        FROM
+            fuhousefinder_homestay.post p
+            JOIN status s ON s.id = p.status_id
+        WHERE 1 = 1
+    """);
+
+        // Add specific count condition
+        if ("Published".equals(countType)) {
+            sql.append(" AND s.name = 'Published' ");
+        } else if ("Rejected".equals(countType)) {
+            sql.append(" AND s.name = 'Rejected' ");
+        } else if ("TODAY".equals(countType)) {
+            sql.append(" AND DATE(p.created_at) = CURDATE() ");
+        }
+
+        int count = 0;
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching post count for type " + countType + ": " + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public int getPostCountForOwner(String countType, String uid) {
+        StringBuilder sql = new StringBuilder("""
+        SELECT COUNT(*) as count
+        FROM
+            fuhousefinder_homestay.post p
+            JOIN status s ON s.id = p.status_id
+        WHERE p.user_id = ?
+    """);
+
+        // Add specific count condition
+        if ("Published".equals(countType)) {
+            sql.append(" AND s.name = 'Published' ");
+        } else if ("Rejected".equals(countType)) {
+            sql.append(" AND s.name = 'Rejected' ");
+        } else if ("TODAY".equals(countType)) {
+            sql.append(" AND DATE(p.created_at) = CURDATE() ");
+        } else {
+
+        }
+
+        int count = 0;
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            ps.setString(1, uid);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching post count for type " + countType + ": " + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public Post getPostDetailManage(String postId) {
+        Post p = new Post();
+
+        String baseQuery = """
+                           SELECT 
+                               p.id as PostId,
+                               p.content as PostContent,
+                               p.target_homestay_id as PostHouseId,
+                               p.target_room_id as PostRoomId,
+                               p.status_id as PostStatusId,
+                               p.created_at as PostCreatedAt,
+                               p.user_id as PostCreatedBy,
+                               p.updated_at as PostUpdatedAt,
+                               p.deleted_at as PostDeletedAt,
+                               p.post_type_id,
+                               p.parent_post_id,
+                               h.name as HouseName,
+                               h.description as HouseDescription,
+                               h.star as HouseStar,
+                               h.is_whole_house as WholeHouse,
+                               h.price_per_night as HousePrice,
+                               h.status_id as HouseStatusId,
+                               h.address_id as HouseAddressId,
+                               u.id as UserPostId,
+                               u.first_name as UserPostFirstName,
+                               u.last_name as UserPostLastName,
+                               u.avatar as UserPostAvatar
+                           FROM
+                               post p
+                                    LEFT JOIN
+                               homestay h ON p.target_homestay_id = h.id
+                                    JOIN
+                               user u ON p.user_id = u.id
+                           WHERE p.id = ?;
+                           """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(baseQuery);
+
+            ps.setString(1, postId);
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Status psta = new Status();
+                Status hsta = new Status();
+
+                p.setId(rs.getString("PostId"));
+                p.setContent(rs.getString("PostContent"));
+                p.setCreated_at(rs.getTimestamp("PostCreatedAt"));
+                p.setUpdated_at(rs.getTimestamp("PostUpdatedAt"));
+                p.setDeleted_at(rs.getTimestamp("PostDeletedAt"));
+
+                House h = new House();
+                Address a = new Address();
+                PostType pt = new PostType();
+
+                h.setId(rs.getString("PostHouseId"));
+                h.setName(rs.getString("HouseName"));
+                h.setDescription(rs.getString("HouseDescription"));
+                h.setStar(rs.getFloat("HouseStar"));
+                h.setIs_whole_house(rs.getBoolean("WholeHouse"));
+                h.setPrice_per_night(rs.getDouble("HousePrice"));
+
+                a.setId(rs.getInt("HouseAddressId"));
+                psta.setId(rs.getInt("PostStatusId"));
+                hsta.setId(rs.getInt("HouseStatusId"));
+
+                p.setStatus(psta);
+                p.setHouse(h);
+                h.setStatus(hsta);
+                h.setAddress(a);
+
+                User owner = new User();
+                owner.setId(rs.getString("UserPostId"));
+                owner.setFirst_name(rs.getString("UserPostFirstName"));
+                owner.setLast_name(rs.getString("UserPostLastName"));
+                owner.setAvatar(rs.getString("UserPostAvatar"));
+
+                pt.setId(rs.getInt("post_type_id"));
+
+                Post parent = new Post();
+                parent.setId(rs.getString("parent_post_id"));
+
+                p.setOwner(owner);
+                p.setPost_type(pt);
+                p.setParent_post(parent);
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return p;
+    }
+
+    @Override
+    public boolean updatePostStatus(String postId, int statusId) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`post`
+                     SET
+                     `status_id` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, statusId);
+            ps.setString(2, postId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
     }
 
 }

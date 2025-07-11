@@ -2,78 +2,55 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package Controller.Common;
+package Controller.Common.AJAX;
 
-import Model.House;
+import Controller.Common.BaseAuthorization;
+import Controller.Common.NewsfeedController;
+import DAL.DAO.IPostDAO;
+import DAL.PostDAO;
 import DTO.PostDTO;
 import Model.Address;
-import Model.Review;
-import Model.Media;
+import Model.House;
 import Model.Like;
+import Model.Media;
 import Model.Post;
+import Model.Review;
 import Model.Status;
 import Model.User;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.http.HttpServlet;
 import java.io.IOException;
+import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author Huyen
+ * @author Tam
  */
-@WebServlet(name = "NewsfeedController", urlPatterns = {"/feeds"})
-public class NewsfeedController extends BaseAuthorization {
+@WebServlet(name = "LoadMoreFeeds", urlPatterns = {"/loadmorefeeds"})
+public class LoadMoreFeedsController extends BaseAuthorization {
 
-    private static final Logger LOGGER = Logger.getLogger(NewsfeedController.class.getName());
-    private static final int LIMIT = 5;
-
-    @Override
-    protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        Map<String, Object> result = new HashMap<>();
-
-        try {
-            // Input
-            String pid = request.getParameter("pid");
-            String type = request.getParameter("type");
-
-            switch (type) {
-                case "like" ->
-                    doLikeAction(pid, user, result);
-                case "unLike" ->
-                    doUnLikeAction(pid, user, result);
-            }
-
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during like process", e);
-            result.put("ok", false);
-            result.put("message", "An unexpected error occurred during like.");
-        }
-
-        sendJsonResponse(response, result);
-    }
+    private static final Logger LOGGER = Logger.getLogger(LoadMoreFeedsController.class.getName());
 
     @Override
-    protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+    protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user)
+            throws ServletException, IOException {
         try {
+            int limit = (request.getParameter("limit") != null && !request.getParameter("limit").isEmpty()) ? Integer.parseInt(request.getParameter("limit")) : 10;
+            int page = (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) ? Integer.parseInt(request.getParameter("page")) : 2;
+
             PostDTO posts;
 
-            int page = 1;
-
             //Logic get posts
-            posts = pDao.getPaginatedPosts(page, LIMIT, "", "");
+            posts = pDao.getPaginatedPosts(page, limit, "", "");
             fullLoadPostInfomation(posts, user);
 
             List<House> hList = new LinkedList<>();
@@ -89,15 +66,21 @@ public class NewsfeedController extends BaseAuthorization {
 
             request.setAttribute("canLoadMore", canLoadMore);
             request.setAttribute("totalPage", totalPage);
-            request.setAttribute("limit", LIMIT);
-            request.setAttribute("page", page);
+            request.setAttribute("limit", limit);
+            request.setAttribute("page", page + 1);
             request.setAttribute("posts", posts.getItems());
-            request.getRequestDispatcher("/FE/Common/Newsfeed.jsp").forward(request, response);
+            request.getRequestDispatcher("/FE/Shared/post.jsp").forward(request, response);
 
         } catch (ServletException | IOException e) {
             LOGGER.log(Level.SEVERE, "Error during get post process", e);
             log.error("Error during get post process");
         }
+    }
+
+    @Override
+    protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user)
+            throws ServletException, IOException {
+
     }
 
     private void fullLoadHouseInfomation(List<House> houses) {
@@ -202,76 +185,4 @@ public class NewsfeedController extends BaseAuthorization {
         }
     }
 
-    protected void doLikeAction(String pid, User user, Map<String, Object> result) {
-        try {
-            // Check if user already liked this post
-            Like existingLike = lDao.getLikeByPostAndUser(pid, user.getId());
-
-            if (existingLike != null && existingLike.getUser_id() != null && existingLike.getPost_id() != null) {
-                // User already has a like record, update it
-                existingLike.setIs_like(true);
-                existingLike.setLiked_at(Timestamp.valueOf(LocalDateTime.now()));
-                existingLike.setDeleted_at(null); // Clear deleted_at if it was set
-
-                if (lDao.update(existingLike)) {
-                    result.put("ok", true);
-                    result.put("message", "Like Success for post: " + pid);
-                } else {
-                    result.put("ok", false);
-                    result.put("message", "Like update failed for post: " + pid);
-                }
-            } else {
-                // Create new like record
-                Like l = new Like();
-                l.setIs_like(true);
-                l.setLiked_at(Timestamp.valueOf(LocalDateTime.now()));
-                l.setPost_id(pid);
-                l.setUser_id(user.getId());
-
-                if (lDao.add(l)) {
-                    result.put("ok", true);
-                    result.put("message", "Like Success for post: " + pid);
-                } else {
-                    result.put("ok", false);
-                    result.put("message", "Like fail for post: " + pid);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during like action", e);
-            result.put("ok", false);
-            result.put("message", "An error occurred while processing like");
-        }
-    }
-
-    protected void doUnLikeAction(String pid, User user, Map<String, Object> result) {
-        try {
-            // Find existing like record
-            Like existingLike = lDao.getLikeByPostAndUser(pid, user.getId());
-
-            if (existingLike != null) {
-                existingLike.setIs_like(false);
-                existingLike.setDeleted_at(Timestamp.valueOf(LocalDateTime.now()));
-
-                if (lDao.update(existingLike)) {
-                    result.put("ok", true);
-                    result.put("message", "Unlike Success for post: " + pid);
-                } else {
-                    result.put("ok", false);
-                    result.put("message", "Unlike fail for post: " + pid);
-                }
-            } else {
-                result.put("ok", false);
-                result.put("message", "No like record found for post: " + pid);
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during unlike action", e);
-            result.put("ok", false);
-            result.put("message", "An error occurred while processing unlike");
-        }
-    }
-
-    private void sendJsonResponse(HttpServletResponse response, Map<String, Object> result) throws IOException {
-        response.getWriter().write(gson.toJson(result));
-        response.getWriter().flush();
-    }
 }

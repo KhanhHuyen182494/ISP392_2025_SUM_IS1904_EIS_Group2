@@ -182,26 +182,26 @@
                                         </div>-->
 
                     <!-- Content Management -->
-                    <!--                    <div class="mb-6">
-                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
-                                            <div class="space-y-2">
-                                                <a href="${pageContext.request.contextPath}/manage/reviews" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-star w-5"></i>
-                                                    <span>Reviews</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/messages" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-comments w-5"></i>
-                                                    <span>Messages</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/notifications" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-bell w-5"></i>
-                                                    <span>Notifications</span>
-                                                </a>
-                                            </div>
-                                        </div>-->
+                    <div class="mb-6">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
+                        <div class="space-y-2">
+<!--                            <a href="${pageContext.request.contextPath}/manage/reviews" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-star w-5"></i>
+                                <span>Reviews</span>
+                            </a>-->
+                            <a href="${pageContext.request.contextPath}/manage/post" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-pen-to-square w-5"></i>
+                                <span>All Posts</span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/manage/post/control" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-bell w-5"></i>
+                                <span>Posts Control</span>
+                            </a>
+                        </div>
+                    </div>
 
                     <!-- System Settings -->
                     <!--                    <div class="mb-6">
@@ -259,7 +259,7 @@
                                 </button>
                             </c:if>
                         </div>
-                </c:if>
+                    </c:if>
 
                     <!-- Booking Status Card -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -542,71 +542,71 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                // Simple interactivity for demo purposes
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    // Handle checkbox selections
-                                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                                    checkboxes.forEach(checkbox => {
-                                        checkbox.addEventListener('change', function () {
-                                            if (this.checked) {
-                                                this.closest('tr')?.classList.add('bg-blue-50');
-                                            } else {
-                                                this.closest('tr')?.classList.remove('bg-blue-50');
-                                            }
+                                    // Simple interactivity for demo purposes
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        // Handle checkbox selections
+                                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                                        checkboxes.forEach(checkbox => {
+                                            checkbox.addEventListener('change', function () {
+                                                if (this.checked) {
+                                                    this.closest('tr')?.classList.add('bg-blue-50');
+                                                } else {
+                                                    this.closest('tr')?.classList.remove('bg-blue-50');
+                                                }
+                                            });
+                                        });
+
+                                        // Handle action buttons
+                                        const actionButtons = document.querySelectorAll('button');
+                                        actionButtons.forEach(button => {
+                                            button.addEventListener('click', function (e) {
+                                                if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
+                                                    e.preventDefault();
+                                                    const action = this.textContent.trim();
+                                                    const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
+                                                    alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
+                                                }
+                                            });
                                         });
                                     });
 
-                                    // Handle action buttons
-                                    const actionButtons = document.querySelectorAll('button');
-                                    actionButtons.forEach(button => {
-                                        button.addEventListener('click', function (e) {
-                                            if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
-                                                e.preventDefault();
-                                                const action = this.textContent.trim();
-                                                const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
-                                                alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
+                                    function rejectBooking(bookingId) {
+                                        Swal.fire({
+                                            title: 'Reject Booking',
+                                            text: 'Are you sure you want to reject this booking?',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#dc2626',
+                                            cancelButtonColor: '#6b7280',
+                                            confirmButtonText: 'Yes, Reject',
+                                            cancelButtonText: 'Cancel'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Add your reject booking logic here
+                                                console.log('Rejecting booking:', bookingId);
+                                                Swal.fire('Rejected!', 'The booking has been rejected.', 'success');
                                             }
                                         });
-                                    });
-                                });
+                                    }
 
-                                function rejectBooking(bookingId) {
-                                    Swal.fire({
-                                        title: 'Reject Booking',
-                                        text: 'Are you sure you want to reject this booking?',
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#dc2626',
-                                        cancelButtonColor: '#6b7280',
-                                        confirmButtonText: 'Yes, Reject',
-                                        cancelButtonText: 'Cancel'
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            // Add your reject booking logic here
-                                            console.log('Rejecting booking:', bookingId);
-                                            Swal.fire('Rejected!', 'The booking has been rejected.', 'success');
-                                        }
-                                    });
-                                }
-
-                                function generateContract(bookingId) {
-                                    $.ajax({
-                                        url: '${pageContext.request.contextPath}/contract/generate',
-                                        type: 'GET',
-                                        data: {
-                                            bookId: bookingId,
-                                            filename: "No"
-                                        },
-                                        success: function (response) {
-                                            const link = document.createElement('a');
-                                            link.href = response.path;
-                                            link.download = '';
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        }
-                                    });
-                                }
+                                    function generateContract(bookingId) {
+                                        $.ajax({
+                                            url: '${pageContext.request.contextPath}/contract/generate',
+                                            type: 'GET',
+                                            data: {
+                                                bookId: bookingId,
+                                                filename: "No"
+                                            },
+                                            success: function (response) {
+                                                const link = document.createElement('a');
+                                                link.href = response.path;
+                                                link.download = '';
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }
+                                        });
+                                    }
         </script>
     </body>
 </html>

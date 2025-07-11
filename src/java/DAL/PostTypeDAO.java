@@ -56,4 +56,37 @@ public class PostTypeDAO extends BaseDao implements IPostTypeDAO {
         return ptList;
     }
 
+    @Override
+    public PostType getPostTypeById(int id) {
+        PostType pt = new PostType();
+        String sql = """
+                     SELECT * FROM post_type WHERE id = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, id);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                pt.setId(rs.getInt("id"));
+                pt.setName(rs.getString("name"));
+            }
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return pt;
+    }
+
 }

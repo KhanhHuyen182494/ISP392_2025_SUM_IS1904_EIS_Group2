@@ -298,11 +298,11 @@
                                     <div class="space-y-2 mb-4">
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-dollar-sign text-green-500"></i>
-                                            <span class="text-sm"><strong>Giá thuê:</strong> <fmt:formatNumber value="${post.house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / tháng</span>
+                                            <span class="text-sm"><strong>Giá thuê:</strong> <fmt:formatNumber value="${post.house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / month</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-bolt text-yellow-500"></i>
-                                            <span class="text-sm"><strong>Tiền điện:</strong> <fmt:formatNumber value="${post.house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / số</span>
+                                            <span class="text-sm"><strong>Tiền điện:</strong> <fmt:formatNumber value="${post.house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <i class="fas fa-tint text-blue-500"></i>

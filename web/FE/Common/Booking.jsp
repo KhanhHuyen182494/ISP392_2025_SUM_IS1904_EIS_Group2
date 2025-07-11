@@ -476,7 +476,7 @@
         <script>
                                 // Configuration
                                 const isWholeHouse = '${h.is_whole_house}' === 'true';
-                                const basePricePerNight = parseInt('${h.price_per_night}');
+                                const basePricePerNight = '${h.price_per_night}';
                                 const homestayId = '${h.id}';
 
                                 const pricing = {
@@ -498,7 +498,6 @@
                                 let currentRoomPrice = basePricePerNight;
                                 const serviceFeeRate = 0.1; // 10%
 
-// Image gallery functionality
                                 const allImages = [
             <c:forEach var="media" items="${h.medias}" varStatus="status">
                                 '${pageContext.request.contextPath}/Asset/Common/House/${media.path}'<c:if test="${!status.last}">,</c:if>
@@ -793,10 +792,16 @@
                                                 // Use current room price or base price for whole house
                                                 const pricePerNight = isWholeHouse ? basePricePerNight : currentRoomPrice;
                                                 const subtotal = pricePerNight * nights;
-                                                const serviceFee = Math.round(subtotal * serviceFeeRate);
+
+                                                if (subtotal > Number.MAX_SAFE_INTEGER) {
+                                                    console.error('Subtotal exceeds safe integer limit');
+                                                    return;
+                                                }
+
+                                                const serviceFee = Math.floor(subtotal * serviceFeeRate);
                                                 const cleaningFee = currentBookingType === 'whole' ? pricing.whole.cleaningFee : pricing.room.cleaningFee;
                                                 const total = subtotal + serviceFee + cleaningFee;
-                                                const deposit = Math.round(total * 0.2);
+                                                const deposit = Math.floor(total * 0.2);
 
                                                 // Update display
                                                 $('#nightCount').text(nights);
@@ -806,7 +811,6 @@
                                                 $('#totalPrice').text(`₫` + total.toLocaleString());
                                                 $('#depositAmount').text(`₫` + deposit.toLocaleString());
 
-                                                // *** ADD THIS SECTION: Update hidden form fields ***
                                                 $('#subtotalHidden').val(subtotal);
                                                 $('#serviceFeeHidden').val(serviceFee);
                                                 $('#cleaningFeeHidden').val(cleaningFee);
