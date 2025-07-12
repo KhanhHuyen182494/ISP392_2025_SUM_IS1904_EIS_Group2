@@ -4,13 +4,13 @@
  */
 package Controller.Common;
 
-import DTO.PostDTO;
 import Model.Address;
 import Model.House;
 import Model.Like;
 import Model.Media;
 import Model.User;
 import Model.Post;
+import Model.PostType;
 import Model.Review;
 import Model.Status;
 import jakarta.servlet.ServletException;
@@ -34,32 +34,36 @@ public class SearchController extends BaseAuthorization {
 
     @Override
     protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         try {
             String searchKey = request.getParameter("searchKey");
             String type = request.getParameter("type");
             String page = request.getParameter("page");
 
-            // Default values
             if (searchKey == null || searchKey.trim().isEmpty()) {
                 searchKey = "";
             }
             if (type == null || type.trim().isEmpty()) {
-                type = "all";
+                type = "users";
             }
 
             int currentPage = 1;
             if (page != null && !page.isEmpty()) {
                 try {
                     currentPage = Integer.parseInt(page);
+                    if (currentPage < 1) {
+                        currentPage = 1;
+                    }
                 } catch (NumberFormatException e) {
                     currentPage = 1;
                 }
             }
 
-            int limit = 10;
+            int limit = 5;
             int offset = (currentPage - 1) * limit;
 
-            // Initialize result lists
             List<House> houses = new ArrayList<>();
             List<User> users = new ArrayList<>();
             List<Post> posts = new ArrayList<>();
@@ -68,45 +72,58 @@ public class SearchController extends BaseAuthorization {
             int totalUsers = 0;
             int totalPosts = 0;
 
-            // Search based on type
-            switch (type.toLowerCase()) {
+            try {
+                switch (type.toLowerCase().trim()) {
+                    case "houses" -> {
+                        houses = hDao.getListPaging(limit, offset, searchKey.trim(), "");
+                        if (houses != null) {
+                            fullLoadHouseInformation(houses);
+                            totalHouses = hDao.getListPaging(Integer.MAX_VALUE, 0, searchKey.trim(), null).size();
+                        }
+                    }
+
+                    case "users" -> {
+                        users = uDao.searchUsers(searchKey.trim(), limit, offset);
+                        if (users != null) {
+                            totalUsers = uDao.countSearchUsers(searchKey.trim());
+                        }
+                    }
+
+                    case "posts" -> {
+                        posts = pDao.searchPosts(searchKey.trim(), limit, offset);
+                        if (posts != null) {
+                            fullLoadPostInfomation(posts, user);
+                            totalPosts = pDao.countSearchPosts(searchKey.trim());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error during search operations", e);
+                houses = new ArrayList<>();
+                users = new ArrayList<>();
+                posts = new ArrayList<>();
+                totalHouses = totalUsers = totalPosts = 0;
+            }
+
+            int totalResults = totalHouses + totalUsers + totalPosts;
+            int totalPages = 1; // Default to 1 page
+
+            switch (type.toLowerCase().trim()) {
                 case "houses":
-                    houses = hDao.getListPaging(limit, offset, searchKey.trim(), "");
-                    fullLoadHouseInformation(houses);
-                    totalHouses = hDao.getListPaging(Integer.MAX_VALUE, 0, searchKey.trim(), "").size();
+                    totalPages = (int) Math.ceil((double) totalHouses / limit);
                     break;
-
                 case "users":
-                    users = uDao.searchUsers(searchKey.trim(), limit, offset);
-                    totalUsers = uDao.countSearchUsers(searchKey.trim());
+                    totalPages = (int) Math.ceil((double) totalUsers / limit);
                     break;
-
                 case "posts":
-                    posts = pDao.searchPosts(searchKey.trim(), limit, offset);
-                    fullLoadPostInfomation(posts, user);
-                    totalPosts = pDao.countSearchPosts(searchKey.trim());
-                    break;
-
-                case "all":
-                default:
-                    // Search all types with smaller limits
-                    int allLimit = 5;
-                    houses = hDao.getListPaging(allLimit, 0, searchKey.trim(), "");
-                    fullLoadHouseInformation(houses);
-                    totalHouses = hDao.getListPaging(Integer.MAX_VALUE, 0, searchKey.trim(), "").size();
-
-                    users = uDao.searchUsers(searchKey.trim(), allLimit, 0);
-                    totalUsers = uDao.countSearchUsers(searchKey.trim());
-
-                    posts = pDao.searchPosts(searchKey.trim(), allLimit, 0);
-                    fullLoadPostInfomation(posts, user);
-                    totalPosts = pDao.countSearchPosts(searchKey.trim());
+                    totalPages = (int) Math.ceil((double) totalPosts / limit);
                     break;
             }
 
-            // Calculate pagination
-            int totalResults = totalHouses + totalUsers + totalPosts;
-            int totalPages = (int) Math.ceil((double) totalResults / limit);
+            if (totalPages < 1) {
+                totalPages = 1;
+            }
+
             boolean hasMore = currentPage < totalPages;
             boolean hasPrevious = currentPage > 1;
 
@@ -129,9 +146,30 @@ public class SearchController extends BaseAuthorization {
             request.getRequestDispatcher("./FE/Common/Search.jsp").forward(request, response);
 
         } catch (ServletException | IOException e) {
-            LOGGER.log(Level.SEVERE, "Something wrong happened in search controller!", e);
+            LOGGER.log(Level.SEVERE, "Fatal error in search controller", e);
+
+            // Set error attributes
             request.setAttribute("error", "An error occurred while searching. Please try again.");
-            request.getRequestDispatcher("./FE/Common/Search.jsp").forward(request, response);
+            request.setAttribute("houses", new ArrayList<>());
+            request.setAttribute("users", new ArrayList<>());
+            request.setAttribute("posts", new ArrayList<>());
+            request.setAttribute("totalHouses", 0);
+            request.setAttribute("totalUsers", 0);
+            request.setAttribute("totalPosts", 0);
+            request.setAttribute("totalResults", 0);
+            request.setAttribute("searchKey", "");
+            request.setAttribute("type", "all");
+            request.setAttribute("currentPage", 1);
+            request.setAttribute("totalPages", 1);
+            request.setAttribute("hasMore", false);
+            request.setAttribute("hasPrevious", false);
+
+            // Only forward once
+            try {
+                request.getRequestDispatcher("./FE/Common/Search.jsp").forward(request, response);
+            } catch (ServletException | IOException forwardException) {
+                LOGGER.log(Level.SEVERE, "Error forwarding to error page", forwardException);
+            }
         }
     }
 
@@ -142,17 +180,29 @@ public class SearchController extends BaseAuthorization {
     }
 
     private void fullLoadHouseInformation(List<House> houses) {
+        if (houses == null || houses.isEmpty()) {
+            return;
+        }
+
         try {
             for (House h : houses) {
                 if (h != null && h.getId() != null) {
-                    String hid = h.getId();
+                    try {
+                        String hid = h.getId();
 
-                    Address a = aDao.getAddressById(h.getAddress().getId());
-                    h.setAddress(a);
+                        Address a = aDao.getAddressById(h.getAddress().getId());
+                        if (a != null) {
+                            h.setAddress(a);
+                        }
 
-                    if (h.getOwner() != null && h.getOwner().getId() != null) {
-                        User owner = uDao.getById(h.getOwner().getId());
-                        h.setOwner(owner);
+                        if (h.getOwner() != null && h.getOwner().getId() != null) {
+                            User owner = uDao.getById(h.getOwner().getId());
+                            if (owner != null) {
+                                h.setOwner(owner);
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Error loading house information for house ID: " + h.getId(), e);
                     }
                 }
             }
@@ -162,83 +212,131 @@ public class SearchController extends BaseAuthorization {
     }
 
     private void fullLoadPostInfomation(List<Post> posts, User user) {
+        if (posts == null || posts.isEmpty()) {
+            return;
+        }
+
         try {
             for (Post p : posts) {
-                String pid = p.getId();
-
-                Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
-
-                Status s = new Status();
-                s.setId(21);
-
-                List<Media> medias = mDao.getMediaByObjectId(p.getId(), "Post", s);
-                List<Like> likes = lDao.getListLikeByPostId(pid);
-                List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
-
-                Post parent = null;
-
-                if (p.getParent_post() != null && p.getParent_post().getId() != null) {
-                    parent = pDao.getById(p.getParent_post().getId());
-                    fullLoadParentPost(parent);
+                if (p == null || p.getId() == null) {
+                    continue;
                 }
 
-                boolean isLikedByCurrentUser = false;
-                if (user != null && !user.getId().isBlank()) {
-                    isLikedByCurrentUser = likes.stream()
-                            .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
-                }
+                try {
+                    String pid = p.getId();
 
-                p.setReviews(reviews);
-                p.getHouse().setAddress(a);
-                p.setMedias(medias);
-                p.setLikes(likes);
-                p.setLikedByCurrentUser(isLikedByCurrentUser);
-                p.setParent_post(parent);
+                    // Load address
+                    Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+                    if (a != null) {
+                        p.getHouse().setAddress(a);
+                    }
+
+                    // Load media
+                    Status s = new Status();
+                    s.setId(21);
+                    List<Media> medias = mDao.getMediaByObjectId(p.getId(), "Post", s);
+                    if (medias != null) {
+                        p.setMedias(medias);
+                    }
+
+                    // Load likes
+                    List<Like> likes = lDao.getListLikeByPostId(pid);
+                    if (likes != null) {
+                        p.setLikes(likes);
+                    }
+
+                    // Load reviews
+                    if (p.getHouse() != null && p.getHouse().getId() != null) {
+                        List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+                        if (reviews != null) {
+                            p.setReviews(reviews);
+                        }
+                    }
+
+                    // Load parent post
+                    Post parent = null;
+                    if (p.getParent_post() != null && p.getParent_post().getId() != null) {
+                        parent = pDao.getById(p.getParent_post().getId());
+                        if (parent != null) {
+                            fullLoadParentPost(parent);
+                        }
+                    }
+                    p.setParent_post(parent);
+
+                    PostType pt = ptDao.getPostTypeById(p.getPost_type().getId());
+                    p.setPost_type(pt);
+
+                    // Check if liked by current user
+                    boolean isLikedByCurrentUser = false;
+                    if (user != null && user.getId() != null && !user.getId().isBlank() && likes != null) {
+                        isLikedByCurrentUser = likes.stream()
+                                .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
+                    }
+                    p.setLikedByCurrentUser(isLikedByCurrentUser);
+
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Error loading post information for post ID: " + p.getId(), e);
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
-            log.error("Error during fullLoadPostInfomation process");
         }
     }
 
     private void fullLoadParentPost(Post p) {
+        if (p == null || p.getId() == null) {
+            return;
+        }
+
         try {
-            //Load address, images, likes, feedbacks
             String pid = p.getId();
 
+            // Load address
             Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+            if (a != null) {
+                p.getHouse().setAddress(a);
+            }
 
+            // Load media
             Status s = new Status();
             s.setId(21);
-
             List<Media> medias = mDao.getMediaByObjectId(pid, "Post", s);
+            if (medias != null) {
+                p.setMedias(medias);
+            }
 
-            p.getHouse().setAddress(a);
-            p.setMedias(medias);
-
-            fullLoadHouseParentPostInfomation(p.getHouse());
+            if (p.getHouse() != null) {
+                fullLoadHouseParentPostInfomation(p.getHouse());
+            }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
-            log.error("Error during fullLoadPostInfomation process");
+            LOGGER.log(Level.WARNING, "Error during fullLoadParentPost process for post ID: " + p.getId(), e);
         }
     }
 
     private void fullLoadHouseParentPostInfomation(House h) {
+        if (h == null || h.getId() == null) {
+            return;
+        }
+
         try {
-            //Load address, images, likes, feedbacks
             String hid = h.getId();
 
+            // Load address
             Address a = aDao.getAddressById(h.getAddress().getId());
+            if (a != null) {
+                h.setAddress(a);
+            }
+
+            // Load media
             Status mediaS = new Status();
             mediaS.setId(21);
             List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
-
-            h.setMedias(medias);
-            h.setAddress(a);
+            if (medias != null) {
+                h.setMedias(medias);
+            }
 
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
-            log.error("Error during fullLoadPostInfomation process");
+            LOGGER.log(Level.WARNING, "Error during fullLoadHouseParentPostInfomation process for house ID: " + h.getId(), e);
         }
     }
 }
