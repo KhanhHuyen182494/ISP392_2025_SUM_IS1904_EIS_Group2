@@ -917,4 +917,14 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
     }
 
+    @Override
+    public List<Post> searchPosts(String searchKey, int limit, int offset) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int countSearchPosts(String searchKey) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 }

@@ -848,4 +848,14 @@ public class UserDAO extends BaseDao implements IUserDAO {
         return count;
     }
 
+    @Override
+    public List<User> searchUsers(String searchKey, int limit, int offset) {
+        
+    }
+
+    @Override
+    public int countSearchUsers(String searchKey) {
+        
+    }
+
 }
