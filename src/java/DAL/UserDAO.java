@@ -848,4 +848,101 @@ public class UserDAO extends BaseDao implements IUserDAO {
         return count;
     }
 
+    @Override
+    public List<User> searchUsers(String searchKey, int limit, int offset) {
+        String sql = "SELECT * FROM user WHERE "
+                + "(first_name LIKE ? OR last_name LIKE ?) "
+                + "ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        List<User> uList = new ArrayList<>();
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            // Set search parameters with wildcards
+            String searchPattern = "%" + searchKey + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            ps.setInt(3, limit);
+            ps.setInt(4, offset);
+
+            rs = ps.executeQuery();
+
+            // Use while loop to process all results
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getString("id"));
+                u.setFirst_name(rs.getString("first_name"));
+                u.setLast_name(rs.getString("last_name"));
+                u.setUsername(rs.getString("username"));
+                u.setBirthdate(rs.getDate("birthdate"));
+                u.setEmail(rs.getString("email"));
+                u.setGender(rs.getString("gender"));
+                u.setDescription(rs.getString("description"));
+                u.setPhone(rs.getString("phone"));
+                u.setCreated_at(rs.getTimestamp("created_at"));
+                u.setUpdated_at(rs.getTimestamp("updated_at"));
+                u.setDeactivated_at(rs.getTimestamp("deactivated_at"));
+                u.setIs_verified(rs.getBoolean("is_verified"));
+                u.setAvatar(rs.getString("avatar"));
+                u.setCover(rs.getString("cover"));
+
+                // Create and set related objects
+                Role r = new Role();
+                Status s = new Status();
+                Address add = new Address();
+                r.setId(rs.getInt("role_id"));
+                s.setId(rs.getInt("status_id"));
+                add.setId(rs.getInt("address_id"));
+                u.setRole(r);
+                u.setStatus(s);
+                u.setAddress(add);
+
+                // Add user to list
+                uList.add(u);
+            }
+        } catch (SQLException e) {
+            logger.error("Error searching users: " + e.getMessage());
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+        return uList;
+    }
+
+    @Override
+    public int countSearchUsers(String searchKey) {
+        String sql = "SELECT COUNT(*) FROM user WHERE "
+                + "(first_name LIKE ? OR last_name LIKE ?)";
+        int count = 0;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            // Set search parameters with wildcards
+            String searchPattern = "%" + searchKey + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error counting search users: " + e.getMessage());
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+        return count;
+    }
+
 }

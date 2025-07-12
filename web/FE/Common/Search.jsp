@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Feeds</title>
+        <title>Search - Homestay Community</title>
 
         <!-- Libs -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -22,120 +22,301 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
+            :root {
+                --primary-orange: #FF7700;
+                --orange-light: #FFA366;
+                --orange-dark: #DE6800;
+                --gray-50: #F8FAFC;
+                --gray-100: #F1F5F9;
+                --gray-200: #E2E8F0;
+                --gray-300: #CBD5E1;
+                --gray-400: #94A3B8;
+                --gray-500: #64748B;
+                --gray-600: #475569;
+                --gray-700: #334155;
+                --gray-800: #1E293B;
+                --gray-900: #0F172A;
+            }
+
             .gradient-bg {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-light) 100%);
             }
-            .card-hover {
+
+            .search-container {
+                background: linear-gradient(135deg, var(--primary-orange) 0%, var(--orange-light) 100%);
+                border-radius: 24px;
+                padding: 2rem;
+                box-shadow: 0 20px 40px rgba(255, 119, 0, 0.15);
+            }
+
+            .search-input {
+                background: rgba(255, 255, 255, 0.95);
+                border: 2px solid transparent;
+                border-radius: 16px;
+                padding: 1rem 1.5rem;
+                font-size: 1.1rem;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .search-input:focus {
+                border-color: white;
+                box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+                outline: none;
+                transform: translateY(-2px);
+            }
+
+            .search-tabs {
+                display: flex;
+                gap: 0.5rem;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 0.5rem;
+                backdrop-filter: blur(10px);
+            }
+
+            .search-tab {
+                flex: 1;
+                text-align: center;
+                padding: 0.75rem 1rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: 2px solid transparent;
+            }
+
+            .search-tab:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-1px);
+            }
+
+            .search-tab.active {
+                background: white;
+                color: var(--primary-orange);
+                border-color: white;
+                box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+            }
+
+            .result-card {
+                background: white;
+                border-radius: 16px;
+                padding: 1.5rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                border: 1px solid var(--gray-200);
                 transition: all 0.3s ease;
             }
-            .card-hover:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+
+            .result-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+                border-color: var(--primary-orange);
             }
-            .tag-hover {
-                transition: all 0.2s ease;
+
+            .user-card {
+                border-left: 4px solid #3B82F6;
             }
-            .tag-hover:hover {
-                background-color: #3b82f6;
+
+            .post-card {
+                border-left: 4px solid #10B981;
+            }
+
+            .house-card {
+                border-left: 4px solid var(--primary-orange);
+            }
+
+            .tag {
+                background: var(--gray-100);
+                color: var(--gray-700);
+                padding: 0.25rem 0.75rem;
+                border-radius: 8px;
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+
+            .tag.orange {
+                background: rgba(255, 119, 0, 0.1);
+                color: var(--primary-orange);
+            }
+
+            .tag.blue {
+                background: rgba(59, 130, 246, 0.1);
+                color: #3B82F6;
+            }
+
+            .tag.green {
+                background: rgba(16, 185, 129, 0.1);
+                color: #10B981;
+            }
+
+            .floating-action {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: var(--primary-orange);
                 color: white;
-            }
-            .like-btn {
-                transition: all 0.2s ease;
-            }
-            .like-btn:hover {
-                background-color: #3b82f6;
-                color: white;
-            }
-            .like-btn.liked {
-                background-color: #3b82f6;
-                color: white;
-            }
-            .feedback-badge {
-                background: linear-gradient(45deg, #ff6b6b, #feca57);
-            }
-            .search-focus {
-                transition: all 0.3s ease;
-            }
-            .search-focus:focus {
-                transform: scale(1.02);
-                box-shadow: 0 0 20px rgba(255, 165, 0, 0.3);
-            }
-
-            /* Modal Styles */
-            .modal-overlay {
-                background-color: rgba(0, 0, 0, 0.5);
-                backdrop-filter: blur(4px);
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.3s ease;
-            }
-
-            .modal-overlay.active {
-                opacity: 1;
-                visibility: visible;
-            }
-
-            .modal-content {
-                transform: translateY(-50px);
-                transition: transform 0.3s ease;
-            }
-
-            .modal-overlay.active .modal-content {
-                transform: translateY(0);
-            }
-
-            .feedback-item {
-                transition: all 0.2s ease;
-            }
-
-            .feedback-item:hover {
-                background-color: #f8fafc;
-                transform: translateX(5px);
-            }
-
-            .star-rating {
-                color: #fbbf24;
-            }
-
-            .loading-spinner {
-                border: 2px solid #f3f3f3;
-                border-top: 2px solid #3498db;
+                border: none;
                 border-radius: 50%;
-                width: 20px;
-                height: 20px;
-                animation: spin 1s linear infinite;
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+                cursor: pointer;
+                box-shadow: 0 8px 24px rgba(255, 119, 0, 0.3);
+                transition: all 0.3s ease;
+                z-index: 40;
             }
 
-            @keyframes spin {
-                0% {
-                    transform: rotate(0deg);
-                }
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
-            .modal-close-btn {
-                transition: all 0.2s ease;
-            }
-
-            .modal-close-btn:hover {
-                background-color: #ef4444;
-                color: white;
+            .floating-action:hover {
                 transform: scale(1.1);
+                box-shadow: 0 12px 32px rgba(255, 119, 0, 0.4);
             }
 
-            .active-search {
-                background-color: #FF7700 !important;
-                color: white !important;
+            .search-stats {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 1rem;
+                backdrop-filter: blur(10px);
+                color: white;
+                margin-top: 1rem;
             }
 
-            .active-search:hover {
-                background-color: #DE6800 !important;
+            .no-results {
+                text-align: center;
+                padding: 4rem 2rem;
+                color: var(--gray-500);
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+
+            .action-btn {
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: 2px solid transparent;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            .action-btn.primary {
+                background: var(--primary-orange);
+                color: white;
+            }
+
+            .action-btn.primary:hover {
+                background: var(--orange-dark);
+                transform: translateY(-1px);
+            }
+
+            .action-btn.secondary {
+                background: var(--gray-100);
+                color: var(--gray-700);
+            }
+
+            .action-btn.secondary:hover {
+                background: var(--gray-200);
+            }
+
+            .result-actions {
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 2rem;
+            }
+
+            .pagination-btn {
+                padding: 0.5rem 1rem;
+                border: 1px solid var(--gray-300);
+                border-radius: 8px;
+                background: white;
+                color: var(--gray-700);
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .pagination-btn:hover {
+                background: var(--primary-orange);
+                color: white;
+                border-color: var(--primary-orange);
+            }
+
+            .pagination-btn.active {
+                background: var(--primary-orange);
+                color: white;
+                border-color: var(--primary-orange);
+            }
+
+            .pagination-btn.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .pagination-btn.disabled:hover {
+                background: white;
+                color: var(--gray-700);
+                border-color: var(--gray-300);
+            }
+
+            .media-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .media-item {
+                aspect-ratio: 1;
+                border-radius: 8px;
+                overflow: hidden;
+                background: var(--gray-100);
+            }
+
+            .media-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .stat-card {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 1rem;
+                text-align: center;
+                color: white;
+                backdrop-filter: blur(10px);
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 0.25rem;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+                opacity: 0.8;
             }
         </style>
     </head>
-    <body>
+    <body class="bg-gray-50 min-h-screen">
 
         <!-- Header -->
         <header class="bg-white shadow-md sticky top-0 z-50">
@@ -144,22 +325,10 @@
                     <div class="flex items-center gap-4">
                         <!-- Logo -->
                         <div class="flex items-center gap-2">
-                            <a href="${pageContext.request.contextPath}/feeds"><img src="${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg" width="30"/></a>
-                        </div>
-
-                        <!-- Search -->
-                        <div class="relative">
-                            <form action="search" method="GET">
-                                <input 
-                                    type="text" 
-                                    placeholder="Search..." 
-                                    name="searchKey"
-                                    required=""
-                                    tabindex="1"
-                                    class="search-focus w-80 px-4 py-2 bg-gray-100 rounded-full border-none outline-none"
-                                    />
-                                <i class="icon-search-focus fas fa-search absolute right-4 top-2.5 text-gray-400"></i>
-                            </form>
+                            <a href="${pageContext.request.contextPath}/feeds">
+                                <img src="${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg" width="30"/>
+                            </a>
+                            <span class="text-xl font-bold text-gray-800">Search</span>
                         </div>
                     </div>
 
@@ -202,470 +371,397 @@
         </header>
 
         <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
-            <div class="col-span-4">
-                <div class="bg-white rounded-2xl shadow-md p-6 sticky top-24">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">Displaying</h2>
-                    </div>
+        <div class="max-w-7xl mx-auto px-4 py-8">
 
-                    <div class="space-y-4">
-                        <div id="displaying-house" class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer items-center">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-[15px]">Houses</span>
+            <!-- Search Section -->
+            <div class="search-container mb-8">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-bold text-white mb-2">Find Your Perfect Match</h1>
+                    <p class="text-white/80 text-lg">Search for users, posts, or houses in our community</p>
+                </div>
+
+                <!-- Search Tabs -->
+                <div class="search-tabs mb-6">
+                    <a href="${pageContext.request.contextPath}/search?searchKey=${searchKey}&type=users&page=1">
+                        <div class="search-tab ${type eq 'users' ? 'active' : ''}" data-tab="users">
+                            <i class="fas fa-users mr-2"></i>
+                            Users
+                        </div>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/search?searchKey=${searchKey}&type=posts&page=1">
+                        <div class="search-tab ${type eq 'posts' ? 'active' : ''}" data-tab="posts">
+                            <i class="fas fa-newspaper mr-2"></i>
+                            Posts
+                        </div>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/search?searchKey=${searchKey}&type=houses&page=1">
+                        <div class="search-tab ${type eq 'houses' ? 'active' : ''}" data-tab="houses">
+                            <i class="fas fa-home mr-2"></i>
+                            Houses
+                        </div>
+                    </a>
+                </div>
+
+                <c:if test="${empty type}">
+                    <c:set var="type" value="all" scope="request"/>
+                </c:if>
+
+                <!-- Search Input -->
+                <div class="relative mb-4">
+                    <form id="searchForm" action="search" method="GET" class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            name="searchKey"
+                            placeholder="Search for anything..." 
+                            class="search-input w-full pr-16"
+                            value="${searchKey}"
+                            />
+                        <input type="hidden" id="searchType" name="type" value="${type}">
+                        <button type="submit" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Search Stats -->
+                <div class="search-stats">
+                    <c:choose>
+                        <c:when test="${not empty searchKey}">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">${totalResults}</div>
+                                    <div class="stat-label">Total Results</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${totalUsers}</div>
+                                    <div class="stat-label">Users</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${totalPosts}</div>
+                                    <div class="stat-label">Posts</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${totalHouses}</div>
+                                    <div class="stat-label">Houses</div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="text-center">
+                                <span>Search for something to see results</span>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
 
-            <div class="col-span-8">
+            <!-- Results Section -->
+            <div class="space-y-6">
                 <c:choose>
-                    <c:when test="${not empty requestScope.houses}">
-                        <div class="bg-white rounded-2xl shadow-lg p-2">
-                            <c:forEach items="${requestScope.houses}" var="house">
-                                <div class="bg-white house-card card-hover p-2 rounded-lg col-span-2 m-2 border border-dashed border-orange-500">
-                                    <div class="house-name mb-3 text-lg">
-                                        <p><b>${house.name}</b></p>
-                                    </div>
-                                    <div class="space-y-2 ml-2 mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <c:if test="${house.status.id == 6}">
-                                                <i class="fa-solid fa-check text-green-500"></i>
-                                            </c:if>
-                                            <c:if test="${house.status.id == 7}">
-                                                <i class="fa-solid fa-xmark text-red-500"></i>
-                                            </c:if>
-                                            <span class="text-sm"><strong>Status: </strong> ${house.status.name}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-dollar-sign text-green-500"></i>
-                                            <span class="text-sm"><strong>Price:</strong> <fmt:formatNumber value="${house.price_per_month}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / month</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-bolt text-yellow-500"></i>
-                                            <span class="text-sm"><strong>Electricity:</strong> <fmt:formatNumber value="${house.electricity_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-tint text-blue-500"></i>
-                                            <span class="text-sm"><strong>Water:</strong> <fmt:formatNumber value="${house.water_price}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / unit</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-money-bill-1-wave text-green-500"></i>
-                                            <span class="text-sm"><strong>Down Payment:</strong> <fmt:formatNumber value="${house.down_payment}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-map-marker-alt text-red-500"></i>
-                                            <span class="text-sm"><strong>Address:</strong> ${house.address.detail} ${house.address.ward}, ${house.address.district}, ${house.address.province}, ${house.address.country}</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="px-6 py-4 flex gap-3">
-                                        <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
-                                            <i class="fas fa-key"></i>
-                                        </button>
-                                        <button class="flex-1 bg-green-500 hover:bg-green-600 text-gray-700 py-3 rounded-lg font-medium transition-colors text-white">
-                                            <i class="fa-solid fa-house text-white"></i>
-                                        </button>
-                                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-medium transition-colors view-feedback-btn" 
-                                                data-house-id="${house.id}" 
-                                                data-house-name="${house.name}">
-                                            <i class="fas fa-comments"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                            
-                            <!-- Load More Button -->
-                            <c:choose>
-                                <c:when test="${requestScope.hasMore == true}">
-                                    <div class="text-center mb-2">
-                                        <button class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-medium transition-all transform hover:scale-105">
-                                            <i class="fas fa-plus mr-2"></i>
-                                            Load More House
-                                        </button>
-                                    </div>
-                                </c:when>
-                            </c:choose>
+                    <c:when test="${totalResults eq 0 && not empty searchKey}">
+                        <!-- No Results -->
+                        <div class="no-results">
+                            <div class="text-center">
+                                <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">No results found</h3>
+                                <p class="text-gray-500 mb-6">Try adjusting your search terms or try different keywords</p>
+                                <a href="${pageContext.request.contextPath}/feeds" class="action-btn primary">
+                                    <i class="fas fa-arrow-left mr-2"></i>
+                                    Back to Feeds
+                                </a>
+                            </div>
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <div class="text-center p-2 mb-3">
-                            <p class="text-gray-500 decoration-wavy">No house available right now!</p>
-                        </div>
+                        <!-- User Results -->
+                        <c:if test="${not empty users}">
+                            <c:forEach var="user" items="${users}">
+                                <div class="result-card user-card">
+                                    <div class="flex items-center gap-4 mb-4">
+                                        <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+                                            <c:choose>
+                                                <c:when test="${not empty user.avatar}">
+                                                    <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${user.avatar}" alt="${user.first_name}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="w-full h-full bg-blue-100 flex items-center justify-center">
+                                                        <i class="fas fa-user text-blue-600 text-xl"></i>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-gray-800">${user.first_name} ${user.last_name}</h3>
+                                            <p class="text-gray-600">
+                                                <c:if test="${not empty user.email}">${user.email}</c:if>
+                                                <c:if test="${not empty user.phone}"> • ${user.phone}</c:if>
+                                                </p>
+                                                <div class="flex items-center gap-2 mt-2">
+                                                <c:if test="${user.is_verified eq true}">
+                                                    <span class="tag blue">Verified</span>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <c:if test="${not empty user.description}">
+                                        <p class="text-gray-700 mb-4">${fn:substring(user.description, 0, 150)}${fn:length(user.description) > 150 ? '...' : ''}</p>
+                                    </c:if>
+                                    <div class="result-actions">
+                                        <a href="${pageContext.request.contextPath}/profile?uid=${user.id}" class="action-btn primary">
+                                            <i class="fas fa-eye mr-2"></i>
+                                            View Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:if>
+
+                        <!-- Post Results -->
+                        <c:if test="${not empty posts}">
+                            <c:forEach var="post" items="${posts}">
+                                <div class="result-card post-card">
+                                    <div class="flex items-center gap-4 mb-4">
+                                        <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+                                            <c:choose>
+                                                <c:when test="${not empty post.owner.avatar}">
+                                                    <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" alt="${post.owner.first_name}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="w-full h-full bg-green-100 flex items-center justify-center">
+                                                        <i class="fas fa-newspaper text-green-600 text-xl"></i>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-gray-800">
+                                                <c:choose>
+                                                    <c:when test="${not empty post.house.name}">
+                                                        ${post.house.name}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        Post by ${post.owner.first_name} ${post.owner.last_name}
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </h3>
+                                            <p class="text-gray-600">
+                                                by ${post.owner.first_name} ${post.owner.last_name} • 
+                                                <fmt:formatDate value="${post.created_at}" pattern="MMM dd, yyyy"/>
+                                            </p>
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <c:if test="${not empty post.post_type}">
+                                                    <span class="tag green">${post.post_type.name}</span>
+                                                </c:if>
+                                                <c:if test="${not empty post.house.address and post.post_type.id == 1}">
+                                                    <span class="tag">${post.house.address.district}, ${post.house.address.province}</span>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <c:if test="${not empty post.content}">
+                                        <p class="text-gray-700 mb-4">${fn:substring(post.content, 0, 200)}${fn:length(post.content) > 200 ? '...' : ''}</p>
+                                    </c:if>
+                                    <c:if test="${not empty post.medias}">
+                                        <div class="media-grid">
+                                            <c:forEach var="media" items="${post.medias}" varStatus="status">
+                                                <c:if test="${status.index < 4}">
+                                                    <div class="media-item">
+                                                        <img src="${pageContext.request.contextPath}/Asset/Common/Media/${media.url}" alt="Post media"/>
+                                                    </div>
+                                                </c:if>
+                                            </c:forEach>
+                                        </div>
+                                    </c:if>
+                                    <div class="flex items-center gap-4 text-gray-500 text-sm mb-4 mt-4">
+                                        <span><i class="fas fa-heart mr-1"></i>${fn:length(post.likes)} likes</span>
+                                        <span><i class="fas fa-comment mr-1"></i>${fn:length(post.reviews)} comments</span>
+                                    </div>
+                                    <div class="result-actions">
+                                        <a href="${pageContext.request.contextPath}/post-detail?pid=${post.id}" class="action-btn primary">
+                                            <i class="fas fa-eye mr-2"></i>
+                                            View Post
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:if>
+
+                        <!-- House Results -->
+                        <c:if test="${not empty houses}">
+                            <c:forEach var="house" items="${houses}">
+                                <div class="result-card house-card">
+                                    <div class="flex items-center gap-4 mb-4">
+                                        <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+                                            <c:choose>
+                                                <c:when test="${not empty house.medias && fn:length(house.medias) > 0}">
+                                                    <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Media/${house.medias[0].url}" alt="${house.name}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="w-full h-full bg-orange-100 flex items-center justify-center">
+                                                        <i class="fas fa-home text-orange-600 text-xl"></i>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-lg font-semibold text-gray-800">${house.name}</h3>
+                                            <p class="text-gray-600">
+                                                <c:if test="${not empty house.address}">
+                                                    ${house.address.district}, ${house.address.province} • 
+                                                </c:if>
+                                                <c:if test="${not empty house.owner}">
+                                                    by ${house.owner.first_name} ${house.owner.last_name}
+                                                </c:if>
+                                            </p>
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <c:if test="${house.status.id eq 1}">
+                                                    <span class="tag orange">Available</span>
+                                                </c:if>
+                                                <c:if test="${house.is_whole_house}">
+                                                    <span class="tag">Whole House</span>
+                                                </c:if>
+                                                <c:if test="${house.is_whole_house == false}">
+                                                    <span class="tag">Rooms only</span>
+                                                </c:if>
+                                                <c:if test="${house.star gt 0}">
+                                                    <span class="tag">★ ${house.star}</span>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <c:if test="${not empty house.description}">
+                                        <p class="text-gray-700 mb-4">${fn:substring(house.description, 0, 200)}${fn:length(house.description) > 200 ? '...' : ''}</p>
+                                    </c:if>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-dollar-sign text-green-500"></i>
+                                            <c:if test="${house.is_whole_house == true}">
+                                                <span class="text-sm">
+                                                    <strong>Price:</strong> 
+                                                    <fmt:formatNumber value="${house.price_per_night}" type="currency" currencyCode="VND"/>
+                                                </span>
+                                            </c:if>
+                                            <c:if test="${house.is_whole_house == false}">
+                                                <span class="text-sm">
+                                                    <strong>Price: Different for each room</strong>
+                                                </span>
+                                            </c:if>
+                                        </div>
+                                        <c:if test="${not empty house.address}">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-map-marker-alt text-blue-500"></i>
+                                                <span class="text-sm">
+                                                    <strong>Location:</strong> ${house.address.district}
+                                                </span>
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                    <c:if test="${not empty house.medias}">
+                                        <div class="media-grid">
+                                            <c:forEach var="media" items="${house.medias}" varStatus="status">
+                                                <c:if test="${status.index < 4}">
+                                                    <div class="media-item">
+                                                        <img src="${pageContext.request.contextPath}/Asset/Common/Media/${media.url}" alt="House media"/>
+                                                    </div>
+                                                </c:if>
+                                            </c:forEach>
+                                        </div>
+                                    </c:if>
+                                    <div class="result-actions">
+                                        <a href="${pageContext.request.contextPath}/house-detail?hid=${house.id}" class="action-btn primary">
+                                            <i class="fas fa-eye mr-2"></i>
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:if>
+
+                        <!-- Pagination -->
+                        <c:if test="${totalPages > 1}">
+                            <div class="pagination">
+                                <c:if test="${currentPage > 1}">
+                                    <a href="?searchKey=${searchKey}&type=${type}&page=${currentPage - 1}" class="pagination-btn">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </c:if>
+
+                                <c:forEach var="i" begin="1" end="${totalPages}">
+                                    <c:choose>
+                                        <c:when test="${i == currentPage}">
+                                            <span class="pagination-btn active">${i}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="?searchKey=${searchKey}&type=${type}&page=${i}" class="pagination-btn">${i}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+
+                                <c:if test="${currentPage < totalPages}">
+                                    <a href="?searchKey=${searchKey}&type=${type}&page=${currentPage + 1}" class="pagination-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </c:if>
+                            </div>
+                        </c:if>
                     </c:otherwise>
                 </c:choose>
             </div>
         </div>
 
-        <!-- Feedback Modal -->
-        <div id="feedbackModal" class="fixed inset-0 z-50 modal-overlay">
-            <div class="flex items-center justify-center min-h-screen px-4 py-8">
-                <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-
-                    <!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex gap-2 items-center">
-                                <h2 class="text-xl font-bold text-[#FF7700]">Feedbacks</h2>
-                                <p> <b>-</b> </p>
-                                <p id="modalHouseName" class="text-blue-500 text-xl font-bold"></p>
-                            </div>
-                            <button id="closeModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
-                                <i class="fas fa-times text-lg text-white"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-
-                        <!-- Loading State -->
-                        <div id="feedbackLoading" class="text-center py-8">
-                            <div class="loading-spinner mx-auto mb-4"></div>
-                            <p class="text-gray-500">Loading feedbacks...</p>
-                        </div>
-
-                        <!-- Error State -->
-                        <div id="feedbackError" class="text-center py-8 hidden">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                            <p class="text-red-500 font-medium">Failed to load feedbacks</p>
-                            <button id="retryFeedback" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                                <i class="fas fa-redo mr-2"></i>
-                                Retry
-                            </button>
-                        </div>
-
-                        <!-- No Feedback State -->
-                        <div id="noFeedback" class="text-center py-8 hidden">
-                            <i class="fas fa-comment-slash text-gray-400 text-3xl mb-4"></i>
-                            <p class="text-gray-500">No feedbacks available for this property</p>
-                        </div>
-
-                        <!-- Feedbacks Container -->
-                        <div id="feedbackContainer" class="space-y-4">
-                            <!-- Dynamic feedback items will be inserted here -->
-                        </div>
-
-                        <!-- Load More Feedbacks -->
-                        <div id="loadMoreFeedback" class="text-center mt-6 hidden">
-                            <button id="loadMoreFeedbackBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
-                                <i class="fas fa-chevron-down mr-2"></i>
-                                Load More Feedbacks
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+        <!-- JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+
         <script>
-            $(document).ready(function () {
-                const modal = $('#feedbackModal');
-                const modalHouseName = $('#modalHouseName');
-                const feedbackContainer = $('#feedbackContainer');
-                const loadingDiv = $('#feedbackLoading');
-                const errorDiv = $('#feedbackError');
-                const noFeedbackDiv = $('#noFeedback');
-                const loadMoreDiv = $('#loadMoreFeedback');
-                const displayHouseDiv = $('#displaying-house');
+            // Tab switching functionality
+            document.addEventListener('DOMContentLoaded', function () {
+                const tabs = document.querySelectorAll('.search-tab');
+                const searchType = document.getElementById('searchType');
+                const searchForm = document.getElementById('searchForm');
 
-                let displayCate = '${requestScope.displaying}';
-
-                if (displayCate === 'house') {
-                    $(displayHouseDiv).addClass('active-search');
-                }
-
-
-                let currentHouseId = null;
-                let currentPage = 1;
-                let isLoading = false;
-
-                $('.view-feedback-btn').on('click', function () {
-                    const houseId = $(this).data('house-id');
-                    const houseName = $(this).data('house-name');
-
-                    currentHouseId = houseId;
-                    currentPage = 1;
-
-                    modalHouseName.text(houseName);
-                    modal.addClass('active');
-                    $('body').addClass('overflow-hidden');
-
-                    loadFeedbacks(houseId, 1, true);
-                });
-
-                // Close modal
-                $('#closeModalBtn').on('click', function (e) {
-                    closeModal();
-
-                });
-
-                modal.on('click', function (e) {
-                    if (e.target === this) {
-                        closeModal();
+                // Search input enhancement
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('keyup', function (e) {
+                    if (e.key === 'Enter') {
+                        searchForm.submit();
                     }
                 });
 
-                modal.on('click', function (e) {
-                    if (!$(e.target).closest('.modal-content').length) {
-                        closeModal();
-                    }
-                });
-
-                // Retry loading feedbacks
-                $('#retryFeedback').on('click', function () {
-                    if (currentHouseId) {
-                        loadFeedbacks(currentHouseId, 1, true);
-                    }
-                });
-
-                // Load more feedbacks
-                $('#loadMoreFeedbackBtn').on('click', function () {
-                    if (currentHouseId && !isLoading) {
-                        loadFeedbacks(currentHouseId, currentPage + 1, false);
-                    }
-                });
-
-                // ESC key to close modal
-                $(document).on('keydown', function (e) {
-                    if (e.key === 'Escape' && modal.hasClass('active')) {
-                        closeModal();
-                    }
-                });
-
-                function closeModal() {
-                    modal.removeClass('active');
-                    $('body').removeClass('overflow-hidden');
-                    // Reset modal state after animation
-                    setTimeout(() => {
-                        resetModalState();
-                    }, 300);
-                }
-
-                function resetModalState() {
-                    feedbackContainer.empty();
-                    loadingDiv.show();
-                    errorDiv.addClass('hidden');
-                    noFeedbackDiv.addClass('hidden');
-                    loadMoreDiv.addClass('hidden');
-                    currentHouseId = null;
-                    currentPage = 1;
-                }
-
-                function loadFeedbacks(houseId, page, isNewLoad) {
-                    if (isLoading)
-                        return;
-
-                    isLoading = true;
-
-                    if (isNewLoad) {
-                        // Show loading for new load
-                        loadingDiv.show();
-                        errorDiv.addClass('hidden');
-                        noFeedbackDiv.addClass('hidden');
-                        loadMoreDiv.addClass('hidden');
-                        feedbackContainer.empty();
-                    } else {
-                        // Show loading on load more button
-                        $('#loadMoreFeedbackBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
-                    }
-
-                    $.ajax({
-                        url: '${pageContext.request.contextPath}/feedback/house',
-                        method: 'GET',
-                        data: {
-                            houseId: houseId,
-                            page: page,
-                            limit: 5
-                        },
-                        success: function (response) {
-                            loadingDiv.hide();
-
-                            if (isNewLoad) {
-                                feedbackContainer.empty();
-                            }
-
-                            if (response.feedbacks && response.feedbacks.length > 0) {
-                                appendFeedbacks(response.feedbacks);
-                                currentPage = page;
-
-                                // Show load more if there are more feedbacks
-                                if (response.hasMore) {
-                                    loadMoreDiv.removeClass('hidden');
-                                } else {
-                                    loadMoreDiv.addClass('hidden');
-                                }
-
-                                errorDiv.addClass('hidden');
-                                noFeedbackDiv.addClass('hidden');
-                            } else if (isNewLoad) {
-                                // No feedbacks found
-                                noFeedbackDiv.removeClass('hidden');
-                                errorDiv.addClass('hidden');
-                                loadMoreDiv.addClass('hidden');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error loading feedbacks:', error);
-                            loadingDiv.hide();
-
-                            if (isNewLoad) {
-                                errorDiv.removeClass('hidden');
-                                noFeedbackDiv.addClass('hidden');
-                            } else {
-                                // Show error toast for load more
-                                showToast('Failed to load more feedbacks', 'error');
-                            }
-                        },
-                        complete: function () {
-                            isLoading = false;
-                            $('#loadMoreFeedbackBtn').html('<i class="fas fa-chevron-down mr-2"></i>Load More Feedbacks');
-                        }
-                    });
-                }
-
-                function appendFeedbacks(feedbacks) {
-                    feedbacks.forEach(function (feedback) {
-                        const feedbackHtml = createFeedbackHtml(feedback);
-                        feedbackContainer.append(feedbackHtml);
-                    });
-                }
-
-                function createFeedbackHtml(feedback) {
-                    const stars = generateStarRating(feedback.star);
-
-                    return `
-                                                        <div class="feedback-item p-4 border border-gray-200 rounded-xl bg-gray-50">
-                                                            <div class="flex items-start gap-4">
-                                                                <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                                                    <img class="w-12 h-12 rounded-full object-cover" src="` + feedback.user.avatar + `" 
-                                                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                                                    <i class="fas fa-user text-white text-sm" style="display: none;"></i>
-                                                                </div>
-                                                                <div class="flex-1">
-                                                                    <div class="flex items-center justify-between mb-2">
-                                                                        <div class="flex items-center gap-3">
-                                                                            <a href="${pageContext.request.contextPath}/profile?id=` + feedback.user.id + `" class="font-semibold text-gray-800">` + feedback.user.first_name + ` ` + feedback.user.last_name + `</a>
-                                                                            <div class="star-rating flex">
-                                                                                ` + stars + `
-                                                                            </div>
-                                                                        </div>
-                                                                        <span class="text-xs text-gray-500">` + feedback.created_at + ` </span>
-                                                                    </div>
-                                                                    <p class="text-gray-700 text-sm leading-relaxed">` + feedback.content + `</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    `;
-                }
-
-                function generateStarRating(rating) {
-                    let stars = '';
-                    for (let i = 1; i <= 5; i++) {
-                        if (i <= rating) {
-                            stars += '<i class="fas fa-star text-xs"></i>';
-                        } else {
-                            stars += '<i class="far fa-star text-xs"></i>';
-                        }
-                    }
-                    return stars;
-                }
-
-                function showToast(message, type = 'success') {
-                    Toastify({
-                        text: message,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: type === 'success' ? '#10B981' : '#EF4444',
-                        stopOnFocus: true
-                    }).showToast();
-                }
+                // Auto-focus search input
+                searchInput.focus();
             });
 
-            function toggleLike(button) {
-                const uid = '${sessionScope.user_id}';
-
-                if (uid || uid.trim()) {
-                    const likeCount = button.querySelector('.like-count');
-                    const currentCount = parseInt(likeCount.textContent);
-                    const pid = $(button).data('post-id');
-
-                    if (button.classList.contains('liked')) {
-                        // Unlike
-                        button.classList.remove('liked');
-                        likeCount.textContent = currentCount - 1;
-                        button.style.backgroundColor = 'white';
-                        button.style.color = '#3b82f6';
-                        sendLikeRequest(pid, 'unLike');
-                    } else {
-                        // Like
-                        button.classList.add('liked');
-                        likeCount.textContent = currentCount + 1;
-                        button.style.backgroundColor = '#3b82f6';
-                        button.style.color = 'white';
-                        sendLikeRequest(pid, 'like');
-                    }
-                } else {
-                    Swal.fire({
-                        title: 'You must login to use this feature',
-                        imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                        imageWidth: 150,
-                        imageHeight: 150,
-                        imageAlt: 'Custom icon',
-                        showCancelButton: true,
-                        confirmButtonText: 'Login now',
-                        cancelButtonText: 'Back to Newsfeed',
-                        reverseButtons: true,
-                        focusConfirm: false,
-                        focusCancel: false,
-                        customClass: {
-                            popup: 'rounded-xl shadow-lg',
-                            title: 'text-xl font-semibold',
-                            confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                            cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                            actions: 'space-x-4'
-                        },
-                        buttonsStyling: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.href = '${pageContext.request.contextPath}/login';
-                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            Swal.close();
+            // Image lazy loading
+            document.addEventListener('DOMContentLoaded', function () {
+                const images = document.querySelectorAll('img[data-src]');
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src;
+                            img.classList.remove('lazy');
+                            observer.unobserve(img);
                         }
                     });
+                });
+
+                images.forEach(img => imageObserver.observe(img));
+            });
+
+            document.addEventListener('keydown', function (e) {
+                // Ctrl/Cmd + K to focus search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
                 }
-            }
 
-            function sendLikeRequest(postId, type) {
-                $.ajax({
-                    url: '${pageContext.request.contextPath}/feeds',
-                    type: 'POST',
-                    data: {
-                        pid: postId,
-                        type: type
-                    }
-                });
-            }
-
-            function showImageModal(imageSrc) {
-                Swal.fire({
-                    imageUrl: imageSrc,
-                    imageWidth: 'auto',
-                    imageHeight: 'auto',
-                    showCloseButton: false,
-                    showConfirmButton: false,
-                    customClass: {
-                        image: 'rounded-lg p-5'
-                    }
-                });
-            }
+                if (e.key === 'Escape') {
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('searchInput').focus();
+                }
+            });
         </script>
     </body>
 </html>

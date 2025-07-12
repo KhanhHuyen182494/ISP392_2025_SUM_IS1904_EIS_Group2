@@ -36,6 +36,10 @@ public interface IUserDAO extends IBaseUUID<User> {
     public int countNewUsers();
     
     public int countAllUsers();
+    
+    public List<User> searchUsers(String searchKey, int limit, int offset);
+    
+    public int countSearchUsers(String searchKey);
 
     //Add
     //Delete

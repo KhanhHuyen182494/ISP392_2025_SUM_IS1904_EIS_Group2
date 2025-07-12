@@ -37,6 +37,10 @@ public interface IPostDAO extends IBaseUUID<Post> {
     public Post getPostDetailManage(String postId);
 
     public int getPostCountForOwner(String countType, String uid);
+    
+    public List<Post> searchPosts(String searchKey, int limit, int offset);
+    
+    public int countSearchPosts(String searchKey);
 
     //Update
     public boolean updatePostStatus(String postId, int statusId);
