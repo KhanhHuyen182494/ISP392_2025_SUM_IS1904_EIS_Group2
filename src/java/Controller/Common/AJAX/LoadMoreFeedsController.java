@@ -5,9 +5,6 @@
 package Controller.Common.AJAX;
 
 import Controller.Common.BaseAuthorization;
-import Controller.Common.NewsfeedController;
-import DAL.DAO.IPostDAO;
-import DAL.PostDAO;
 import DTO.PostDTO;
 import Model.Address;
 import Model.House;
@@ -17,13 +14,9 @@ import Model.Post;
 import Model.Review;
 import Model.Status;
 import Model.User;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.http.HttpServlet;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
