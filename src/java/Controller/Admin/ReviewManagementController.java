@@ -5,7 +5,9 @@
 package Controller.Admin;
 
 import Controller.Common.BaseAuthorization;
+import Model.Address;
 import Model.House;
+import Model.Media;
 import Model.Review;
 import Model.Status;
 import Model.User;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -103,7 +106,49 @@ public class ReviewManagementController extends BaseAuthorization {
     }
 
     protected void doGetReviewDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String reviewId = request.getParameter("rid");
 
+        if (reviewId == null || reviewId.isEmpty()) {
+            response.sendError(404);
+            return;
+        }
+
+        Review r = rDao.getById(reviewId);
+
+        House h = hDao.getById(r.getHomestay().getId());
+        Status s = sDao.getStatusById(r.getStatus().getId());
+        User owner = uDao.getById(r.getOwner().getId());
+        Status us = sDao.getStatusById(owner.getStatus().getId());
+        owner.setStatus(us);
+
+        fullLoadHouseInfomation(h);
+        
+        r.setOwner(owner);
+        r.setStatus(s);
+        r.setHomestay(h);
+        
+        request.setAttribute("review", r);
+        request.getRequestDispatcher("/FE/Admin/ReviewManagement/ReviewDetail.jsp").forward(request, response);
+    }
+
+    private void fullLoadHouseInfomation(House h) {
+        try {
+            String hid = h.getId();
+            User owner = uDao.getById(h.getOwner().getId());
+
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+
+            h.setMedias(medias);
+            h.setAddress(a);
+            h.setOwner(owner);
+
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
     }
 
 }

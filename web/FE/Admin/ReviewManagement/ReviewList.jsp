@@ -298,9 +298,9 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <c:forEach var="r" items="${rList}">
                                     <tr class="hover:bg-gray-50 transition-colors duration-200">
-<!--                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            ${r.id}
-                                        </td>-->
+                                        <!--                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        ${r.id}
+                                    </td>-->
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <img class="h-10 w-10 rounded-full" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${r.owner.avatar}" alt="">
@@ -341,16 +341,7 @@
                                             </c:choose>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
-                                            <c:choose>
-                                                <c:when test="${user.status.id == 4}">
-                                                    <a href="#" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Ban</a>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <a href="${pageContext.request.contextPath}/manage/reviews/detail?rid=${r.id}" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
                                         </td>
                                     </tr>
                                 </c:forEach>
