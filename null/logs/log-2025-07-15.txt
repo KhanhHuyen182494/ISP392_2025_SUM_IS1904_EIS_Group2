@@ -1,0 +1,1 @@
+[2025-07-15 22:32:40] [ERROR] Error in getPaginatedManageReview: java.sql.SQLNonTransientConnectionException: No operations allowed after connection closed.

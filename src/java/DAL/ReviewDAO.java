@@ -11,10 +11,13 @@ import Model.Review;
 import Model.Room;
 import Model.Status;
 import Model.User;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +49,7 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
                 0 // offset
         );
 
-        System.out.println(result.get(3).getRoom());
+        System.out.println(fDao.getPaginatedManageReview("", null, null, null, 10, 0));
     }
 
     @Override
@@ -426,4 +429,185 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
+    @Override
+    public List<Review> getPaginatedManageReview(String keyword, Integer statusId, Integer star, Date createdDate, int limit, int offset) {
+        List<Review> reviews = new ArrayList<>();
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT r.id, r.star, r.content, r.created_at, r.updated_at, r.status_id, r.user_id, r.homestay_id, r.room_id ");
+        sql.append("FROM review r ");
+        List<Object> parameters = new ArrayList<>();
+
+        // Add joins for keyword search
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("LEFT JOIN user u ON r.user_id = u.id ");
+            sql.append("LEFT JOIN homestay h ON r.homestay_id = h.id ");
+        }
+
+        // Build WHERE clause
+        List<String> conditions = new ArrayList<>();
+
+        // Keyword filter - FIXED: Added missing closing parenthesis
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            conditions.add("(r.content LIKE ? OR CONCAT_WS(' ', u.first_name, u.last_name) LIKE ? OR h.name LIKE ?)");
+            String likeKeyword = "%" + keyword.toLowerCase() + "%";
+            parameters.add(likeKeyword);
+            parameters.add(likeKeyword);
+            parameters.add(likeKeyword);
+        }
+
+        if (statusId != null) {
+            conditions.add("r.status_id = ?");
+            parameters.add(statusId);
+        }
+
+        if (star != null) {
+            conditions.add("r.star = ?");
+            parameters.add(star);
+        }
+
+        if (createdDate != null) {
+            conditions.add("DATE(r.created_at) = DATE(?)");
+            parameters.add(new java.sql.Date(createdDate.getTime()));
+        }
+
+        if (!conditions.isEmpty()) {
+            sql.append("WHERE ");
+            sql.append(String.join(" AND ", conditions));
+            sql.append(" "); // Add space before ORDER BY
+        }
+
+        sql.append("ORDER BY r.created_at DESC LIMIT ? OFFSET ?");
+        parameters.add(limit);
+        parameters.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            // Set parameters
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Review review = new Review();
+                review.setId(rs.getString("id"));
+                review.setStar(rs.getInt("star"));
+                review.setContent(rs.getString("content"));
+                review.setCreated_at(rs.getTimestamp("created_at"));
+                review.setUpdated_at(rs.getTimestamp("updated_at"));
+
+                // Create and set Status
+                Status s = new Status();
+                s.setId(rs.getInt("status_id"));
+                review.setStatus(s);
+
+                // Create and set User
+                User owner = new User();
+                owner.setId(rs.getString("user_id"));
+                review.setOwner(owner);
+
+                // Create and set House
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+                review.setHomestay(h);
+
+                // Handle room_id (can be null)
+                String roomId = rs.getString("room_id");
+                if (roomId != null) {
+                    Room room = new Room();
+                    room.setId(roomId);
+                    review.setRoom(room);
+                }
+
+                reviews.add(review);
+            }
+        } catch (SQLException e) {
+            logger.error("Error in getPaginatedManageReview: " + e.getMessage());
+            throw new RuntimeException("Database error occurred while fetching reviews", e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return reviews;
+    }
+
+    @Override
+    public int countManageReview(String keyword, Integer statusId, Integer star, Date createdDate) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM review r ");
+
+        List<Object> parameters = new ArrayList<>();
+
+        // Add joins for keyword search
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("LEFT JOIN user u ON r.user_id = u.id ");
+            sql.append("LEFT JOIN homestay h ON r.homestay_id = h.id ");
+            sql.append("LEFT JOIN room rm ON r.room_id = rm.id ");
+        }
+
+        // Build WHERE clause
+        List<String> conditions = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            conditions.add("(LOWER(r.content) LIKE ? OR LOWER(u.name) LIKE ? OR LOWER(h.name) LIKE ? OR LOWER(rm.name) LIKE ?)");
+            String likeKeyword = "%" + keyword.toLowerCase() + "%";
+            parameters.add(likeKeyword);
+            parameters.add(likeKeyword);
+            parameters.add(likeKeyword);
+            parameters.add(likeKeyword);
+        }
+
+        if (statusId != null) {
+            conditions.add("r.status_id = ?");
+            parameters.add(statusId);
+        }
+
+        if (star != null) {
+            conditions.add("r.star = ?");
+            parameters.add(star);
+        }
+
+        if (createdDate != null) {
+            conditions.add("DATE(r.created_at) = DATE(?)");
+            parameters.add(new java.sql.Date(createdDate.getTime()));
+        }
+
+        if (!conditions.isEmpty()) {
+            sql.append("WHERE ");
+            sql.append(String.join(" AND ", conditions));
+        }
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            // Set parameters
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
+            }
+
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Error in countManageReview: " + e.getMessage());
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex);
+            }
+        }
+
+        return 0;
+    }
 }
