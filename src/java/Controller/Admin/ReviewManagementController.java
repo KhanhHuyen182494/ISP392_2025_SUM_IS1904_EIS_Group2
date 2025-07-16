@@ -16,9 +16,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,12 +49,52 @@ public class ReviewManagementController extends BaseAuthorization {
                 doGetReviewsList(request, response, user);
             case BASE_PATH + "/detail" ->
                 doGetReviewDetail(request, response, user);
-
         }
     }
 
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String path = request.getServletPath();
+
+        switch (path) {
+            case BASE_PATH + "/update" ->
+                doPostUpdateReview(request, response, user);
+        }
+    }
+
+    protected void doPostUpdateReview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> jsonResponse = new HashMap<>();
+        PrintWriter out = response.getWriter();
+
+        try {
+            String type = request.getParameter("typeUpdate");
+
+            if (type.equalsIgnoreCase("status")) {
+                String rid = request.getParameter("rid");
+                String statusStr = request.getParameter("status");
+
+                int status = Integer.parseInt(statusStr);
+
+                if (rDao.updateReviewStatus(rid, status)) {
+                    jsonResponse.put("ok", true);
+                    jsonResponse.put("message", "Update review visible successfully!");
+                } else {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Update review visible faileds!");
+                }
+            }
+
+            out.print(gson.toJson(jsonResponse));
+            out.flush();
+        } catch (NumberFormatException e) {
+            jsonResponse.put("ok", false);
+            jsonResponse.put("message", "An error occurred while creating the post: " + e.getMessage());
+            out.print(gson.toJson(jsonResponse));
+            out.flush();
+        }
 
     }
 
@@ -122,11 +165,11 @@ public class ReviewManagementController extends BaseAuthorization {
         owner.setStatus(us);
 
         fullLoadHouseInfomation(h);
-        
+
         r.setOwner(owner);
         r.setStatus(s);
         r.setHomestay(h);
-        
+
         request.setAttribute("review", r);
         request.getRequestDispatcher("/FE/Admin/ReviewManagement/ReviewDetail.jsp").forward(request, response);
     }

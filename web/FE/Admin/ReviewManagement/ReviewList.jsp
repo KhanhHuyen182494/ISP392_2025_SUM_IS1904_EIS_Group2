@@ -342,6 +342,12 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <a href="${pageContext.request.contextPath}/manage/reviews/detail?rid=${r.id}" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
+                                            <c:if test="${r.status.id == 23}">
+                                                <button onclick="updateReview('${r.id}', 'hide')" class="text-red-500 hover:text-red-700 transition-colors duration-200">Hide</button>
+                                            </c:if>
+                                            <c:if test="${r.status.id == 24}">
+                                                <button onclick="updateReview('${r.id}', 'show')" class="text-red-500 hover:text-red-700 transition-colors duration-200">Show</button>
+                                            </c:if>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -395,33 +401,138 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                    // Simple interactivity for demo purposes
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        // Handle checkbox selections
-                                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                                        checkboxes.forEach(checkbox => {
-                                            checkbox.addEventListener('change', function () {
-                                                if (this.checked) {
-                                                    this.closest('tr')?.classList.add('bg-blue-50');
-                                                } else {
-                                                    this.closest('tr')?.classList.remove('bg-blue-50');
-                                                }
-                                            });
-                                        });
+                                                    function updateReview(rid, type) {
+                                                        if (type == 'hide') {
+                                                            Swal.fire({
+                                                                title: 'Are you sure wanted to hide this review?',
+                                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                imageWidth: 150,
+                                                                imageHeight: 150,
+                                                                imageAlt: 'Custom icon',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Hide it',
+                                                                cancelButtonText: 'Cancel',
+                                                                reverseButtons: false,
+                                                                focusConfirm: false,
+                                                                focusCancel: false,
+                                                                customClass: {
+                                                                    popup: 'rounded-xl shadow-lg',
+                                                                    title: 'text-xl font-semibold',
+                                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                    actions: 'space-x-4'
+                                                                },
+                                                                buttonsStyling: false
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    $.ajax({
+                                                                        url: '${pageContext.request.contextPath}/manage/reviews/update',
+                                                                        type: 'POST',
+                                                                        beforeSend: function (xhr) {
+                                                                            Swal.showLoading();
+                                                                        },
+                                                                        data: {
+                                                                            typeUpdate: 'status',
+                                                                            rid: rid,
+                                                                            status: 24
+                                                                        },
+                                                                        success: function (response) {
+                                                                            if (response.ok) {
+                                                                                showToast(response.message);
+                                                                                setTimeout(function () {
+                                                                                    location.reload();
+                                                                                }, 2000);
+                                                                            } else {
+                                                                                showToast(response.message, 'error');
+                                                                            }
+                                                                        },
+                                                                        complete: function (jqXHR, textStatus) {
+                                                                            Swal.close();
+                                                                        }
+                                                                    });
+                                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                    Swal.close();
+                                                                }
+                                                            });
+                                                        } else if (type == 'show') {
+                                                            Swal.fire({
+                                                                title: 'Are you sure wanted to show this review?',
+                                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                                                imageWidth: 150,
+                                                                imageHeight: 150,
+                                                                imageAlt: 'Custom icon',
+                                                                showCancelButton: true,
+                                                                confirmButtonText: 'Show it',
+                                                                cancelButtonText: 'Cancel',
+                                                                reverseButtons: false,
+                                                                focusConfirm: false,
+                                                                focusCancel: false,
+                                                                customClass: {
+                                                                    popup: 'rounded-xl shadow-lg',
+                                                                    title: 'text-xl font-semibold',
+                                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                                    actions: 'space-x-4'
+                                                                },
+                                                                buttonsStyling: false
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    $.ajax({
+                                                                        url: '${pageContext.request.contextPath}/manage/reviews/update',
+                                                                        type: 'POST',
+                                                                        beforeSend: function (xhr) {
+                                                                            Swal.showLoading();
+                                                                        },
+                                                                        data: {
+                                                                            typeUpdate: 'status',
+                                                                            rid: rid,
+                                                                            status: 23
+                                                                        },
+                                                                        success: function (response) {
+                                                                            if (response.ok) {
+                                                                                showToast(response.message);
+                                                                                setTimeout(function () {
+                                                                                    location.reload();
+                                                                                }, 2000);
+                                                                            } else {
+                                                                                showToast(response.message, 'error');
+                                                                            }
+                                                                        },
+                                                                        complete: function (jqXHR, textStatus) {
+                                                                            Swal.close();
+                                                                        }
+                                                                    });
+                                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                                    Swal.close();
+                                                                }
+                                                            });
+                                                        }
+                                                    }
 
-                                        // Handle action buttons
-                                        const actionButtons = document.querySelectorAll('button');
-                                        actionButtons.forEach(button => {
-                                            button.addEventListener('click', function (e) {
-                                                if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
-                                                    e.preventDefault();
-                                                    const action = this.textContent.trim();
-                                                    const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
-                                                    alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
-                                                }
-                                            });
-                                        });
-                                    });
+                                                    function showToast(message, type = 'success') {
+                                                        let backgroundColor;
+                                                        if (type === "success") {
+                                                            backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
+                                                        } else if (type === "error") {
+                                                            backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
+                                                        } else if (type === "warning") {
+                                                            backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
+                                                        } else if (type === "info") {
+                                                            backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
+                                                        } else {
+                                                            backgroundColor = "#333"; // Default color (dark gray)
+                                                        }
+
+                                                        Toastify({
+                                                            text: message, // Dynamically set message
+                                                            duration: 2000,
+                                                            close: true,
+                                                            gravity: "top",
+                                                            position: "right",
+                                                            backgroundColor: backgroundColor, // Dynamically set background color
+                                                            stopOnFocus: true
+                                                        }).showToast();
+                                                    }
         </script>
     </body>
 </html>
