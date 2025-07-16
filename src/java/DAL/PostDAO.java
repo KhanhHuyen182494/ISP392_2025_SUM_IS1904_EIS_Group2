@@ -11,6 +11,7 @@ import Model.Address;
 import Model.House;
 import Model.Post;
 import Model.PostType;
+import Model.Room;
 import Model.Status;
 import Model.User;
 import java.util.ArrayList;
@@ -34,7 +35,9 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
     public static void main(String[] args) {
         PostDAO pDao = new PostDAO();
-        System.out.println(pDao.updatePostStatus("POST-1c7c735686354762bf3b2c05f134837", 14));
+        User u = new User();
+        u.setId("U-87fbb6d15ad548318110b60b797f84da");
+        System.out.println(pDao.getPaginatedPostUser(u, "", null, null, null, 10, 0));
     }
 
     @Override
@@ -1060,6 +1063,141 @@ public class PostDAO extends BaseDao implements IPostDAO {
             }
         }
         return count;
+    }
+
+    @Override
+    public List<Post> getPaginatedPostUser(User u, String keyword, Integer statusId, Integer typeId, String sortBy, int limit, int offset) {
+        List<Post> pList = new ArrayList<>();
+
+        String baseQuery = """
+                            SELECT 
+                                p.id,
+                                p.content,
+                                p.created_at,
+                                p.updated_at,
+                                p.deleted_at,
+                                p.user_id,
+                                p.post_type_id,
+                                p.status_id,
+                                p.target_room_id,
+                                p.target_homestay_id,
+                                p.parent_post_id,
+                                s.name as StatusName,
+                                pt.name as PostTypeName,
+                                u.first_name,
+                                u.last_name,
+                                u.avatar
+                            FROM
+                                fuhousefinder_homestay.post p
+                                JOIN status s ON s.id = p.status_id
+                                JOIN `User` u ON u.id = p.user_id
+                                JOIN post_type pt ON pt.id = p.post_type_id
+                            WHERE p.user_id = ? 
+                            """;
+
+        StringBuilder sql = new StringBuilder(baseQuery);
+        List<Object> params = new ArrayList<>();
+
+        params.add(u.getId()); // user_id parameter
+
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append(" AND p.content LIKE ? ");
+            params.add("%" + keyword + "%");
+        }
+
+        if (statusId != null) {
+            sql.append(" AND p.status_id = ? ");
+            params.add(statusId);
+        }
+
+        if (typeId != null) {
+            sql.append(" AND p.post_type_id = ? ");
+            params.add(typeId);
+        }
+
+        sql.append(" ORDER BY p.created_at DESC LIMIT ? OFFSET ? ");
+        params.add(limit);
+        params.add(offset);
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            // Set parameters dynamically
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) param);
+                } else {
+                    ps.setObject(i + 1, param);
+                }
+            }
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Post p = new Post();
+                p.setId(rs.getString("id"));
+                p.setContent(rs.getString("content"));
+                p.setCreated_at(rs.getTimestamp("created_at"));
+                p.setUpdated_at(rs.getTimestamp("updated_at"));
+                p.setDeleted_at(rs.getTimestamp("deleted_at"));
+
+                // Status
+                Status psta = new Status();
+                psta.setId(rs.getInt("status_id"));
+                psta.setName(rs.getString("StatusName"));
+                p.setStatus(psta);
+
+                // Post Type
+                PostType pt = new PostType();
+                pt.setId(rs.getInt("post_type_id"));
+                pt.setName(rs.getString("PostTypeName"));
+                p.setPost_type(pt);
+
+                // Owner/User
+                User owner = new User();
+                owner.setId(rs.getString("user_id"));
+                owner.setFirst_name(rs.getString("first_name"));
+                owner.setLast_name(rs.getString("last_name"));
+                owner.setAvatar(rs.getString("avatar"));
+                p.setOwner(owner);
+
+                // House (target_homestay_id)
+                String targetHomestayId = rs.getString("target_homestay_id");
+                if (targetHomestayId != null) {
+                    House h = new House();
+                    h.setId(targetHomestayId);
+                    p.setHouse(h);
+                }
+
+                // Room (target_room_id)
+                String targetRoomId = rs.getString("target_room_id");
+                if (targetRoomId != null) {
+                    Room r = new Room();
+                    r.setId(targetRoomId);
+                    p.setRoom(r);
+                }
+
+                // Parent Post
+                String parentPostId = rs.getString("parent_post_id");
+                if (parentPostId != null) {
+                    Post parent = new Post();
+                    parent.setId(parentPostId);
+                    p.setParent_post(parent);
+                }
+
+                pList.add(p);
+
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error fetching paginated posts for user with filters: " + e);
+        }
+
+        return pList;
     }
 
 }

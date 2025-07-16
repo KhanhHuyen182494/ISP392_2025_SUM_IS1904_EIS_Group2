@@ -6,8 +6,8 @@ package DAL.DAO;
 
 import DTO.PostDTO;
 import Model.Post;
+import Model.User;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +24,8 @@ public interface IPostDAO extends IBaseUUID<Post> {
 
     public List<Post> getPaginatedManagePost(String keyword, Integer statusId, Integer typeId, String homestayId, Date createdDate, Date updatedDate, int limit, int offset);
 
+    public List<Post> getPaginatedPostUser(User u, String keyword, Integer statusId, Integer typeId, String sortBy, int limit, int offset);
+
     public Map<String, Integer> getPostCounts();
 
     public int getTotalPostCount();
@@ -37,9 +39,9 @@ public interface IPostDAO extends IBaseUUID<Post> {
     public Post getPostDetailManage(String postId);
 
     public int getPostCountForOwner(String countType, String uid);
-    
+
     public List<Post> searchPosts(String searchKey, int limit, int offset);
-    
+
     public int countSearchPosts(String searchKey);
 
     //Update

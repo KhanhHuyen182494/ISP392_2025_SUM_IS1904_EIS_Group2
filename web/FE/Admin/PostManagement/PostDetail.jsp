@@ -188,15 +188,15 @@
                     <div class="mb-6">
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
                         <div class="space-y-2">
-<!--                            <a href="${pageContext.request.contextPath}/manage/reviews" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-star w-5"></i>
-                                <span>Reviews</span>
-                            </a>-->
                             <a href="${pageContext.request.contextPath}/manage/post" 
-                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
                                 <i class="fas fa-pen-to-square w-5"></i>
                                 <span>All Posts</span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/manage/reviews" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-star w-5"></i>
+                                <span>All Reviews</span>
                             </a>
                         </div>
                     </div>

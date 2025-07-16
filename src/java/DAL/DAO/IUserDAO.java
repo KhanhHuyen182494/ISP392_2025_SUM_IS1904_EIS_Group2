@@ -63,4 +63,6 @@ public interface IUserDAO extends IBaseUUID<User> {
     public boolean isValidEmail(String email);
 
     public boolean isValidPhone(String phone);
+    
+    public boolean isValidUsername(String username);
 }

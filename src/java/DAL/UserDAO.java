@@ -945,4 +945,32 @@ public class UserDAO extends BaseDao implements IUserDAO {
         return count;
     }
 
+    @Override
+    public boolean isValidUsername(String username) {
+        String sql = "SELECT * FROM User u WHERE u.username = ?;";
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, username);
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return false;
+            }
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return true;
+    }
+
 }

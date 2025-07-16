@@ -335,6 +335,12 @@
                                     View your's houses
                                 </button>
                             </a>
+                            <a href="${pageContext.request.contextPath}/post-request">
+                                <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-blog"></i>
+                                    Post Request
+                                </button>
+                            </a>
                         </c:if>
                         <a href="${pageContext.request.contextPath}/review">
                             <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
@@ -359,6 +365,14 @@
                                 <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                     <i class="fas fa-plus"></i>
                                     Add Post
+                                </button>
+                            </a>
+                        </c:if>
+                        <c:if test="${sessionScope.user.role.id == 3 or sessionScope.user.role.id == 5}">
+                            <a href="${pageContext.request.contextPath}/post-request">
+                                <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-blog"></i>
+                                    Post Request
                                 </button>
                             </a>
                         </c:if>
