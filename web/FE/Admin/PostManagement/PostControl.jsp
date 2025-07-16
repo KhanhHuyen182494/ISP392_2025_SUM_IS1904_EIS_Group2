@@ -198,11 +198,6 @@
                                 <i class="fas fa-pen-to-square w-5"></i>
                                 <span>All Posts</span>
                             </a>
-                            <a href="${pageContext.request.contextPath}/manage/post/control" 
-                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
-                                <i class="fas fa-bell w-5"></i>
-                                <span>Posts Control</span>
-                            </a>
                         </div>
                     </div>
 

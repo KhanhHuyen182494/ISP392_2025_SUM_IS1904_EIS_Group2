@@ -77,8 +77,6 @@ public class PostManagementController extends BaseAuthorization {
     }
 
     protected void doGetPostList(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        int roleId = user.getRole().getId();
-
         String keyword = request.getParameter("keyword");
         String statusIdStr = request.getParameter("statusId");
         String typeIdStr = request.getParameter("typeId");

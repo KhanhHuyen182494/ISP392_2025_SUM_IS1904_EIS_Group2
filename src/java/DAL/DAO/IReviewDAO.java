@@ -6,6 +6,7 @@ package DAL.DAO;
 
 import Model.Review;
 import Model.User;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -34,5 +35,11 @@ public interface IReviewDAO extends IBaseUUID<Review> {
             int offset);
 
     public List<Review> getAllReviewsPaging();
+
+    public List<Review> getPaginatedManageReview(String keyword, Integer statusId, Integer star, Date createdDate, int limit, int offset);
+
+    public int countManageReview(String keyword, Integer statusId, Integer star, Date createdDate);
+
+    public boolean updateReviewStatus(String rid, int statusId);
 
 }

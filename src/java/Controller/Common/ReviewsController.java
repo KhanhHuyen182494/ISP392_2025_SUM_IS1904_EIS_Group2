@@ -133,6 +133,9 @@ public class ReviewsController extends BaseAuthorization {
                 r.setRoom(room);
             }
 
+            Status s = sDao.getStatusById(r.getStatus().getId());
+            
+            r.setStatus(s);
             r.setHomestay(h);
         }
 
