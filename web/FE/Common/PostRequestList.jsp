@@ -223,14 +223,16 @@
                                                         class="w-full text-left px-4 py-2 text-sm text-blue-700 hover:bg-blue-50">
                                                     <i class="fas fa-eye mr-2"></i>View Details
                                                 </button>
-                                                <button onclick="viewPostDetails('${post.id}')" 
-                                                        class="w-full text-left px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50">
-                                                    <i class="fas fa-edit mr-2"></i>Edit
-                                                </button>
-                                                <button onclick="updatePostStatus('${post.id}', 15)" 
-                                                        class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
-                                                    <i class="fas fa-trash mr-2"></i>Delete
-                                                </button>
+                                                <c:if test="${post.status.id != 15 and post.status.id != 38}">
+                                                    <button onclick="viewPostDetails('${post.id}')" 
+                                                            class="w-full text-left px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50">
+                                                        <i class="fas fa-edit mr-2"></i>Edit
+                                                    </button>
+                                                    <button onclick="updatePostStatus('${post.id}', 15)" 
+                                                            class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                                                        <i class="fas fa-trash mr-2"></i>Delete
+                                                    </button>
+                                                </c:if>
                                             </div>
                                         </div>
                                     </div>
@@ -437,7 +439,7 @@
                     }
 
                     function viewPostDetails(postId) {
-                        window.open('${pageContext.request.contextPath}/post/detail?id=' + postId, '_blank');
+                        window.open('${pageContext.request.contextPath}/post-request/detail?pid=' + postId, '_blank');
                     }
 
                     function updatePostStatus(postId, status) {
