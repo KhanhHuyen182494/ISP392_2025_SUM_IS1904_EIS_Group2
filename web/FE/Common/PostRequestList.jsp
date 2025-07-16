@@ -243,7 +243,12 @@
                         <!-- Post Content -->
                         <div class="px-6 pb-4">
                             <div class="text-gray-800 mb-4">
-                                <p class="whitespace-pre-wrap">${post.content}</p>
+                                <c:if test="${not empty post.content}">
+                                    <p class="whitespace-pre-wrap">${post.content}</p>
+                                </c:if>
+                                <c:if test="${empty post.content}">
+                                    <p class="whitespace-pre-wrap text-gray-500">"This post has no content"</p>
+                                </c:if>
                             </div>
 
                             <!-- House/Room Information -->

@@ -7,10 +7,14 @@ package Controller.Common;
 import Base.EmailSender;
 import Base.Generator;
 import Base.Hashing;
+import DTO.PostDTO;
 import Model.Address;
 import Model.House;
+import Model.Like;
+import Model.Media;
 import Model.Post;
 import Model.PostType;
+import Model.Review;
 import Model.Role;
 import Model.Status;
 import Model.User;
@@ -35,8 +39,7 @@ import java.util.logging.Logger;
 @WebServlet(name = "PostRequestController", urlPatterns = {
     "/post-request",
     "/post-request/update",
-    "/post-request/detail",
-})
+    "/post-request/detail",})
 public class PostRequestController extends BaseAuthorization {
 
     private static final Logger LOGGER = Logger.getLogger(PostRequestController.class.getName());
@@ -52,6 +55,8 @@ public class PostRequestController extends BaseAuthorization {
                 doGetPostRequest(request, response, user);
             case BASE_URL + "/update" ->
                 doGetPostEdit(request, response, user);
+            case BASE_URL + "/detail" ->
+                doGetPostDetail(request, response, user);
         }
     }
 
@@ -63,6 +68,22 @@ public class PostRequestController extends BaseAuthorization {
             case BASE_URL + "/update" ->
                 doPostPostEdit(request, response, user);
         }
+    }
+
+    protected void doGetPostDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String postId = request.getParameter("pid");
+
+        if (postId == null || postId.trim().isEmpty() || !postId.startsWith("POST")) {
+            response.sendError(404);
+            return;
+        }
+
+        Post p = pDao.getPost(postId);
+        fullLoadPostInfomation(p, user);
+        fullLoadHouseInfomation(p.getHouse());
+
+        request.setAttribute("post", p);
+        request.getRequestDispatcher("/FE/Common/PostDetail.jsp").forward(request, response);
     }
 
     protected void doGetPostRequest(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
@@ -159,12 +180,92 @@ public class PostRequestController extends BaseAuthorization {
             String hid = h.getId();
 
             Address a = aDao.getAddressById(h.getAddress().getId());
-//            Status mediaS = new Status();
-//            mediaS.setId(21);
-//            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
 
-//            h.setMedias(medias);
+            h.setMedias(medias);
             h.setAddress(a);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+
+    private void fullLoadPostInfomation(Post p, User user) {
+        try {
+            String pid = p.getId();
+
+            Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+
+            Status s = new Status();
+            s.setId(21);
+
+            List<Media> medias = mDao.getMediaByObjectId(p.getId(), "Post", s);
+            List<Like> likes = lDao.getListLikeByPostId(pid);
+            List<Review> reviews = rDao.getReviewsByHouseId(p.getHouse().getId(), Integer.MAX_VALUE, 0);
+
+            Post parent = null;
+
+            if (p.getParent_post() != null && p.getParent_post().getId() != null) {
+                parent = pDao.getById(p.getParent_post().getId());
+                fullLoadParentPost(parent);
+            }
+
+            boolean isLikedByCurrentUser = false;
+            if (user != null && !user.getId().isBlank()) {
+                isLikedByCurrentUser = likes.stream()
+                        .anyMatch(like -> like.getUser_id().equals(user.getId()) && like.isIs_like());
+            }
+
+            p.setReviews(reviews);
+            p.getHouse().setAddress(a);
+            p.setMedias(medias);
+            p.setLikes(likes);
+            p.setLikedByCurrentUser(isLikedByCurrentUser);
+            p.setParent_post(parent);
+
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+
+    private void fullLoadParentPost(Post p) {
+        try {
+            //Load address, images, likes, feedbacks
+            String pid = p.getId();
+
+            Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+
+            Status s = new Status();
+            s.setId(21);
+
+            List<Media> medias = mDao.getMediaByObjectId(pid, "Post", s);
+
+            p.getHouse().setAddress(a);
+            p.setMedias(medias);
+
+            fullLoadHouseParentPostInfomation(p.getHouse());
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
+            log.error("Error during fullLoadPostInfomation process");
+        }
+    }
+
+    private void fullLoadHouseParentPostInfomation(House h) {
+        try {
+            //Load address, images, likes, feedbacks
+            String hid = h.getId();
+
+            Address a = aDao.getAddressById(h.getAddress().getId());
+            Status mediaS = new Status();
+            mediaS.setId(21);
+            List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
+
+            h.setMedias(medias);
+            h.setAddress(a);
+
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");

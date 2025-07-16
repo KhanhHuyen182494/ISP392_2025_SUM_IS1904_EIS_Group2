@@ -314,6 +314,11 @@
                                                     </p>
                                                 </div>
                                             </div>
+
+                                            <p class="text-lg mb-4">
+                                                ${post.parent_post.content}
+                                            </p>
+
                                             <c:if test="${post.parent_post.post_type.id == 1}">
                                                 <!-- Property Title -->
                                                 <h2 class="text-xl font-bold text-gray-800 mb-3">${post.parent_post.house.name}</h2>
@@ -327,7 +332,12 @@
                                                 <div class="space-y-2 mb-4">
                                                     <div class="flex items-center gap-2">
                                                         <i class="fas fa-dollar-sign text-green-500"></i>
-                                                        <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.parent_post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                                        <c:if test="${post.parent_post.house.is_whole_house == true}">
+                                                            <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / night</span>
+                                                        </c:if>
+                                                        <c:if test="${post.parent_post.house.is_whole_house == false}">
+                                                            <span class="text-sm"><strong>Price per night:</strong> Different for each room</span>
+                                                        </c:if>
                                                     </div>
                                                     <div class="flex items-center gap-2">
                                                         <i class="fas fa-map-marker-alt text-red-500"></i>

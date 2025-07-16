@@ -108,10 +108,6 @@
             <div class="col-span-12 sticky top-20 z-50">
                 <div class="bg-white rounded-2xl shadow-md p-4 sticky top-24">
                     <div class="group-button">
-                        <button class="flex-1 bg-yellow-400 hover:bg-yellow-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
-                            <i class="fa-solid fa-star"></i>
-                            Top House
-                        </button>
                         <a href="${pageContext.request.contextPath}/feeds">
                             <button class="flex-1 bg-blue-400 hover:bg-blue-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
                                 <i class="fa-solid fa-house"></i>
