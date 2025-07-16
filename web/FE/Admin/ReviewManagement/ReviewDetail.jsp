@@ -194,7 +194,7 @@
                                 <span>All Posts</span>
                             </a>
                             <a href="${pageContext.request.contextPath}/manage/reviews" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
                                 <i class="fas fa-star w-5"></i>
                                 <span>All Reviews</span>
                             </a>
