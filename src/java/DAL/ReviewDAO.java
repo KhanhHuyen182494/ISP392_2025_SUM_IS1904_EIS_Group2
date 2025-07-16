@@ -64,7 +64,7 @@ public class ReviewDAO extends BaseDao implements IReviewDAO {
                          review r
                             JOIN 
                          User u ON r.user_id = u.id
-                     WHERE r.homestay_id = ?
+                     WHERE r.homestay_id = ? AND r.status_id = 23
                      ORDER BY r.created_at DESC
                      LIMIT ? OFFSET ?
                      """;
