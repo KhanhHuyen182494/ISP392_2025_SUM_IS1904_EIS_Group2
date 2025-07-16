@@ -1,7 +1,7 @@
 <%-- 
-    Document   : Newsfeed
-    Created on : May 24, 2025, 9:21:47 PM
-    Author     : Huyen
+    Document   : PostDetail
+    Created on : Jul 16, 2025, 8:23:16 PM
+    Author     : Tam
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Feeds</title>
+        <title>Post Detail</title>
 
         <!-- Libs -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -125,6 +125,17 @@
                 transform: scale(1.1);
             }
 
+            .swal2-loader {
+                border-color: #FF7700 !important;
+                border-top-color: transparent !important;
+            }
+
+            .swal2-loader {
+                width: 2.2em !important;
+                height: 2.2em !important;
+                border-width: 0.22em !important;
+            }
+
             /* Comment Form Styles */
             .comment-form {
                 background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -155,6 +166,62 @@
                 cursor: not-allowed;
                 transform: none;
                 box-shadow: none;
+            }
+
+            .loading-spinner {
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #3498db;
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .comment-section {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                border-radius: 20px;
+                padding: 24px;
+                margin-top: 24px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .comment-item {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .comment-form {
+                background: white;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin-bottom: 24px;
+            }
+
+            .comment-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 16px 24px;
+                margin: -24px -24px 24px -24px;
             }
         </style>
     </head>
@@ -237,14 +304,16 @@
             <div class="col-span-12 sticky top-20 z-50">
                 <div class="bg-white rounded-2xl shadow-md p-4 sticky top-24">
                     <div class="group-button">
-                        <button class="flex-1 bg-yellow-400 hover:bg-yellow-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
-                            <i class="fa-solid fa-star"></i>
-                            Top House
-                        </button>
                         <a href="${pageContext.request.contextPath}/house/available">
                             <button class="flex-1 bg-green-400 hover:bg-green-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
                                 <i class="fa-solid fa-house"></i>
                                 View Available House
+                            </button>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/feeds">
+                            <button class="flex-1 bg-blue-400 hover:bg-blue-500 px-2 py-1 text-white-700 rounded-lg font-medium transition-colors text-white">
+                                <i class="fa-solid fa-house"></i>
+                                Newsfeed
                             </button>
                         </a>
                     </div>
@@ -254,397 +323,432 @@
             <!-- Main Feed -->
             <div class="col-span-12">
                 <!-- Feed Items -->
-                <c:choose>
-                    <c:when test="${not empty requestScope.posts}">
-                        <c:forEach items="${requestScope.posts}" var="post" varStatus="postStatus">
-                            <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden card-hover post-container" data-post-index="${postStatus.index}">
-                                <!-- User Info -->
-                                <div class="p-6 pb-4">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
-                                                <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
-                                                    <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
-                                                </a>
-                                            </div>
-                                            <div>
-                                                <c:choose>
-                                                    <c:when test="${sessionScope.user_id == post.owner.id}">
-                                                        <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}"><h3 class="font-semibold text-gray-800">Posted by You</h3></a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}"><h3 class="font-semibold text-gray-800">${post.owner.first_name} ${post.owner.last_name}</h3></a>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
-                                            </div>
-                                        </div>
-                                    </div>
+                <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden card-hover post-container" data-post-index="${postStatus.index}">
+                    <!-- User Info -->
+                    <div class="p-6 pb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-full border-white overflow-hidden shadow-lg bg-white">
+                                    <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}">
+                                        <img class="w-full h-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.owner.avatar}" />
+                                    </a>
+                                </div>
+                                <div>
+                                    <c:choose>
+                                        <c:when test="${sessionScope.user_id == post.owner.id}">
+                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}"><h3 class="font-semibold text-gray-800">Posted by You</h3></a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.owner.id}"><h3 class="font-semibold text-gray-800">${post.owner.first_name} ${post.owner.last_name}</h3></a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <p class="text-lg mb-4">
-                                        ${post.content}
+                        <p class="text-lg mb-4">
+                            ${post.content}
+                        </p>
+
+                        <!-- Share/Repost Section -->
+                        <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-white">
+                                        <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}">
+                                            <img class="w-full h-full object-cover" 
+                                                 src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.parent_post.owner.avatar}" 
+                                                 alt="Avatar" loading="lazy" />
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <c:choose>
+                                            <c:when test="${sessionScope.user_id == post.parent_post.owner.id}">
+                                                <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
+                                                   class="font-medium text-gray-700 hover:text-blue-600">You</a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
+                                                   class="font-medium text-gray-700 hover:text-blue-600">
+                                                    ${post.parent_post.owner.first_name} ${post.parent_post.owner.last_name}
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <p class="text-xs text-gray-500">
+                                            <fmt:formatDate value="${post.parent_post.created_at}" pattern="HH:mm dd/MM/yyyy" />
+                                        </p>
+                                    </div>
+                                </div>
+                                <c:if test="${post.parent_post.post_type.id == 1}">
+                                    <!-- Property Title -->
+                                    <h2 class="text-xl font-bold text-gray-800 mb-3">${post.parent_post.house.name}</h2>
+
+                                    <!-- Description -->
+                                    <p class="text-gray-600 mb-4">
+                                        ${post.parent_post.house.description}
                                     </p>
 
-                                    <!-- Share/Repost Section -->
-                                    <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
-                                        <div class="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
-                                            <div class="flex items-center gap-3 mb-3">
-                                                <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-white">
-                                                    <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}">
-                                                        <img class="w-full h-full object-cover" 
-                                                             src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.parent_post.owner.avatar}" 
-                                                             alt="Avatar" loading="lazy" />
-                                                    </a>
-                                                </div>
-                                                <div>
-                                                    <c:choose>
-                                                        <c:when test="${sessionScope.user_id == post.parent_post.owner.id}">
-                                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
-                                                               class="font-medium text-gray-700 hover:text-blue-600">You</a>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
-                                                               class="font-medium text-gray-700 hover:text-blue-600">
-                                                                ${post.parent_post.owner.first_name} ${post.parent_post.owner.last_name}
-                                                            </a>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                    <p class="text-xs text-gray-500">
-                                                        <fmt:formatDate value="${post.parent_post.created_at}" pattern="HH:mm dd/MM/yyyy" />
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <p class="text-lg mb-4">
-                                                ${post.parent_post.content}
-                                            </p>
-
-                                            <c:if test="${post.parent_post.post_type.id == 1}">
-                                                <!-- Property Title -->
-                                                <h2 class="text-xl font-bold text-gray-800 mb-3">${post.parent_post.house.name}</h2>
-
-                                                <!-- Description -->
-                                                <p class="text-gray-600 mb-4">
-                                                    ${post.parent_post.house.description}
-                                                </p>
-
-                                                <!-- Property Details -->
-                                                <div class="space-y-2 mb-4">
-                                                    <div class="flex items-center gap-2">
-                                                        <i class="fas fa-dollar-sign text-green-500"></i>
-                                                        <c:if test="${post.parent_post.house.is_whole_house == true}">
-                                                            <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / night</span>
-                                                        </c:if>
-                                                        <c:if test="${post.parent_post.house.is_whole_house == false}">
-                                                            <span class="text-sm"><strong>Price per night:</strong> Different for each room</span>
-                                                        </c:if>
-                                                    </div>
-                                                    <div class="flex items-center gap-2">
-                                                        <i class="fas fa-map-marker-alt text-red-500"></i>
-                                                        <span class="text-sm"><strong>Address:</strong> ${post.parent_post.house.address.detail} ${post.parent_post.house.address.ward}, ${post.parent_post.house.address.district}, ${post.parent_post.house.address.province}, ${post.parent_post.house.address.country}</span>
-                                                    </div>
-                                                </div>
-                                            </c:if>
-
-                                            <div class="px-6 pb-4">
-                                                <div class="grid grid-cols-2 gap-4">
-                                                    <!-- Calculate total images count for shared post -->
-                                                    <c:set var="sharedPostMediaCount" value="${fn:length(post.parent_post.medias)}" />
-                                                    <c:set var="sharedHouseMediaCount" value="${post.parent_post.post_type.id == 1 ? fn:length(post.parent_post.house.medias) : 0}" />
-                                                    <c:set var="sharedTotalImages" value="${sharedPostMediaCount + sharedHouseMediaCount}" />
-                                                    <c:set var="sharedMaxDisplay" value="4" />
-                                                    <c:set var="sharedRemainingCount" value="${sharedTotalImages - sharedMaxDisplay}" />
-                                                    <c:set var="sharedDisplayedCount" value="0" />
-
-                                                    <!-- Display Shared Post Media Images -->
-                                                    <c:forEach items="${post.parent_post.medias}" var="media" varStatus="status">
-                                                        <c:if test="${sharedDisplayedCount < sharedMaxDisplay}">
-                                                            <c:choose>
-                                                                <c:when test="${sharedDisplayedCount == 3 && sharedTotalImages > sharedMaxDisplay}">
-                                                                    <!-- Last image with overlay for remaining count -->
-                                                                    <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
-                                                                         onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
-                                                                        <img class="rounded-[20px] h-96 w-full object-cover" 
-                                                                             src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
-                                                                        <!-- Overlay -->
-                                                                        <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
-                                                                            <span class="text-white text-2xl font-bold">+${sharedRemainingCount}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <!-- Regular image -->
-                                                                    <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
-                                                                         onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
-                                                                        <img class="rounded-[20px] h-96 w-full object-cover" 
-                                                                             src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
-                                                                    </div>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                            <c:set var="sharedDisplayedCount" value="${sharedDisplayedCount + 1}" />
-                                                        </c:if>
-                                                    </c:forEach>
-
-                                                    <!-- Display Shared House Media Images -->
-                                                    <c:if test="${post.parent_post.post_type.id == 1}">
-                                                        <c:forEach items="${post.parent_post.house.medias}" var="mediaH" varStatus="status">
-                                                            <c:if test="${sharedDisplayedCount < sharedMaxDisplay}">
-                                                                <c:choose>
-                                                                    <c:when test="${sharedDisplayedCount == 3 && sharedTotalImages > sharedMaxDisplay}">
-                                                                        <!-- Last image with overlay for remaining count -->
-                                                                        <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
-                                                                             onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
-                                                                            <img class="rounded-[20px] h-96 w-full object-cover" 
-                                                                                 src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
-                                                                            <!-- Overlay -->
-                                                                            <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
-                                                                                <span class="text-white text-2xl font-bold">+${sharedRemainingCount}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <!-- Regular image -->
-                                                                        <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
-                                                                             onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
-                                                                            <img class="rounded-[20px] h-96 w-full object-cover" 
-                                                                                 src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
-                                                                        </div>
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                                <c:set var="sharedDisplayedCount" value="${sharedDisplayedCount + 1}" />
-                                                            </c:if>
-                                                        </c:forEach>
-                                                    </c:if>
-                                                </div>
-                                            </div>
+                                    <!-- Property Details -->
+                                    <div class="space-y-2 mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-dollar-sign text-green-500"></i>
+                                            <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.parent_post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
                                         </div>
-                                    </c:if>
-
-                                    <c:if test="${post.post_type.id == 1}">
-                                        <!-- Property Title -->
-                                        <h2 class="text-xl font-bold text-gray-800 mb-3">${post.house.name} ${not empty post.room.id ? ' - ' + post.room.id : ''}</h2>
-
-                                        <!-- Description -->
-                                        <p class="text-gray-600 mb-4">
-                                            ${post.house.description}
-                                        </p>
-
-                                        <!-- Property Details -->
-                                        <div class="space-y-2 mb-4">
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-dollar-sign text-green-500"></i>
-                                                <c:if test="${post.house.is_whole_house == true}">
-                                                    <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / night</span>
-                                                </c:if>
-                                                <c:if test="${post.house.is_whole_house == false}">
-                                                    <span class="text-sm"><strong>Price per night:</strong> Different for each room</span>
-                                                </c:if>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-map-marker-alt text-red-500"></i>
-                                                <span class="text-sm"><strong>Address:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
-                                            </div>
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-map-marker-alt text-red-500"></i>
+                                            <span class="text-sm"><strong>Address:</strong> ${post.parent_post.house.address.detail} ${post.parent_post.house.address.ward}, ${post.parent_post.house.address.district}, ${post.parent_post.house.address.province}, ${post.parent_post.house.address.country}</span>
                                         </div>
-                                    </c:if>
-                                </div>
+                                    </div>
+                                </c:if>
 
-                                <!-- Images -->
                                 <div class="px-6 pb-4">
                                     <div class="grid grid-cols-2 gap-4">
-                                        <!-- Calculate total images count -->
-                                        <c:set var="postMediaCount" value="${fn:length(post.medias)}" />
-                                        <c:set var="houseMediaCount" value="${post.post_type.id == 1 ? fn:length(post.house.medias) : 0}" />
-                                        <c:set var="totalImages" value="${postMediaCount + houseMediaCount}" />
-                                        <c:set var="maxDisplay" value="4" />
-                                        <c:set var="remainingCount" value="${totalImages - maxDisplay}" />
+                                        <!-- Calculate total images count for shared post -->
+                                        <c:set var="sharedPostMediaCount" value="${fn:length(post.parent_post.medias)}" />
+                                        <c:set var="sharedHouseMediaCount" value="${post.parent_post.post_type.id == 1 ? fn:length(post.parent_post.house.medias) : 0}" />
+                                        <c:set var="sharedTotalImages" value="${sharedPostMediaCount + sharedHouseMediaCount}" />
+                                        <c:set var="sharedMaxDisplay" value="4" />
+                                        <c:set var="sharedRemainingCount" value="${sharedTotalImages - sharedMaxDisplay}" />
+                                        <c:set var="sharedDisplayedCount" value="0" />
 
-                                        <!-- Create a counter for displayed images -->
-                                        <c:set var="displayedCount" value="0" />
-
-                                        <!-- Display Post Media Images -->
-                                        <c:forEach items="${post.medias}" var="media" varStatus="status">
-                                            <c:if test="${displayedCount < maxDisplay}">
+                                        <!-- Display Shared Post Media Images -->
+                                        <c:forEach items="${post.parent_post.medias}" var="media" varStatus="status">
+                                            <c:if test="${sharedDisplayedCount < sharedMaxDisplay}">
                                                 <c:choose>
-                                                    <c:when test="${displayedCount == 3 && totalImages > maxDisplay}">
+                                                    <c:when test="${sharedDisplayedCount == 3 && sharedTotalImages > sharedMaxDisplay}">
                                                         <!-- Last image with overlay for remaining count -->
                                                         <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
-                                                             onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                             onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
                                                             <img class="rounded-[20px] h-96 w-full object-cover" 
                                                                  src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
                                                             <!-- Overlay -->
                                                             <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
-                                                                <span class="text-white text-2xl font-bold">+${remainingCount}</span>
+                                                                <span class="text-white text-2xl font-bold">+${sharedRemainingCount}</span>
                                                             </div>
                                                         </div>
                                                     </c:when>
                                                     <c:otherwise>
                                                         <!-- Regular image -->
                                                         <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
-                                                             onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                             onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
                                                             <img class="rounded-[20px] h-96 w-full object-cover" 
                                                                  src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
                                                         </div>
                                                     </c:otherwise>
                                                 </c:choose>
-                                                <c:set var="displayedCount" value="${displayedCount + 1}" />
+                                                <c:set var="sharedDisplayedCount" value="${sharedDisplayedCount + 1}" />
                                             </c:if>
                                         </c:forEach>
 
-                                        <!-- Display House Media Images (if post type is 1 and we haven't reached max display) -->
-                                        <c:if test="${post.post_type.id == 1}">
-                                            <c:forEach items="${post.house.medias}" var="mediaH" varStatus="status">
-                                                <c:if test="${displayedCount < maxDisplay}">
+                                        <!-- Display Shared House Media Images -->
+                                        <c:if test="${post.parent_post.post_type.id == 1}">
+                                            <c:forEach items="${post.parent_post.house.medias}" var="mediaH" varStatus="status">
+                                                <c:if test="${sharedDisplayedCount < sharedMaxDisplay}">
                                                     <c:choose>
-                                                        <c:when test="${displayedCount == 3 && totalImages > maxDisplay}">
+                                                        <c:when test="${sharedDisplayedCount == 3 && sharedTotalImages > sharedMaxDisplay}">
                                                             <!-- Last image with overlay for remaining count -->
                                                             <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
-                                                                 onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                                 onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
                                                                 <img class="rounded-[20px] h-96 w-full object-cover" 
                                                                      src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
                                                                 <!-- Overlay -->
                                                                 <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
-                                                                    <span class="text-white text-2xl font-bold">+${remainingCount}</span>
+                                                                    <span class="text-white text-2xl font-bold">+${sharedRemainingCount}</span>
                                                                 </div>
                                                             </div>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <!-- Regular image -->
                                                             <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
-                                                                 onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                                 onclick="openImageCarousel(${sharedDisplayedCount}, this.closest('.post-container'))">
                                                                 <img class="rounded-[20px] h-96 w-full object-cover" 
                                                                      src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
                                                             </div>
                                                         </c:otherwise>
                                                     </c:choose>
-                                                    <c:set var="displayedCount" value="${displayedCount + 1}" />
+                                                    <c:set var="sharedDisplayedCount" value="${sharedDisplayedCount + 1}" />
                                                 </c:if>
                                             </c:forEach>
                                         </c:if>
                                     </div>
                                 </div>
+                            </div>
+                        </c:if>
 
-                                <!-- Hidden divs to store image data for JavaScript - UNIQUE ID per post -->
-                                <div id="imageDataContainer" style="display: none;">
-                                    <!-- Include current post's images if it has any -->
-                                    <c:forEach items="${post.medias}" var="media" varStatus="status">
-                                        <div class="image-data" 
-                                             data-path="${media.path}" 
-                                             data-type="Post" 
-                                             data-full-path="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}">
-                                        </div>
-                                    </c:forEach>
-                                    <!-- Include house images if this is a property post -->
-                                    <c:if test="${post.post_type.id == 1}">
-                                        <c:forEach items="${post.house.medias}" var="mediaH" varStatus="status">
-                                            <div class="image-data" 
-                                                 data-path="${mediaH.path}" 
-                                                 data-type="House" 
-                                                 data-full-path="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}">
-                                            </div>
-                                        </c:forEach>
+                        <c:if test="${post.post_type.id == 1}">
+                            <!-- Property Title -->
+                            <h2 class="text-xl font-bold text-gray-800 mb-3">${post.house.name} ${not empty post.room.id ? ' - ' + post.room.id : ''}</h2>
+
+                            <!-- Description -->
+                            <p class="text-gray-600 mb-4">
+                                ${post.house.description}
+                            </p>
+
+                            <!-- Property Details -->
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-dollar-sign text-green-500"></i>
+                                    <c:if test="${post.house.is_whole_house == true}">
+                                        <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / night</span>
                                     </c:if>
-                                    <!-- If this is a shared post, also include the shared post's images -->
-                                    <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
-                                        <c:forEach items="${post.parent_post.medias}" var="sharedMedia" varStatus="status">
-                                            <div class="image-data" 
-                                                 data-path="${sharedMedia.path}" 
-                                                 data-type="Post" 
-                                                 data-full-path="${pageContext.request.contextPath}/Asset/Common/Post/${sharedMedia.path}">
-                                            </div>
-                                        </c:forEach>
-                                        <c:if test="${post.parent_post.post_type.id == 1}">
-                                            <c:forEach items="${post.parent_post.house.medias}" var="sharedMediaH" varStatus="status">
-                                                <div class="image-data" 
-                                                     data-path="${sharedMediaH.path}" 
-                                                     data-type="House" 
-                                                     data-full-path="${pageContext.request.contextPath}/Asset/Common/House/${sharedMediaH.path}">
-                                                </div>
-                                            </c:forEach>
-                                        </c:if>
+                                    <c:if test="${post.house.is_whole_house == false}">
+                                        <span class="text-sm"><strong>Price per night:</strong> Different for each room</span>
                                     </c:if>
                                 </div>
-
-                                <!-- Action Bar -->
-                                <div class="px-6 py-4 flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <button data-post-id="${post.id}" 
-                                                class="like-btn ${post.likedByCurrentUser ? 'liked' : ''} flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white transition-colors" 
-                                                onclick="toggleLike(this)"
-                                                style="${post.likedByCurrentUser ? 'background-color: #3b82f6; color: white;' : ''}">
-                                            <i class="fas fa-thumbs-up"></i>
-                                            <span class="like-count">${fn:length(post.likes)}</span>
-                                        </button>
-                                    </div>
-
-                                    <c:if test="${post.post_type.id == 1}">
-                                        <div class="flex items-center gap-2">
-                                            <div class="review-badge text-white px-3 py-1 rounded-full text-xs font-medium">
-                                                ${fn:length(post.reviews)} reviews
-                                            </div>
-                                        </div>
-                                    </c:if>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <c:if test="${post.post_type.id == 1}"> 
-                                    <div class="px-6 py-4 flex gap-3">
-                                        <button data-house-id="${post.house.id}" onclick="book(this)" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
-                                            <i class="fas fa-key mr-2"></i>
-                                            Book
-                                        </button>
-                                        <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
-                                            <a href="${pageContext.request.contextPath}/owner-house/detail?hid=${post.house.id}">
-                                                <i class="fa-solid fa-house text-white"></i>
-                                                View Detail
-                                            </a>
-                                        </button>
-                                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
-                                                data-house-id="${post.house.id}" 
-                                                data-house-name="${post.house.name}">
-                                            <i class="fas fa-comment mr-2"></i>
-                                            View Review
-                                        </button>
-                                    </div>
-                                </c:if>
-                                <div class="px-6 py-4 gap-3 grid grid-cols-9">
-                                    <button class="col-span-6 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors"
-                                            data-post-id="${post.id}">
-                                        <i class="fas fa-comments mr-2"></i>
-                                        Comment
-                                    </button>
-                                    <button class="col-span-3 bg-white-500 hover:bg-blue-500 hover:text-white border-[1px] border-blue-600 text-blue-600 py-3 rounded-lg font-medium transition-colors"
-                                            data-post-share-id="${not empty post.parent_post.id ? post.parent_post.id : post.id}">
-                                        <i class="fas fa-comments mr-2"></i>
-                                        Share
-                                    </button>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-map-marker-alt text-red-500"></i>
+                                    <span class="text-sm"><strong>Address:</strong> ${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</span>
                                 </div>
                             </div>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="text-center p-2 mb-3">
-                            <p class="text-gray-500 decoration-wavy">No post available right now!</p>
+                        </c:if>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="px-6 pb-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Calculate total images count -->
+                            <c:set var="postMediaCount" value="${fn:length(post.medias)}" />
+                            <c:set var="houseMediaCount" value="${post.post_type.id == 1 ? fn:length(post.house.medias) : 0}" />
+                            <c:set var="totalImages" value="${postMediaCount + houseMediaCount}" />
+                            <c:set var="maxDisplay" value="4" />
+                            <c:set var="remainingCount" value="${totalImages - maxDisplay}" />
+
+                            <!-- Create a counter for displayed images -->
+                            <c:set var="displayedCount" value="0" />
+
+                            <!-- Display Post Media Images -->
+                            <c:forEach items="${post.medias}" var="media" varStatus="status">
+                                <c:if test="${displayedCount < maxDisplay}">
+                                    <c:choose>
+                                        <c:when test="${displayedCount == 3 && totalImages > maxDisplay}">
+                                            <!-- Last image with overlay for remaining count -->
+                                            <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
+                                                 onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                     src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
+                                                <!-- Overlay -->
+                                                <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
+                                                    <span class="text-white text-2xl font-bold">+${remainingCount}</span>
+                                                </div>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <!-- Regular image -->
+                                            <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+                                                 onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                     src="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}"/>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <c:set var="displayedCount" value="${displayedCount + 1}" />
+                                </c:if>
+                            </c:forEach>
+
+                            <!-- Display House Media Images (if post type is 1 and we haven't reached max display) -->
+                            <c:if test="${post.post_type.id == 1}">
+                                <c:forEach items="${post.house.medias}" var="mediaH" varStatus="status">
+                                    <c:if test="${displayedCount < maxDisplay}">
+                                        <c:choose>
+                                            <c:when test="${displayedCount == 3 && totalImages > maxDisplay}">
+                                                <!-- Last image with overlay for remaining count -->
+                                                <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer relative overflow-hidden"
+                                                     onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                    <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                         src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
+                                                    <!-- Overlay -->
+                                                    <div class="absolute inset-0 bg-black bg-opacity-60 rounded-[20px] flex items-center justify-center">
+                                                        <span class="text-white text-2xl font-bold">+${remainingCount}</span>
+                                                    </div>
+                                                </div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <!-- Regular image -->
+                                                <div class="bg-gray-200 h-96 rounded-[20px] flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+                                                     onclick="openImageCarousel(${displayedCount}, this.closest('.post-container'))">
+                                                    <img class="rounded-[20px] h-96 w-full object-cover" 
+                                                         src="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}"/>
+                                                </div>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <c:set var="displayedCount" value="${displayedCount + 1}" />
+                                    </c:if>
+                                </c:forEach>
+                            </c:if>
                         </div>
-                    </c:otherwise>
-                </c:choose>
+                    </div>
 
-                <div id="loadmoreitems"></div>
+                    <!-- Hidden divs to store image data for JavaScript - UNIQUE ID per post -->
+                    <div id="imageDataContainer" style="display: none;">
+                        <!-- Include current post's images if it has any -->
+                        <c:forEach items="${post.medias}" var="media" varStatus="status">
+                            <div class="image-data" 
+                                 data-path="${media.path}" 
+                                 data-type="Post" 
+                                 data-full-path="${pageContext.request.contextPath}/Asset/Common/Post/${media.path}">
+                            </div>
+                        </c:forEach>
+                        <!-- Include house images if this is a property post -->
+                        <c:if test="${post.post_type.id == 1}">
+                            <c:forEach items="${post.house.medias}" var="mediaH" varStatus="status">
+                                <div class="image-data" 
+                                     data-path="${mediaH.path}" 
+                                     data-type="House" 
+                                     data-full-path="${pageContext.request.contextPath}/Asset/Common/House/${mediaH.path}">
+                                </div>
+                            </c:forEach>
+                        </c:if>
+                        <!-- If this is a shared post, also include the shared post's images -->
+                        <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
+                            <c:forEach items="${post.parent_post.medias}" var="sharedMedia" varStatus="status">
+                                <div class="image-data" 
+                                     data-path="${sharedMedia.path}" 
+                                     data-type="Post" 
+                                     data-full-path="${pageContext.request.contextPath}/Asset/Common/Post/${sharedMedia.path}">
+                                </div>
+                            </c:forEach>
+                            <c:if test="${post.parent_post.post_type.id == 1}">
+                                <c:forEach items="${post.parent_post.house.medias}" var="sharedMediaH" varStatus="status">
+                                    <div class="image-data" 
+                                         data-path="${sharedMediaH.path}" 
+                                         data-type="House" 
+                                         data-full-path="${pageContext.request.contextPath}/Asset/Common/House/${sharedMediaH.path}">
+                                    </div>
+                                </c:forEach>
+                            </c:if>
+                        </c:if>
+                    </div>
 
-                <!-- Load More Button -->
-                <c:choose>
-                    <c:when test="${not empty canLoadMore and canLoadMore == true}">
-                        <div class="text-center">
-                            <button onclick="loadMore()" id="loadMoreBtn" class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-medium transition-all transform hover:scale-105">
-                                <i class="fas fa-plus mr-2"></i>
-                                Load More Posts
+                    <!-- Action Bar -->
+                    <div class="px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <button data-post-id="${post.id}" 
+                                    class="like-btn ${post.likedByCurrentUser ? 'liked' : ''} flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white transition-colors" 
+                                    onclick="toggleLike(this)"
+                                    style="${post.likedByCurrentUser ? 'background-color: #3b82f6; color: white;' : ''}">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span class="like-count">${fn:length(post.likes)}</span>
                             </button>
                         </div>
-                    </c:when>
-                </c:choose>
+
+                        <c:if test="${post.post_type.id == 1}">
+                            <div class="flex items-center gap-2">
+                                <div class="review-badge text-white px-3 py-1 rounded-full text-xs font-medium">
+                                    ${fn:length(post.reviews)} reviews
+                                </div>
+                            </div>
+                        </c:if>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <c:if test="${post.post_type.id == 1}"> 
+                        <div class="px-6 py-4 flex gap-3">
+                            <button data-house-id="${post.house.id}" onclick="book(this)" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
+                                <i class="fas fa-key mr-2"></i>
+                                Book
+                            </button>
+                            <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                <a href="${pageContext.request.contextPath}/owner-house/detail?hid=${post.house.id}">
+                                    <i class="fa-solid fa-house text-white"></i>
+                                    View Detail
+                                </a>
+                            </button>
+                            <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
+                                    data-house-id="${post.house.id}" 
+                                    data-house-name="${post.house.name}">
+                                <i class="fas fa-comment mr-2"></i>
+                                View Review
+                            </button>
+                        </div>
+                    </c:if>
+                    <div class="px-6 py-4 gap-3 grid grid-cols-9">
+                        <button class="col-span-9 bg-white-500 hover:bg-blue-500 hover:text-white border-[1px] border-blue-600 text-blue-600 py-3 rounded-lg font-medium transition-colors"
+                                data-post-share-id="${not empty post.parent_post.id ? post.parent_post.id : post.id}">
+                            <i class="fas fa-comments mr-2"></i>
+                            Share
+                        </button>
+                    </div>
+
+                    <div class="comment-section">
+                        <div class="comment-header">
+                            <h2 class="text-xl font-bold flex items-center gap-2">
+                                <i class="fas fa-comments"></i>
+                                Comments
+                                <span id="commentCount" class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-sm">0</span>
+                            </h2>
+                        </div>
+
+                        <!-- Comment Form -->
+                        <c:if test="${not empty sessionScope.user.id}">
+                            <div class="comment-form">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0">
+                                        <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" 
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                        <i class="fas fa-user text-white text-sm" style="display: none;"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <textarea id="commentInput" 
+                                                  class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none" 
+                                                  placeholder="Write your comment here..." 
+                                                  rows="3"></textarea>
+                                        <div class="flex justify-between items-center mt-4">
+                                            <span class="text-xs text-gray-500">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Press Ctrl+Enter to submit
+                                            </span>
+                                            <button id="submitCommentBtn" 
+                                                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                                                    disabled>
+                                                <i class="fas fa-paper-plane mr-2"></i>
+                                                Post Comment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <!-- Comments Container -->
+                        <div id="commentContainer" class="space-y-4">
+                            <!-- Loading State -->
+                            <div id="commentLoading" class="text-center py-8">
+                                <div class="loading-spinner mx-auto mb-4"></div>
+                                <p class="text-gray-500">Loading comments...</p>
+                            </div>
+
+                            <!-- Error State -->
+                            <div id="commentError" class="text-center py-8 hidden">
+                                <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
+                                <p class="text-red-500 font-medium">Failed to load comments</p>
+                                <button id="retryComment" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                    <i class="fas fa-redo mr-2"></i>
+                                    Retry
+                                </button>
+                            </div>
+
+                            <!-- No Comments State -->
+                            <div id="noComment" class="text-center py-8 hidden">
+                                <i class="fas fa-comment-slash text-gray-400 text-3xl mb-4"></i>
+                                <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+                            </div>
+
+                            <!-- Dynamic comments will be inserted here -->
+                        </div>
+
+                        <!-- Load More Comments -->
+                        <div id="loadMoreComment" class="text-center mt-6 hidden">
+                            <button id="loadMoreCommentBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                                <i class="fas fa-chevron-down mr-2"></i>
+                                Load More Comments
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Review Modal -->
         <div id="reviewModal" class="fixed inset-0 z-50 modal-overlay">
             <div class="flex items-center justify-center min-h-screen px-4 py-8">
                 <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
@@ -698,97 +802,6 @@
                             <button id="loadMoreReviewBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
                                 <i class="fas fa-chevron-down mr-2"></i>
                                 Load More reviews
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Comment Modal -->
-        <div id="commentModal" class="fixed inset-0 z-50 modal-overlay">
-            <div class="flex items-center justify-center min-h-screen px-4 py-8">
-                <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-
-                    <!-- Modal Header -->
-                    <div class="bg-gradient-to-r from-green-500 to-blue-600 px-6 py-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex gap-2 items-center">
-                                <h2 class="text-xl font-bold">Comments</h2>
-                                <p class=""> <b>-</b> </p>
-                                <p id="modalCommentHouseName" class="text-orange-500 text-xl font-bold"></p>
-                            </div>
-                            <button id="closeCommentModalBtn" class="modal-close-btn w-10 h-10 rounded-full bg-red-500 bg-opacity-30 flex items-center justify-center hover:bg-opacity-30 transition-all">
-                                <i class="fas fa-times text-lg text-white"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-
-                        <!-- Comment Form -->
-                        <c:if test="${not empty sessionScope.user.id}">
-                            <div class="comment-form rounded-xl p-4 mb-6 border-2 border-blue-100">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0">
-                                        <img class="w-10 h-10 rounded-full object-cover" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${sessionScope.user.avatar}" 
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                        <i class="fas fa-user text-white text-sm" style="display: none;"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <textarea id="commentInput" 
-                                                  class="comment-input w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
-                                                  placeholder="Write your comment here..." 
-                                                  rows="3"></textarea>
-                                        <div class="flex justify-between items-center mt-3">
-                                            <span class="text-xs text-gray-500">
-                                                <i class="fas fa-info-circle mr-1"></i>
-                                                Be respectful and constructive in your comments
-                                            </span>
-                                            <button id="submitCommentBtn" 
-                                                    class="comment-submit-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                                <i class="fas fa-paper-plane mr-2"></i>
-                                                Post Comment
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:if>
-
-                        <!-- Loading State -->
-                        <div id="commentLoading" class="text-center py-8">
-                            <div class="loading-spinner mx-auto mb-4"></div>
-                            <p class="text-gray-500">Loading comments...</p>
-                        </div>
-
-                        <!-- Error State -->
-                        <div id="commentError" class="text-center py-8 hidden">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-4"></i>
-                            <p class="text-red-500 font-medium">Failed to load comments</p>
-                            <button id="retryComment" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                                <i class="fas fa-redo mr-2"></i>
-                                Retry
-                            </button>
-                        </div>
-
-                        <!-- No Comment State -->
-                        <div id="noComment" class="text-center py-8 hidden">
-                            <i class="fas fa-comments text-gray-400 text-3xl mb-4"></i>
-                            <p class="text-gray-500">No comments yet. Be the first to comment!</p>
-                        </div>
-
-                        <!-- Comments Container -->
-                        <div id="commentContainer" class="space-y-4">
-                            <!-- Dynamic comment items will be inserted here -->
-                        </div>
-
-                        <!-- Load More Comments -->
-                        <div id="loadMoreComment" class="text-center mt-6 hidden">
-                            <button id="loadMoreCommentBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
-                                <i class="fas fa-chevron-down mr-2"></i>
-                                Load More Comments
                             </button>
                         </div>
                     </div>
@@ -1100,8 +1113,6 @@
                                     }
 
                                     //Comment script section
-                                    const modalComment = $('#commentModal');
-                                    const modalCommentHouseName = $('#modalCommentHouseName');
                                     const commentContainer = $('#commentContainer');
                                     const commentLoadingDiv = $('#commentLoading');
                                     const commentErrorDiv = $('#commentError');
@@ -1109,93 +1120,50 @@
                                     const loadMoreCommentDiv = $('#loadMoreComment');
                                     const commentInput = $('#commentInput');
                                     const submitCommentBtn = $('#submitCommentBtn');
-                                    let currentCommentPostId = null;
+                                    const commentCount = $('#commentCount');
+
+                                    // Get post ID from URL or data attribute
+                                    const currentPostId = '${post.id}';
                                     let currentCommentPage = 1;
                                     let isLoadingComment = false;
                                     let isSubmittingComment = false;
-                                    $('button:contains("Comment")').each(function () {
-                                        const postId = $(this).closest('.card-hover').find('button[data-post-id]').first().data('post-id');
-                                        $(this).attr('data-post-id', postId);
-                                    });
-                                    // Open Comment Modal
-                                    $(document).on('click', 'button:contains("Comment")', function () {
-                                        const postId = $(this).data('post-id');
-                                        const houseName = $(this).closest('.card-hover').find('h2').first().text().trim();
-                                        if (!postId) {
-                                            showToast('Unable to load comments', 'error');
-                                            return;
-                                        }
+                                    let totalComments = 0;
 
-                                        currentCommentPostId = postId;
-                                        currentCommentPage = 1;
-                                        modalCommentHouseName.text(houseName);
-                                        modalComment.addClass('active');
-                                        $('body').addClass('overflow-hidden');
-                                        loadComments(postId, 1, true);
+                                    // Initialize comments on page load
+                                    $(document).ready(function () {
+                                        loadComments(currentPostId, 1, true);
                                     });
-                                    // Close Comment Modal
-                                    $('#closeCommentModalBtn').on('click', function (e) {
-                                        closeCommentModal();
-                                    });
-                                    modalComment.on('click', function (e) {
-                                        if (e.target === this || !$(e.target).closest('.modal-content').length) {
-                                            closeCommentModal();
-                                        }
-                                    });
+
                                     // Submit Comment
                                     submitCommentBtn.on('click', function () {
                                         submitComment();
                                     });
-                                    // Submit comment on Enter (Ctrl+Enter)
+
+                                    // Submit comment on Ctrl+Enter
                                     commentInput.on('keydown', function (e) {
                                         if (e.ctrlKey && e.key === 'Enter') {
                                             e.preventDefault();
                                             submitComment();
                                         }
                                     });
+
                                     // Enable/disable submit button based on input
                                     commentInput.on('input', function () {
                                         const hasContent = $(this).val().trim().length > 0;
                                         submitCommentBtn.prop('disabled', !hasContent || isSubmittingComment);
                                     });
-                                    // Retry loading comments
-                                    $('#retryComment').on('click', function () {
-                                        if (currentCommentPostId) {
-                                            loadComments(currentCommentPostId, 1, true);
-                                        }
-                                    });
+
                                     // Load more comments
                                     $('#loadMoreCommentBtn').on('click', function () {
-                                        if (currentCommentPostId && !isLoadingComment) {
-                                            loadComments(currentCommentPostId, currentCommentPage + 1, false);
+                                        if (!isLoadingComment) {
+                                            loadComments(currentPostId, currentCommentPage + 1, false);
                                         }
                                     });
-                                    // ESC key to close comment modal
-                                    $(document).on('keydown', function (e) {
-                                        if (e.key === 'Escape' && modalComment.hasClass('active')) {
-                                            closeCommentModal();
-                                        }
-                                    });
-                                    function closeCommentModal() {
-                                        modalComment.removeClass('active');
-                                        $('body').removeClass('overflow-hidden');
-                                        // Reset modal state after animation
-                                        setTimeout(() => {
-                                            resetCommentModalState();
-                                        }, 300);
-                                    }
 
-                                    function resetCommentModalState() {
-                                        commentContainer.empty();
-                                        commentLoadingDiv.show();
-                                        commentErrorDiv.addClass('hidden');
-                                        noCommentDiv.addClass('hidden');
-                                        loadMoreCommentDiv.addClass('hidden');
-                                        commentInput.val('');
-                                        submitCommentBtn.prop('disabled', true);
-                                        currentCommentPostId = null;
-                                        currentCommentPage = 1;
-                                    }
+                                    // Retry loading comments
+                                    $('#retryComment').on('click', function () {
+                                        loadComments(currentPostId, 1, true);
+                                    });
 
                                     function submitComment() {
                                         const content = commentInput.val().trim();
@@ -1215,11 +1183,12 @@
                                         isSubmittingComment = true;
                                         submitCommentBtn.prop('disabled', true);
                                         submitCommentBtn.html('<div class="loading-spinner inline-block mr-2"></div>Posting...');
+
                                         $.ajax({
                                             url: '${pageContext.request.contextPath}/comment',
                                             method: 'POST',
                                             data: {
-                                                postId: currentCommentPostId,
+                                                postId: currentPostId,
                                                 content: content,
                                                 type: "add"
                                             },
@@ -1234,7 +1203,7 @@
                                                         commentContainer.prepend(newCommentHtml);
                                                         noCommentDiv.addClass('hidden');
                                                     } else {
-                                                        loadComments(currentCommentPostId, 1, true);
+                                                        loadComments(currentPostId, 1, true);
                                                     }
                                                 } else {
                                                     showToast(response.message || 'Failed to post comment', 'error');
@@ -1255,16 +1224,16 @@
                                     function loadComments(postId, page, isNewLoad) {
                                         if (isLoadingComment)
                                             return;
+
                                         isLoadingComment = true;
+
                                         if (isNewLoad) {
-                                            // Show loading for new load
                                             commentLoadingDiv.show();
                                             commentErrorDiv.addClass('hidden');
                                             noCommentDiv.addClass('hidden');
                                             loadMoreCommentDiv.addClass('hidden');
-                                            commentContainer.empty();
+                                            $('#commentContainer .comment-item').remove();
                                         } else {
-                                            // Show loading on load more button
                                             $('#loadMoreCommentBtn').html('<div class="loading-spinner inline-block mr-2"></div>Loading...');
                                         }
 
@@ -1285,6 +1254,13 @@
                                                 if (response.comments && response.comments.length > 0) {
                                                     appendComments(response.comments);
                                                     currentCommentPage = page;
+
+                                                    // Update comment count
+                                                    if (isNewLoad) {
+                                                        totalComments = response.comments.length;
+                                                        commentCount.text(totalComments);
+                                                    }
+
                                                     // Show load more if there are more comments
                                                     if (response.hasMore) {
                                                         loadMoreCommentDiv.removeClass('hidden');
@@ -1299,6 +1275,7 @@
                                                     noCommentDiv.removeClass('hidden');
                                                     commentErrorDiv.addClass('hidden');
                                                     loadMoreCommentDiv.addClass('hidden');
+                                                    commentCount.text('0');
                                                 }
                                             },
                                             error: function (xhr, status, error) {
@@ -1327,10 +1304,11 @@
                                     }
 
                                     function createCommentHtml(comment) {
-                                        const isCurrentUser = comment.owner && comment.owner.id == '${sessionScope.user_id}';
+                                        const isCurrentUser = comment.owner && comment.owner.id === '${sessionScope.user_id}';
                                         const ownerName = comment.owner ? (comment.owner.first_name + ' ' + comment.owner.last_name) : 'Anonymous';
                                         const ownerAvatar = comment.owner ? comment.owner.avatar : 'default.png';
                                         const ownerId = comment.owner ? comment.owner.id : '';
+
                                         let deleteButton = '';
                                         if (isCurrentUser) {
                                             deleteButton = '<button class="text-xs text-gray-500 hover:text-red-600 transition-colors" onclick="deleteComment(`' + comment.id + '`)">' +
@@ -1397,146 +1375,6 @@
                                                             `;
                                         }
                                     }
-
-                                    // Global function for deleting comments
-                                    window.deleteComment = function (commentId) {
-                                        Swal.fire({
-                                            title: 'Delete comment ?',
-                                            html: 'This action can not be undo, please sure you have make decision!',
-                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                            imageWidth: 150,
-                                            imageHeight: 150,
-                                            imageAlt: 'Custom icon',
-                                            showCancelButton: true,
-                                            confirmButtonText: 'Delete',
-                                            cancelButtonText: 'Cancel',
-                                            reverseButtons: true,
-                                            focusConfirm: false,
-                                            focusCancel: false,
-                                            customClass: {
-                                                popup: 'rounded-xl shadow-lg',
-                                                title: 'text-xl font-semibold',
-                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                actions: 'space-x-4'
-                                            },
-                                            buttonsStyling: false
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                $.ajax({
-                                                    url: '${pageContext.request.contextPath}/comment',
-                                                    method: 'POST',
-                                                    data: {commentId: commentId, type: "delete"},
-                                                    success: function (response) {
-                                                        if (response.ok) {
-                                                            showToast('Comment deleted successfully', 'success');
-                                                            // Remove the comment from the DOM
-                                                            $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
-                                                                $(this).remove();
-                                                                // Show no comments message if container is empty
-                                                                if (commentContainer.children().length === 0) {
-                                                                    noCommentDiv.removeClass('hidden');
-                                                                }
-                                                            });
-                                                        } else {
-                                                            showToast(response.message || 'Failed to delete comment', 'error');
-                                                        }
-                                                    },
-                                                    error: function () {
-                                                        showToast('Failed to delete comment', 'error');
-                                                    }
-                                                });
-                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                Swal.close();
-                                            }
-                                        });
-                                    };
-
-                                    $('button:contains("Share")').each(function () {
-                                        const postId = $(this).closest('.card-hover').find('button[data-post-share-id]').first().data('post-id');
-                                        $(this).attr('data-post-share-id', postId);
-                                    });
-
-                                    $(document).on('click', 'button:contains("Share")', function () {
-                                        let user = '${sessionScope.user_id}';
-                                        if (user.trim() === '') {
-                                            Swal.fire({
-                                                title: 'You must login to use this feature',
-                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                imageWidth: 150,
-                                                imageHeight: 150,
-                                                imageAlt: 'Custom icon',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Login now',
-                                                cancelButtonText: 'Back to Newsfeed',
-                                                reverseButtons: true,
-                                                focusConfirm: false,
-                                                focusCancel: false,
-                                                customClass: {
-                                                    popup: 'rounded-xl shadow-lg',
-                                                    title: 'text-xl font-semibold',
-                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                    actions: 'space-x-4'
-                                                },
-                                                buttonsStyling: false
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    location.href = '${pageContext.request.contextPath}/login';
-                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                    Swal.close();
-                                                }
-                                            });
-                                        } else {
-                                            let sharePost = $(this).data('post-share-id');
-                                            Swal.fire({
-                                                title: 'Wanna share this post?',
-                                                html: 'Say something about this post or leave blank?',
-                                                input: 'text',
-                                                inputPlaceholder: 'Add a message...',
-                                                imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
-                                                imageWidth: 150,
-                                                imageHeight: 150,
-                                                imageAlt: 'Custom icon',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Share',
-                                                cancelButtonText: 'Cancel',
-                                                reverseButtons: true,
-                                                focusConfirm: false,
-                                                focusCancel: false,
-                                                customClass: {
-                                                    popup: 'rounded-xl shadow-lg',
-                                                    title: 'text-xl font-semibold',
-                                                    confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
-                                                    cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-                                                    actions: 'space-x-4'
-                                                },
-                                                buttonsStyling: false
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    const inputValue = result.value;
-                                                    $.ajax({
-                                                        url: '${pageContext.request.contextPath}/post',
-                                                        type: 'POST',
-                                                        data: {
-                                                            typeWork: 'share',
-                                                            postId: sharePost,
-                                                            content: inputValue
-                                                        }
-                                                        , success: function (response) {
-                                                            if (response.ok) {
-                                                                showToast(response.message);
-                                                            } else {
-                                                                showToast(response.message, 'error');
-                                                            }
-                                                        }
-                                                    });
-                                                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                                                    Swal.close();
-                                                }
-                                            });
-                                        }
-                                    });
 
                                     function showToast(message, type = 'success') {
                                         Toastify({
@@ -1744,45 +1582,60 @@
                                         stopOnFocus: true
                                     }).showToast();
                                 }
-
-                                let currentPage = '${page}';
-                                let limit = '${limit}';
-                                let canLoadMore = '${canLoadMore}';
-
-                                function loadMore() {
-                                    // Check if we can load more
-                                    if (!canLoadMore) {
-                                        console.log('No more content to load');
-                                        return;
-                                    }
-
-                                    // Increment page for next request
-                                    currentPage++;
-
-                                    $.ajax({
-                                        url: '${pageContext.request.contextPath}/loadmorefeeds',
-                                        type: 'GET',
-                                        data: {
-                                            limit: limit,
-                                            page: currentPage
+                                // Global function for deleting comments
+                                window.deleteComment = function (commentId) {
+                                    Swal.fire({
+                                        title: 'Delete comment ?',
+                                        html: 'This action can not be undo, please sure you have make decision!',
+                                        imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                        imageWidth: 150,
+                                        imageHeight: 150,
+                                        imageAlt: 'Custom icon',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Delete',
+                                        cancelButtonText: 'Cancel',
+                                        reverseButtons: true,
+                                        focusConfirm: false,
+                                        focusCancel: false,
+                                        customClass: {
+                                            popup: 'rounded-xl shadow-lg',
+                                            title: 'text-xl font-semibold',
+                                            confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                            cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                            actions: 'space-x-4'
                                         },
-                                        success: function (response) {
-                                            const tempDiv = $('<div>').html(response);
-                                            const newCanLoadMore = tempDiv.find('#canLoadMore').length > 0;
-
-                                            $('#loadmoreitems').append(response);
-
-                                            canLoadMore = newCanLoadMore;
-
-                                            if (!canLoadMore) {
-                                                $('#loadMoreBtn').hide();
-                                            }
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error loading more content:', error);
+                                        buttonsStyling: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            $.ajax({
+                                                url: '${pageContext.request.contextPath}/comment',
+                                                method: 'POST',
+                                                data: {commentId: commentId, type: "delete"},
+                                                success: function (response) {
+                                                    if (response.ok) {
+                                                        showToast('Comment deleted successfully', 'success');
+                                                        // Remove the comment from the DOM
+                                                        $(`[data-comment-id="` + commentId + `"]`).fadeOut(300, function () {
+                                                            $(this).remove();
+                                                            // Show no comments message if container is empty
+                                                            if (commentContainer.children().length === 0) {
+                                                                noCommentDiv.removeClass('hidden');
+                                                            }
+                                                        });
+                                                    } else {
+                                                        showToast(response.message || 'Failed to delete comment', 'error');
+                                                    }
+                                                },
+                                                error: function () {
+                                                    showToast('Failed to delete comment', 'error');
+                                                }
+                                            });
+                                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                            Swal.close();
                                         }
                                     });
-                                }
+                                };
+
         </script>
     </body>
 </html>

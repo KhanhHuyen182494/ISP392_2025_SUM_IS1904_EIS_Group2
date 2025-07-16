@@ -215,6 +215,13 @@
                                         </button>
                                     </a>
                                 </c:if>
+                                <c:if test="${sessionScope.user.role.id == 3}">
+                                    <a href="${pageContext.request.contextPath}/manage/booking">
+                                        <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
+                                            House Onwer Panel
+                                        </button>
+                                    </a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/logout">
                                     <button class="p-1 px-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors">
                                         Logout
@@ -324,7 +331,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-end gap-3 mt-4">
+            <div class="flex flex-wrap justify-center gap-3 mt-4">
                 <c:choose>
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
@@ -333,12 +340,6 @@
                                 <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                     <i class="fas fa-home"></i>
                                     View your's houses
-                                </button>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/post-request">
-                                <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                    <i class="fas fa-blog"></i>
-                                    Post Request
                                 </button>
                             </a>
                         </c:if>
@@ -480,6 +481,11 @@
                                                     </p>
                                                 </div>
                                             </div>
+
+                                            <p class="text-lg mb-4">
+                                                ${post.parent_post.content}
+                                            </p>
+
                                             <c:if test="${post.parent_post.post_type.id == 1}">
                                                 <!-- Property Title -->
                                                 <h2 class="text-xl font-bold text-gray-800 mb-3">${post.parent_post.house.name}</h2>
@@ -493,7 +499,12 @@
                                                 <div class="space-y-2 mb-4">
                                                     <div class="flex items-center gap-2">
                                                         <i class="fas fa-dollar-sign text-green-500"></i>
-                                                        <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.parent_post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnđ / đêm</span>
+                                                        <c:if test="${post.parent_post.house.is_whole_house == true}">
+                                                            <span class="text-sm"><strong>Price per night:</strong> <fmt:formatNumber value="${post.house.price_per_night}" type="number" groupingUsed="true" maxFractionDigits="0" /> vnd / night</span>
+                                                        </c:if>
+                                                        <c:if test="${post.parent_post.house.is_whole_house == false}">
+                                                            <span class="text-sm"><strong>Price per night:</strong> Different for each room</span>
+                                                        </c:if>
                                                     </div>
                                                     <div class="flex items-center gap-2">
                                                         <i class="fas fa-map-marker-alt text-red-500"></i>

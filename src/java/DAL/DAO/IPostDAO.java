@@ -20,6 +20,8 @@ public interface IPostDAO extends IBaseUUID<Post> {
     //Get
     public PostDTO getPaginatedPosts(int currentPage, int pageSize, String searchKey, String sortBy);
 
+    public Post getPost(String pid);
+
     public PostDTO getPaginatedPostsByUid(int currentPage, int pageSize, String searchKey, String sortBy, String uid);
 
     public List<Post> getPaginatedManagePost(String keyword, Integer statusId, Integer typeId, String homestayId, Date createdDate, Date updatedDate, int limit, int offset);

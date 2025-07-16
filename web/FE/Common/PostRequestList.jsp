@@ -113,37 +113,49 @@
 
             <!-- Filter Options -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                <div class="flex flex-wrap gap-4 items-center">
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700">Search:</label>
-                        <input type="text" name="keyword" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <form action="${pageContext.request.contextPath}/post-request" method="GET">
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700">Search:</label>
+                            <input type="text" name="keyword" placeholder="Search something ..." value="${keyword}" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700">Status:</label>
+                            <select name="status" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All</option>
+                                <c:forEach items="${sList}" var="s">
+                                    <option value="${s.id}" ${statusId == s.id ? "selected" : ""}>${s.name}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700">Post Type:</label>
+                            <select name="postType" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Types</option>
+                                <c:forEach items="${tList}" var="t">
+                                    <c:if test="${t.id != 5 and t.id != 3 }">
+                                        <option value="${t.id}" ${typeId == t.id ? "selected" : ""}>${t.name}</option>
+                                    </c:if>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <!--                        <div class="flex items-center gap-2">
+                                                    <label class="text-sm font-medium text-gray-700">Sort by:</label>
+                                                    <select name="sortBy" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                        <option value="newest">Newest First</option>
+                                                        <option value="oldest">Oldest First</option>
+                                                    </select>
+                                                </div>-->
+                        <div class="flex flex-wrap gap-2 pt-4">
+                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
+                                <i class="fas fa-search mr-2"></i>Apply Filters
+                            </button>
+                            <a href="${pageContext.request.contextPath}/post-request" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md font-medium transition-colors">
+                                <i class="fas fa-times mr-2"></i>Clear Filters
+                            </a>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700">Status:</label>
-                        <select name="status" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All</option>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700">Post Type:</label>
-                        <select name="postType" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All Types</option>
-                            <option value="house">House</option>
-                            <option value="room">Room</option>
-                            <option value="review">Review</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700">Sort by:</label>
-                        <select name="sortBy" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
-                        </select>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <!-- Post List -->
@@ -189,9 +201,11 @@
                                 <div class="flex items-center gap-2">
                                     <span class="px-3 py-1 text-sm font-medium rounded-full
                                           <c:choose>
-                                              <c:when test="${post.status.name == 'approved'}">bg-green-100 text-green-800</c:when>
-                                              <c:when test="${post.status.name == 'pending'}">bg-yellow-100 text-yellow-800</c:when>
-                                              <c:when test="${post.status.name == 'rejected'}">bg-red-100 text-red-800</c:when>
+                                              <c:when test="${post.status.name == 'Deleted'}">bg-red-100 text-red-800</c:when>
+                                              <c:when test="${post.status.name == 'Private'}">bg-purple-100 text-purple-800</c:when>
+                                              <c:when test="${post.status.name == 'Rejected'}">bg-red-100 text-red-800</c:when>
+                                              <c:when test="${post.status.name == 'Wait for approval'}">bg-yellow-100 text-yellow-800</c:when>
+                                              <c:when test="${post.status.name == 'Published'}">bg-green-100 text-green-800</c:when>
                                               <c:otherwise>bg-gray-100 text-gray-800</c:otherwise>
                                           </c:choose>">
                                         ${post.status.name}
@@ -205,24 +219,20 @@
                                         </button>
                                         <div id="dropdown-${post.id}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
                                             <div class="py-1">
-                                                <c:if test="${post.status.name == 'pending'}">
-                                                    <button onclick="approvePost('${post.id}')" 
-                                                            class="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50">
-                                                        <i class="fas fa-check mr-2"></i>Approve
-                                                    </button>
-                                                    <button onclick="rejectPost('${post.id}')" 
-                                                            class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
-                                                        <i class="fas fa-times mr-2"></i>Reject
-                                                    </button>
-                                                </c:if>
                                                 <button onclick="viewPostDetails('${post.id}')" 
                                                         class="w-full text-left px-4 py-2 text-sm text-blue-700 hover:bg-blue-50">
                                                     <i class="fas fa-eye mr-2"></i>View Details
                                                 </button>
-                                                <button onclick="deletePost('${post.id}')" 
-                                                        class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
-                                                    <i class="fas fa-trash mr-2"></i>Delete
-                                                </button>
+                                                <c:if test="${post.status.id != 15 and post.status.id != 38}">
+                                                    <button onclick="viewPostDetails('${post.id}')" 
+                                                            class="w-full text-left px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50">
+                                                        <i class="fas fa-edit mr-2"></i>Edit
+                                                    </button>
+                                                    <button onclick="updatePostStatus('${post.id}', 15)" 
+                                                            class="w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                                                        <i class="fas fa-trash mr-2"></i>Delete
+                                                    </button>
+                                                </c:if>
                                             </div>
                                         </div>
                                     </div>
@@ -233,7 +243,12 @@
                         <!-- Post Content -->
                         <div class="px-6 pb-4">
                             <div class="text-gray-800 mb-4">
-                                <p class="whitespace-pre-wrap">${post.content}</p>
+                                <c:if test="${not empty post.content}">
+                                    <p class="whitespace-pre-wrap">${post.content}</p>
+                                </c:if>
+                                <c:if test="${empty post.content}">
+                                    <p class="whitespace-pre-wrap text-gray-500">"This post has no content"</p>
+                                </c:if>
                             </div>
 
                             <!-- House/Room Information -->
@@ -244,14 +259,25 @@
                                     </h4>
                                     <div class="grid grid-cols-2 gap-4 text-sm">
                                         <div>
+                                            <span class="font-medium text-gray-700">Name:</span>
+                                            <p class="text-gray-600">${post.house.name}</p>
+                                        </div>
+                                        <div>
                                             <span class="font-medium text-gray-700">Address:</span>
-                                            <p class="text-gray-600">${post.house.address}</p>
+                                            <p class="text-gray-600">${post.house.address.detail} ${post.house.address.ward}, ${post.house.address.district}, ${post.house.address.province}, ${post.house.address.country}</p>
                                         </div>
                                         <div>
                                             <span class="font-medium text-gray-700">Price:</span>
-                                            <p class="text-gray-600">
-                                                <fmt:formatNumber value="${post.house.price}" type="currency" currencyCode="VND"/>
-                                            </p>
+                                            <c:if test="${post.house.is_whole_house == true}">
+                                                <p class="text-gray-600">
+                                                    <fmt:formatNumber value="${post.house.price_per_night}" type="currency" currencyCode="VND"/>
+                                                </p>
+                                            </c:if>
+                                            <c:if test="${post.house.is_whole_house == false}">
+                                                <p class="text-gray-600">
+                                                    Different for each room
+                                                </p>
+                                            </c:if>
                                         </div>
                                     </div>
                                 </div>
@@ -279,25 +305,25 @@
 
                             <!-- Media Gallery -->
                             <c:if test="${not empty post.medias}">
-                                <div class="mb-4">
-                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                        <c:forEach var="media" items="${post.medias}" varStatus="status">
-                                            <c:if test="${status.index < 6}">
-                                                <div class="relative aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                                                    <img src="${pageContext.request.contextPath}/Asset/Media/${media.url}" 
-                                                         alt="Post media" 
-                                                         class="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
-                                                         onclick="openImageModal('${media.url}')"/>
-                                                    <c:if test="${status.index == 5 && fn:length(post.medias) > 6}">
-                                                        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                                            <span class="text-white font-semibold text-lg">+${fn:length(post.medias) - 6}</span>
-                                                        </div>
-                                                    </c:if>
-                                                </div>
-                                            </c:if>
-                                        </c:forEach>
+                                <!--                                <div class="mb-4">
+                                                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                <c:forEach var="media" items="${post.medias}" varStatus="status">
+                                    <c:if test="${status.index < 6}">
+                                        <div class="relative aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                                            <img src="${pageContext.request.contextPath}/Asset/Common/House/${media.url}" 
+                                                 alt="Post media" 
+                                                 class="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                                                 onclick="openImageModal('${media.url}')"/>
+                                        <c:if test="${status.index == 5 && fn:length(post.medias) > 6}">
+                                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                                <span class="text-white font-semibold text-lg">+${fn:length(post.medias) - 6}</span>
+                                            </div>
+                                        </c:if>
                                     </div>
-                                </div>
+                                    </c:if>
+                                </c:forEach>
+                            </div>
+                        </div>-->
                             </c:if>
                         </div>
 
@@ -305,18 +331,7 @@
                         <div class="px-6 py-4 bg-gray-50 border-t">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-6">
-                                    <div class="flex items-center gap-2">
-                                        <button class="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors">
-                                            <i class="fas fa-heart ${post.likedByCurrentUser ? 'text-red-500' : ''}"></i>
-                                            <span class="text-sm">${fn:length(post.likes)}</span>
-                                        </button>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <button class="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors">
-                                            <i class="fas fa-comment"></i>
-                                            <span class="text-sm">${fn:length(post.reviews)}</span>
-                                        </button>
-                                    </div>
+
                                 </div>
 
                                 <div class="text-sm text-gray-500">
@@ -326,6 +341,12 @@
                         </div>
                     </div>
                 </c:forEach>
+
+                <c:if test="${empty posts}">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden p-3">
+                        <p class="text-center">Not have these ${not empty keyword ? keyword : ""} post yet!</p>
+                    </div>
+                </c:if>
             </div>
 
             <c:if test="${totalPages > 1}">
@@ -422,67 +443,11 @@
                         });
                     }
 
-                    function approvePost(postId) {
-                        Swal.fire({
-                            title: 'Approve Post?',
-                            text: 'Are you sure you want to approve this post?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#10b981',
-                            cancelButtonColor: '#6b7280',
-                            confirmButtonText: 'Yes, approve it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Make AJAX request to approve post
-                                $.ajax({
-                                    url: '${pageContext.request.contextPath}/manage/post/approve',
-                                    method: 'POST',
-                                    data: {postId: postId},
-                                    success: function (response) {
-                                        Swal.fire('Approved!', 'Post has been approved.', 'success');
-                                        location.reload();
-                                    },
-                                    error: function () {
-                                        Swal.fire('Error!', 'Failed to approve post.', 'error');
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    function rejectPost(postId) {
-                        Swal.fire({
-                            title: 'Reject Post?',
-                            text: 'Are you sure you want to reject this post?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            cancelButtonColor: '#6b7280',
-                            confirmButtonText: 'Yes, reject it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Make AJAX request to reject post
-                                $.ajax({
-                                    url: '${pageContext.request.contextPath}/manage/post/reject',
-                                    method: 'POST',
-                                    data: {postId: postId},
-                                    success: function (response) {
-                                        Swal.fire('Rejected!', 'Post has been rejected.', 'success');
-                                        location.reload();
-                                    },
-                                    error: function () {
-                                        Swal.fire('Error!', 'Failed to reject post.', 'error');
-                                    }
-                                });
-                            }
-                        });
-                    }
-
                     function viewPostDetails(postId) {
-                        window.open('${pageContext.request.contextPath}/post/detail?id=' + postId, '_blank');
+                        window.open('${pageContext.request.contextPath}/post-request/detail?pid=' + postId, '_blank');
                     }
 
-                    function deletePost(postId) {
+                    function updatePostStatus(postId, status) {
                         Swal.fire({
                             title: 'Delete Post?',
                             text: 'This action cannot be undone!',
@@ -495,15 +460,26 @@
                             if (result.isConfirmed) {
                                 // Make AJAX request to delete post
                                 $.ajax({
-                                    url: '${pageContext.request.contextPath}/manage/post/delete',
+                                    url: '${pageContext.request.contextPath}/post-request/update',
                                     method: 'POST',
-                                    data: {postId: postId},
+                                    data: {
+                                        postId: postId,
+                                        type: 'statusUpdate',
+                                        statusId: status
+                                    },
                                     success: function (response) {
-                                        Swal.fire('Deleted!', 'Post has been deleted.', 'success');
-                                        location.reload();
+                                        if (response.ok) {
+                                            Swal.fire('Deleted!', 'Post has been updated.', 'success');
+                                        } else {
+                                            Swal.fire('Deleted failed!', 'Post update failure.', 'error');
+                                        }
+
+                                        setTimeout(function () {
+                                            location.reload();
+                                        }, 2000);
                                     },
                                     error: function () {
-                                        Swal.fire('Error!', 'Failed to delete post.', 'error');
+                                        Swal.fire('Error!', 'Failed to update post.', 'error');
                                     }
                                 });
                             }
