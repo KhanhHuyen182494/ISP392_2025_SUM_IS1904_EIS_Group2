@@ -331,6 +331,10 @@
                                         class="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-300">
                                     Clear Filter
                                 </button>
+                                <button type="button" onclick="location.href = '${pageContext.request.contextPath}/manage/user/add'"
+                                        class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-300">
+                                    Add User
+                                </button>
                             </div>
                         </form>
                     </div>

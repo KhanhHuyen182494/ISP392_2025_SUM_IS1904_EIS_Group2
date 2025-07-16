@@ -60,6 +60,17 @@ public class EmailSender {
         return sendEmail(u.getEmail(), subject, message);
     }
 
+    public static boolean sendEmailCreateUser(User u, String password) {
+        String subject = "FUHF Added User!";
+        String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
+                + "You have get a account from FUHF, below is your login information:" + "\n"
+                + "Email: " + u.getEmail() + "\n"
+                + "Password: " + password + "\n"
+                + "Please change this auto-gen password to your easily remember!";
+
+        return sendEmail(u.getEmail(), subject, message);
+    }
+
     public static boolean sendEmail(String toEmail, String subject, String content) {
         boolean send = false;
 
