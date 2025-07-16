@@ -324,7 +324,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-end gap-3 mt-4">
+            <div class="flex flex-wrap justify-center gap-3 mt-4">
                 <c:choose>
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
@@ -333,12 +333,6 @@
                                 <button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                                     <i class="fas fa-home"></i>
                                     View your's houses
-                                </button>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/post-request">
-                                <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                    <i class="fas fa-blog"></i>
-                                    Post Request
                                 </button>
                             </a>
                         </c:if>

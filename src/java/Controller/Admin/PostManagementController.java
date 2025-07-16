@@ -5,7 +5,9 @@ package Controller.Admin;
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 import Controller.Common.BaseAuthorization;
+import Model.Address;
 import Model.House;
+import Model.Media;
 import Model.Post;
 import Model.PostType;
 import Model.Status;
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
