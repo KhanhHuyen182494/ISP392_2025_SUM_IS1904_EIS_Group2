@@ -357,20 +357,6 @@
                                         </c:forEach>
                                     </select>
                                 </div>
-
-                                <!-- Verification Status -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Verification Status
-                                    </label>
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="isVerified" name="isVerified" value="true"
-                                               class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2">
-                                        <label for="isVerified" class="ml-2 text-sm text-gray-700">
-                                            Mark as verified
-                                        </label>
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Form Actions -->
