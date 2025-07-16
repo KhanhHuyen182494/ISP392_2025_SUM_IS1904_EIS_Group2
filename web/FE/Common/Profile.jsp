@@ -361,6 +361,12 @@
                                     Add Post
                                 </button>
                             </a>
+                            <a href="${pageContext.request.contextPath}/post-request">
+                                <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    Post Request
+                                </button>
+                            </a>
                         </c:if>
                         <!--<a href="${pageContext.request.contextPath}/change-password">-->
                         <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >
