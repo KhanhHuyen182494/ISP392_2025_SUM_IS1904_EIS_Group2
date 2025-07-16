@@ -19,6 +19,8 @@ public interface IFeatureDAO {
 
     public List<Feature> getAllFeature();
 
+    public List<Feature> getAllFeaturePaging(String keyword, int limit, int offset);
+
     public boolean add(Feature f);
 
     public boolean update(Feature f);

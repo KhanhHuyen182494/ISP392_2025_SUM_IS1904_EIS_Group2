@@ -1,7 +1,7 @@
 <%-- 
-    Document   : AddUser
-    Created on : Jul 16, 2025, 11:32:09 AM
-    Author     : Tam
+    Document   : AuthorizationAdd
+    Created on : Jul 16, 2025, 10:33:15 PM
+    Author     : nongducdai
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -106,7 +106,7 @@
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">User Management</h3>
                         <div class="space-y-2">
                             <a href="${pageContext.request.contextPath}/manage/user" 
-                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
                                 <i class="fas fa-users w-5"></i>
                                 <span>All Users</span>
                             </a>
@@ -205,16 +205,16 @@
                     <div class="mb-6">
                         <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">System</h3>
                         <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/authorization"
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                            <a href="${pageContext.request.contextPath}/manage/authorization" 
+                               class="flex items-center gap-3 p-3 rounded-lg bg-orange-50 text-primary font-medium">
                                 <i class="fas fa-cog w-5"></i>
                                 <span>Authorizations</span>
                             </a>
-    <!--                            <a href="${pageContext.request.contextPath}/manage/logs" 
-                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                    <i class="fas fa-file-alt w-5"></i>
-                                    <span>System Logs</span>
-                                </a>-->
+<!--                            <a href="${pageContext.request.contextPath}/manage/logs" 
+                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                <i class="fas fa-file-alt w-5"></i>
+                                <span>System Logs</span>
+                            </a>-->
                         </div>
                     </div>
                 </nav>
@@ -227,135 +227,59 @@
                     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h1 class="text-2xl font-bold text-gray-800">Add New User</h1>
-                                <p class="text-gray-600 mt-1">Create a new user account for the FUHF system</p>
+                                <h1 class="text-2xl font-bold text-gray-800">Add New Auth</h1>
+                                <p class="text-gray-600 mt-1">Create a new endpoints for the FUHF system</p>
                             </div>
                             <div class="flex items-center gap-3">
-                                <a href="${pageContext.request.contextPath}/manage/user" 
+                                <a href="${pageContext.request.contextPath}/manage/authorization" 
                                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
                                     <i class="fas fa-arrow-left text-sm"></i>
-                                    Back to Users
+                                    Back to Authorization List
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Add User Form -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
-                        <form id="addUserForm" action="${pageContext.request.contextPath}/manage/user/add" method="post" enctype="multipart/form-data">
+                        <form id="addForm" action="${pageContext.request.contextPath}/manage/user/add" method="post" enctype="multipart/form-data">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Personal Information Section -->
-                                <div class="md:col-span-2">
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                        <i class="fas fa-user text-primary"></i>
-                                        Personal Information
-                                    </h3>
-                                </div>
 
-                                <!-- First Name -->
                                 <div>
-                                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
-                                        First Name <span class="text-red-500">*</span>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Name: <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="firstName" name="firstName" required
+                                    <input type="text" id="name" name="name" required
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                 </div>
 
-                                <!-- Last Name -->
                                 <div>
-                                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Last Name <span class="text-red-500">*</span>
+                                    <label for="path" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Path: <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="lastName" name="lastName" required
+                                    <input type="text" id="path" name="path" required
                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                 </div>
 
-                                <!-- Username -->
                                 <div>
-                                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Username <span class="text-red-500">*</span>
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                                        Role: <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="username" name="username" required
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-
-                                <!-- Email -->
-                                <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Email <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="email" id="email" name="email" required
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-
-                                <!-- Phone -->
-                                <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Phone Number
-                                    </label>
-                                    <input type="tel" id="phone" name="phone"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-
-                                <!-- Gender -->
-                                <div>
-                                    <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Gender
-                                    </label>
-                                    <select id="gender" name="gender"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                        <option value="">Select Gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-
-                                <!-- Birth Date -->
-                                <div>
-                                    <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Birth Date
-                                    </label>
-                                    <input type="date" id="birthdate" name="birthdate" max="" required=""
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-
-                                <!-- Role -->
-                                <div>
-                                    <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Role <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="role" name="role" required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                        <option value="">Select Role</option>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <c:forEach items="${rList}" var="r">
-                                            <c:if test="${r.id != 2}">
-                                                <option value="${r.id}">${r.name}</option>
-                                            </c:if>
+                                            <div class="relative">
+                                                <input type="checkbox" id="${r.name}" name="role" value="${r.id}" 
+                                                       class="peer sr-only">
+                                                <label for="${r.name}" 
+                                                       class="flex items-center justify-between w-full p-3 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-all duration-200">
+                                                    <span class="text-sm font-medium">${r.name}</span>
+                                                    <svg class="w-4 h-4 opacity-0 peer-checked:opacity-100 transition-opacity" 
+                                                         fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </label>
+                                            </div>
                                         </c:forEach>
-                                    </select>
-                                </div>
-
-                                <!-- Account Information Section -->
-                                <div class="md:col-span-2 mt-6">
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                        <i class="fas fa-lock text-primary"></i>
-                                        Account Information
-                                    </h3>
-                                </div>
-
-                                <!-- Status -->
-                                <div>
-                                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Status
-                                    </label>
-                                    <select id="status" name="status" disabled=""
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                        <option value="">Select Status</option>
-                                        <c:forEach items="${sList}" var="s">
-                                            <option value="${s.id}" ${s.id == 1 ? "selected" : ""}>${s.name}</option>
-                                        </c:forEach>
-                                    </select>
+                                    </div>
                                 </div>
                             </div>
 
@@ -365,10 +289,10 @@
                                    class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                                     Cancel
                                 </a>
-                                <button type="submit"
+                                <button type="button" id="submitBtn"
                                         class="px-6 py-2 bg-primary hover:bg-secondary text-white rounded-lg transition-colors flex items-center gap-2">
                                     <i class="fas fa-plus"></i>
-                                    Add User
+                                    Add
                                 </button>
                             </div>
                         </form>
@@ -381,64 +305,39 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-            const birthdateInput = document.getElementById('birthdate');
-            const today = new Date().toISOString().split('T')[0];
-            birthdateInput.max = today;
-
             // Form validation
-            document.getElementById('addUserForm').addEventListener('submit', function (e) {
-                e.preventDefault();
+            document.getElementById('submitBtn').addEventListener('click', function () {
 
-                var firstName = $('#firstName').val();
-                var lastName = $('#lastName').val();
-                var username = $('#username').val();
-                var phone = $('#phone').val();
-                var gender = $('#gender').val();
-                var birthdate = $('#birthdate').val();
-                var role = $('#role').val();
-                var email = $('#email').val();
+                var name = $('#name').val();
+                var path = $('#path').val();
+                var roles = [];
+                $('input[name="role"]:checked').each(function () {
+                    roles.push($(this).val());
+                });
 
-                const vietnamPhoneRegex = /^(?:\+?84|0)(3|5|7|8|9)\d{8}$/;
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                if (firstName.trim().length <= 0) {
-                    showToast("Please enter valid first name!", "error");
+                if (name.trim().length <= 0 || name.trim().length > 50) {
+                    showToast("Please enter valid name (> 0 and < 50 length)!", "error");
                     return;
                 }
 
-                if (lastName.trim().length <= 0) {
-                    showToast("Please enter valid last name!", "error");
+                if (path.trim().length <= 0 || path.trim().length > 50) {
+                    showToast("Please enter valid path (> 0 and < 50 length)!", "error");
                     return;
                 }
 
-                if (username.trim().length <= 0) {
-                    showToast("Please enter valid username!", "error");
-                    return;
-                }
-
-                if (phone.trim().length <= 0 || !vietnamPhoneRegex.test(phone.trim())) {
-                    showToast("Please enter a valid Vietnamese phone number!", "error");
-                    return;
-                }
-
-                if (gender.trim().length <= 0) {
-                    showToast("Please choose valid gender!", "error");
-                    return;
-                }
-
-                if (!emailRegex.test(email)) {
-                    showToast("Please enter valid email address!", "error");
+                if (roles.length === 0) {
+                    showToast("Please select at least one role!", "error");
                     return;
                 }
 
                 Swal.fire({
-                    title: 'Add New User?',
-                    text: 'Are you sure you want to create this user account?',
+                    title: 'Add New Auth?',
+                    text: 'Are you sure you want to create?',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#FF6B35',
                     cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Yes, create user',
+                    confirmButtonText: 'Yes, create',
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -448,12 +347,12 @@
                         submitBtn.disabled = true;
 
                         $.ajax({
-                            url: '${pageContext.request.contextPath}/manage/user/add',
+                            url: '${pageContext.request.contextPath}/manage/authorization/add',
                             method: 'POST',
                             beforeSend: function () {
                                 Swal.fire({
-                                    title: 'Sending Email...',
-                                    text: 'Please wait while we create the user and send an email.',
+                                    title: 'Adding ...',
+                                    text: 'Please wait while we create the authorization.',
                                     allowOutsideClick: false,
                                     allowEscapeKey: false,
                                     didOpen: () => {
@@ -462,20 +361,15 @@
                                 });
                             },
                             data: {
-                                firstName: firstName,
-                                lastName: lastName,
-                                username: username,
-                                phone: phone,
-                                gender: gender,
-                                birthdate: birthdate,
-                                role: role,
-                                email: email
+                                name: name,
+                                path: path,
+                                roles: roles
                             },
                             success: function (response) {
                                 Swal.close();
                                 if (response.ok) {
                                     showToast(response.message);
-                                    $('#addUserForm')[0].reset();
+                                    $('#addForm')[0].reset();
                                 } else {
                                     showToast(response.message, "error");
                                 }
@@ -484,7 +378,7 @@
                             },
                             error: function () {
                                 Swal.close();
-                                showToast("Failed to create user!", "error");
+                                showToast("Failed to create authorization!", "error");
                                 submitBtn.innerHTML = originalText;
                                 submitBtn.disabled = false;
                             }
@@ -492,7 +386,6 @@
                     }
                 });
             });
-
 
             // Handle form submission success/error messages
             <c:if test="${not empty sessionScope.successMessage}">
