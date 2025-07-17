@@ -29,7 +29,15 @@ public interface IFeatureDAO {
 
     public boolean addFeatureRole(Feature f, List<Role> rList);
 
+    public boolean updateFeatureRole(Feature f, List<Role> rList);
+
+    public boolean updateRoleFeature(RoleFeature rf);
+
+    public boolean isFeatureRoleExisted(Feature f, Role r);
+
     public boolean add(Feature f);
+
+    public boolean addRoleFeature(RoleFeature rf);
 
     public boolean update(Feature f);
 

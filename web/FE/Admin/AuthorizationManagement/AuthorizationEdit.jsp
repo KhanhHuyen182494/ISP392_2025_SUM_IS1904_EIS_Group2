@@ -282,7 +282,7 @@
                                         <c:forEach items="${rList}" var="role">
                                             <c:set var="isAssigned" value="false"/>
                                             <c:forEach items="${rfList}" var="rf">
-                                                <c:if test="${rf.role.id == role.id}">
+                                                <c:if test="${rf.role.id == role.id and rf.status.id == 18}">
                                                     <c:set var="isAssigned" value="true"/>
                                                 </c:if>
                                             </c:forEach>
@@ -345,21 +345,19 @@
                 var name = $('#name').val();
                 var path = $('#path').val();
                 var enabledRoles = [];
-                var disabledRoles = [];
 
                 $('input[name="role"]').each(function () {
                     var roleId = $(this).val();
                     var isCurrentlyAssigned = $(this).data('originally-assigned') === true;
                     var isChecked = $(this).is(':checked');
 
-                    if (isChecked && !isCurrentlyAssigned) {
+                    if (isChecked) {
                         // Role is being enabled (newly checked)
                         enabledRoles.push(roleId);
-                    } else if (!isChecked && isCurrentlyAssigned) {
-                        // Role is being disabled (was assigned but now unchecked)
-                        disabledRoles.push(roleId);
                     }
                 });
+
+                
 
                 if (name.trim().length <= 0 || name.trim().length > 50) {
                     showToast("Please enter valid name (> 0 and < 50 length)!", "error");
@@ -379,7 +377,7 @@
 
                 Swal.fire({
                     title: 'Update Authorization?',
-                    text: 'Are you sure you want to update this authorization?',
+                    text: 'Are you sure you want to update this authorization? (CAUTION: If you disable you own role endpoint, you and other user of that role will no longer can reach that endpoint!)',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#FF6B35',
@@ -409,10 +407,9 @@
                             },
                             data: {
                                 id: id,
-                                name: name,
-                                path: path,
-                                enabledRoles: enabledRoles,
-                                disabledRoles: disabledRoles
+                                name: name.trim(),
+                                path: path.trim(),
+                                enabledRoles: enabledRoles
                             },
                             success: function (response) {
                                 Swal.close();
@@ -420,7 +417,7 @@
                                     showToast(response.message);
                                     // Optionally redirect to authorization list after successful update
                                     setTimeout(() => {
-                                        window.location.href = '${pageContext.request.contextPath}/manage/authorization';
+                                        location.reload();
                                     }, 2000);
                                 } else {
                                     showToast(response.message, "error");
