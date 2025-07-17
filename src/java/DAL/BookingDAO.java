@@ -43,6 +43,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             u.setId("U-87fbb6d15ad548318110b60b797f84da");
 
 //            System.out.println(b.getListBookingHomestayOwnerManage(u, 10, 0, null, "Thời gian X", null, null, null));
+            System.out.println(b.getAllBooking().size());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -669,6 +670,55 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
 
         } catch (SQLException e) {
             logger.error("Error fetching paginated homestay owner bookings with filters: " + e);
+        }
+
+        return bList;
+    }
+
+    @Override
+    public List<Booking> getAllBooking() {
+        List<Booking> bList = new ArrayList<>();
+        String sql = """
+                     SELECT * FROM fuhousefinder_homestay.booking;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Booking b = new Booking();
+
+                b.setId(rs.getString("id"));
+
+                User tenant = new User();
+                tenant.setId(rs.getString("tenant_id"));
+                b.setTenant(tenant);
+
+                House h = new House();
+                h.setId(rs.getString("homestay_id"));
+                b.setHomestay(h);
+
+                Room r = new Room();
+                r.setId(rs.getString("room_id"));
+                b.setRoom(r);
+
+                b.setCheck_in(rs.getDate("check_in"));
+                b.setCheckout(rs.getDate("check_out"));
+                b.setTotal_price(rs.getDouble("total_price"));
+                b.setDeposit(rs.getDouble("deposit"));
+                b.setService_fee(rs.getDouble("service_fee"));
+                b.setCleaning_fee(rs.getDouble("cleaning_fee"));
+                b.setCreated_at(rs.getTimestamp("created_at"));
+                b.setNote(rs.getString("note"));
+
+                bList.add(b);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error getAllBooking: " + e);
         }
 
         return bList;
