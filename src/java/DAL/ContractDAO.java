@@ -34,7 +34,7 @@ public class ContractDAO extends BaseDao implements IContractDAO {
     public Contract getContractByBookingId(String bookId) {
         Contract c = new Contract();
         String sql = """
-                     SELECT * FROM fuhousefinder_homestay.contract WHERE bookId = ?;
+                     SELECT * FROM `fuhousefinder_homestay`.`contract` WHERE bookId = ?;
                      """;
 
         try {

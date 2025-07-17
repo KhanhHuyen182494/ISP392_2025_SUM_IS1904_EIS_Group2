@@ -18,4 +18,16 @@
         <error-code>403</error-code>
         <location>/FE/ErrorPages/403.jsp</location>
     </error-page>
+    <servlet>
+        <servlet-name>BookingManagementController</servlet-name>
+        <servlet-class>Controller.Admin.BookingManagementController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookingManagementController</servlet-name>
+        <url-pattern>/manage/booking</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingManagementController</servlet-name>
+        <url-pattern>/manage/booking/detail</url-pattern>
+    </servlet-mapping>
 </web-app>
