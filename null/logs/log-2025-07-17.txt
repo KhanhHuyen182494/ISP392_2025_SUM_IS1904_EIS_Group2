@@ -3,3 +3,5 @@
 [2025-07-17 08:02:31] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
 [2025-07-17 08:02:49] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
 [2025-07-17 08:02:49] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
+[2025-07-17 08:41:43] [ERROR] Error executing getAllRoleByFeatureId query: Column 'status_id' not found.
+[2025-07-17 08:42:25] [ERROR] Error executing getAllRoleByFeatureId query: Column 'status_id' not found.

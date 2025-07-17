@@ -7,6 +7,7 @@ package Controller.Admin;
 import Controller.Common.BaseAuthorization;
 import Model.Feature;
 import Model.Role;
+import Model.RoleFeature;
 import Model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -44,6 +45,8 @@ public class AuthorizationManagementController extends BaseAuthorization {
                 doGetListAuthorization(request, response, user);
             case BASE_PATH + "/add" ->
                 doGetAddAuthorization(request, response, user);
+            case BASE_PATH + "/edit" ->
+                doGetEditAuthorization(request, response, user);
         }
     }
 
@@ -121,6 +124,26 @@ public class AuthorizationManagementController extends BaseAuthorization {
 
         out.print(gson.toJson(jsonResponse));
         out.flush();
+    }
+
+    protected void doGetEditAuthorization(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String fidStr = request.getParameter("fid");
+
+        if (fidStr == null || fidStr.isEmpty()) {
+            response.sendError(404);
+            return;
+        }
+
+        int fid = Integer.parseInt(fidStr);
+
+        Feature f = feaDao.getFeatureById(fid);
+        List<RoleFeature> rfList = feaDao.getAllRoleByFeatureId(fid);
+        List<Role> rList = roleDao.getAllRole();
+
+        request.setAttribute("f", f);
+        request.setAttribute("rfList", rfList);
+        request.setAttribute("rList", rList);
+        request.getRequestDispatcher("/FE/Admin/AuthorizationManagement/AuthorizationEdit.jsp").forward(request, response);
     }
 
     protected void doGetAddAuthorization(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {

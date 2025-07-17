@@ -274,7 +274,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Path</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <!--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>-->
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -290,11 +290,11 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             ${a.path}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-
-                                        </td>
+                                        <!--                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        
+                                                                                </td>-->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
+                                            <a href="${pageContext.request.contextPath}/manage/authorization/edit?fid=${a.id}" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
                                         </td>
                                     </tr>
                                 </c:forEach>
