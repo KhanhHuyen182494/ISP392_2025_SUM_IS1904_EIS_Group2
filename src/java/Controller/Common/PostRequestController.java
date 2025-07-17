@@ -4,10 +4,8 @@
  */
 package Controller.Common;
 
-import Base.EmailSender;
 import Base.Generator;
-import Base.Hashing;
-import DTO.PostDTO;
+import Base.ImageUtil;
 import Model.Address;
 import Model.House;
 import Model.Like;
@@ -15,18 +13,23 @@ import Model.Media;
 import Model.Post;
 import Model.PostType;
 import Model.Review;
-import Model.Role;
 import Model.Status;
 import Model.User;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -40,6 +43,11 @@ import java.util.logging.Logger;
     "/post-request",
     "/post-request/update",
     "/post-request/detail",})
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 4, // 4 MB
+        maxFileSize = 1024 * 1024 * 40, // 40 MB
+        maxRequestSize = 1024 * 1024 * 200 // 200 MB
+)
 public class PostRequestController extends BaseAuthorization {
 
     private static final Logger LOGGER = Logger.getLogger(PostRequestController.class.getName());
@@ -139,13 +147,108 @@ public class PostRequestController extends BaseAuthorization {
         switch (typeUpdate) {
             case "statusUpdate" ->
                 doUpdatePostStatus(request, response, user, postId);
+            case "post" ->
+                doUpdatePost(request, response, user, postId);
         }
     }
 
     protected void doGetPostEdit(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        String typeUpdate = request.getParameter("type");
-        String postId = request.getParameter("postId");
+        String pid = request.getParameter("pid");
 
+        Post p = pDao.getById(pid);
+        fullLoadPostInfomation(p, user);
+
+        List<Status> sList = sDao.getAllStatusByCategory("post");
+        List<House> hList = hDao.getAll();
+
+        request.setAttribute("hList", hList);
+        request.setAttribute("sList", sList);
+        request.setAttribute("p", p);
+        request.getRequestDispatcher("/FE/Common/PostRequestEdit.jsp").forward(request, response);
+    }
+
+    protected void doUpdatePost(HttpServletRequest request, HttpServletResponse response, User user, String postId) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        Map<String, Object> jsonResponse = new HashMap<>();
+
+        String realPath = request.getServletContext().getRealPath("");
+        String basePath = realPath.replace("\\build", "");
+        String postMediaBuildPath = request.getServletContext().getRealPath("Asset/Common/Post");
+        String postMediaRootPath = basePath + "/Asset/Common/Post";
+
+        try {
+            String content = request.getParameter("content");
+            String homestay = request.getParameter("homestay");
+
+            Post p = new Post();
+            p.setId(postId);
+            p.setContent(content);
+
+            House h = new House();
+            h.setId(homestay);
+
+            p.setHouse(h);
+
+            if (pDao.updatePostForPostRequest(p)) {
+                // Get new images
+                int haveNewUpload = 0;
+                Collection<Part> imageParts = request.getParts();
+                for (Part part : imageParts) {
+                    if ("images".equals(part.getName()) && part.getSize() > 0) {
+                        haveNewUpload++;
+                    }
+                }
+
+                List<String> postImagePaths = new LinkedList<>();
+
+                if (haveNewUpload > 0) {
+                    postImagePaths = saveImages(request.getParts(), "images", postMediaBuildPath, postMediaRootPath);
+
+                    if (!postImagePaths.isEmpty()) {
+                        //Save path to db
+                        for (String fileName : postImagePaths) {
+                            if (!saveMedia(fileName, "Post", postId, user)) {
+                                jsonResponse.put("ok", false);
+                                jsonResponse.put("message", "Failed to save new upload post image.");
+                                out.print(gson.toJson(jsonResponse));
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                // Get images to remove
+                String[] removeImageIds = request.getParameterValues("removeImages");
+                if (removeImageIds != null) {
+                    List<String> mediaIds = new LinkedList<>();
+                    mediaIds.addAll(Arrays.asList(removeImageIds));
+
+                    if (!mDao.deleteMedias(mediaIds)) {
+                        jsonResponse.put("ok", false);
+                        jsonResponse.put("message", "Failed to delete homestay image from db.");
+                        out.print(gson.toJson(jsonResponse));
+                        return;
+                    }
+                }
+            } else {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "Failed to update post!");
+                out.print(gson.toJson(jsonResponse));
+                return;
+            }
+
+            jsonResponse.put("ok", true);
+            jsonResponse.put("message", "Update post success!");
+            out.print(gson.toJson(jsonResponse));
+        } catch (ServletException | IOException e) {
+            jsonResponse.put("ok", false);
+            jsonResponse.put("message", "Server error: " + e.getMessage());
+            out.print(gson.toJson(jsonResponse));
+        } finally {
+            out.close();
+        }
     }
 
     protected void doUpdatePostStatus(HttpServletRequest request, HttpServletResponse response, User user, String postId) throws ServletException, IOException {
@@ -197,6 +300,8 @@ public class PostRequestController extends BaseAuthorization {
             String pid = p.getId();
 
             Address a = aDao.getAddressById(p.getHouse().getAddress().getId());
+            PostType pt = ptDao.getPostTypeById(p.getPost_type().getId());
+            Status sp = sDao.getStatusById(p.getStatus().getId());
 
             Status s = new Status();
             s.setId(21);
@@ -224,7 +329,8 @@ public class PostRequestController extends BaseAuthorization {
             p.setLikes(likes);
             p.setLikedByCurrentUser(isLikedByCurrentUser);
             p.setParent_post(parent);
-
+            p.setPost_type(pt);
+            p.setStatus(sp);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
@@ -270,6 +376,36 @@ public class PostRequestController extends BaseAuthorization {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
         }
+    }
+
+    private List<String> saveImages(Collection<Part> parts, String fieldName, String path1, String path2) throws IOException {
+        List<String> paths = new ArrayList<>();
+        for (Part part : parts) {
+            if (fieldName.equals(part.getName()) && part.getSize() > 0) {
+                String fileName = Generator.generateMediaId();
+                ImageUtil.writeImageToFile(part, path1, fileName);
+                ImageUtil.writeImageToFile(part, path2, fileName);
+                paths.add(fileName);
+            }
+        }
+        return paths;
+    }
+
+    private boolean saveMedia(String fileName, String objectType, String objectId, User user) {
+        Media m = new Media();
+        Status mediaStatus = new Status();
+        mediaStatus.setId(21);
+
+        m.setId(fileName);
+        m.setObject_type(objectType);
+        m.setObject_id(objectId);
+        m.setMedia_type("image");
+        m.setPath(fileName);
+        m.setStatus(mediaStatus);
+        m.setCreated_at(Timestamp.valueOf(LocalDateTime.now()));
+        m.setOwner(user);
+
+        return mDao.addMedia(m);
     }
 
     private void sendJsonResponse(HttpServletResponse response, Map<String, Object> result) throws IOException {

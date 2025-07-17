@@ -224,7 +224,7 @@
                                                     <i class="fas fa-eye mr-2"></i>View Details
                                                 </button>
                                                 <c:if test="${post.status.id != 15 and post.status.id != 38}">
-                                                    <button onclick="viewPostDetails('${post.id}')" 
+                                                    <button onclick="editPost('${post.id}')" 
                                                             class="w-full text-left px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50">
                                                         <i class="fas fa-edit mr-2"></i>Edit
                                                     </button>
@@ -443,8 +443,12 @@
                         });
                     }
 
+                    function editPost(postId) {
+                        location.href = '${pageContext.request.contextPath}/post-request/update?pid=' + postId;
+                    }
+                    
                     function viewPostDetails(postId) {
-                        window.open('${pageContext.request.contextPath}/post-request/detail?pid=' + postId, '_blank');
+                        location.href = '${pageContext.request.contextPath}/post-request/detail?pid=' + postId;
                     }
 
                     function updatePostStatus(postId, status) {

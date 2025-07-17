@@ -680,7 +680,7 @@
                         </div>
 
                         <!-- Comment Form -->
-                        <c:if test="${not empty sessionScope.user.id}">
+                        <c:if test="${not empty sessionScope.user.id and post.status.id == 14}">
                             <div class="comment-form">
                                 <div class="flex items-start gap-3">
                                     <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0">
