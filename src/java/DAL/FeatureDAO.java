@@ -89,7 +89,7 @@ public class FeatureDAO extends BaseDao implements IFeatureDAO {
                      		JOIN
                      	status s On rf.status_id = s.id
                      WHERE
-                        r.id = ?;
+                        r.id = ? AND s.id = 18;
                      """;
         List<Feature> features = new ArrayList<>();
 

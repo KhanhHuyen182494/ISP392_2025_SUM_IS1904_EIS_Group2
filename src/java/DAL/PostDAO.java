@@ -490,7 +490,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
                                         homestay h ON p.target_homestay_id = h.id
                                     JOIN
                                         user u ON p.user_id = u.id
-                                WHERE p.user_id = ? AND 1=1
+                                WHERE p.user_id = ? AND p.status_id = 14 AND 1=1
                            """;
         String countQuery = "SELECT COUNT(*) FROM post p WHERE p.user_id = ? AND 1=1";
 

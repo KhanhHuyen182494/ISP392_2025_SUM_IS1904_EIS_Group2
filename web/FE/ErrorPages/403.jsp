@@ -244,21 +244,11 @@
                         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                             <button onclick="goHome()" class="hover-lift pulse-glow bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 min-w-[200px] justify-center">
                                 <i class="fas fa-home text-lg"></i>
-                                Return to Base
+                                Return to feeds
                             </button>
-
-                            <button onclick="requestAccess()" class="hover-lift glass-effect hover:bg-white/20 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 min-w-[200px] justify-center">
-                                <i class="fas fa-key text-lg"></i>
-                                Request Access
-                            </button>
-                        </div>
-
-                        <!-- Contact Admin -->
-                        <div class="mt-8 pt-6 border-t border-white/20">
-                            <p class="text-gray-300 mb-3">Need higher clearance?</p>
-                            <button onclick="contactAdmin()" class="text-yellow-300 hover:text-yellow-200 font-medium transition-colors duration-300 flex items-center gap-2 mx-auto">
-                                <i class="fas fa-user-shield"></i>
-                                Contact Administrator
+                            <button onclick="goLogin()" class="hover-lift pulse-glow bg-green-400 hover:bg-green-500 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 min-w-[200px] justify-center">
+                                <i class="fas fa-home text-lg"></i>
+                                Return to login
                             </button>
                         </div>
                     </div>
@@ -301,6 +291,11 @@
             function goHome() {
                 // Customize this path to your actual home page
                 window.location.href = '${pageContext.request.contextPath}/';
+            }
+            
+            function goLogin() {
+                // Customize this path to your actual home page
+                window.location.href = '${pageContext.request.contextPath}/login';
             }
 
             function requestAccess() {
