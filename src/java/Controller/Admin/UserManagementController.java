@@ -21,6 +21,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,8 @@ public class UserManagementController extends BaseAuthorization {
                 doGetUserAdd(request, response, user);
             case BASE_PATH + "/detail" ->
                 doGetUserDetail(request, response, user);
+            case BASE_PATH + "/edit" ->
+                doGetUserEdit(request, response, user);
 
         }
     }
@@ -91,6 +96,48 @@ public class UserManagementController extends BaseAuthorization {
                 } else {
                     jsonResponse.put("ok", false);
                     jsonResponse.put("message", "Update user status failed!");
+                    sendJsonResponse(response, jsonResponse);
+                }
+            } else if (typeUpdate.equals("user")) {
+                String uid = request.getParameter("uid");
+                String firstName = request.getParameter("firstName");
+                String lastName = request.getParameter("lastName");
+                String email = request.getParameter("email");
+                String phone = request.getParameter("phone");
+                String gender = request.getParameter("gender");
+                String birthdateStr = request.getParameter("birthdate");
+                String roleIdStr = request.getParameter("roleId");
+                String statusIdStr = request.getParameter("statusId");
+
+                int roleId = Integer.parseInt(roleIdStr);
+                int statusId = Integer.parseInt(statusIdStr);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date bod = null;
+
+                try {
+                    if (birthdateStr != null && !birthdateStr.isEmpty()) {
+                        bod = new Date(sdf.parse(birthdateStr).getTime());
+                    }
+                } catch (ParseException e) {
+                    System.out.println(e);
+                }
+
+                boolean isUpdateEmail = false;
+
+                User u = uDao.getById(uid);
+
+                if (!u.getEmail().equals(email)) {
+                    isUpdateEmail = true;
+                }
+
+                if (uDao.updateUserInfo(uid, firstName, lastName, email, phone, gender, bod, roleId, statusId, isUpdateEmail)) {
+                    jsonResponse.put("ok", true);
+                    jsonResponse.put("message", "Update user success!");
+                    sendJsonResponse(response, jsonResponse);
+                } else {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Update user failed!");
                     sendJsonResponse(response, jsonResponse);
                 }
             }
@@ -195,6 +242,25 @@ public class UserManagementController extends BaseAuthorization {
             jsonResponse.put("message", "An error occurred while creating the post: " + e.getMessage());
             sendJsonResponse(response, jsonResponse);
         }
+    }
+
+    private void doGetUserEdit(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String uid = request.getParameter("uid");
+
+        if (uid == null || uid.isEmpty()) {
+            response.sendError(404);
+            return;
+        }
+
+        User u = uDao.getById(uid);
+
+        List<Role> rList = roleDao.getAllRole();
+        List<Status> sList = sDao.getAllStatusByCategory("user");
+
+        request.setAttribute("rList", rList);
+        request.setAttribute("sList", sList);
+        request.setAttribute("u", u);
+        request.getRequestDispatcher("/FE/Admin/UserManagement/EditUser.jsp").forward(request, response);
     }
 
     private void doGetUserDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {

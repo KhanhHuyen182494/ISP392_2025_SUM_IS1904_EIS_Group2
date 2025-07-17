@@ -57,6 +57,8 @@ public interface IUserDAO extends IBaseUUID<User> {
     public boolean updateUserImage(String uid, String path, String type);
 
     public boolean updateUserStatus(String uid, int statusId);
+    
+    public boolean updateUserInfo(String uid, String firstName, String lastName, String email, String phone, String gender, Date birthdate, int roleId, int statusId, boolean isNewEmail);
 
     //Search
     //Validate

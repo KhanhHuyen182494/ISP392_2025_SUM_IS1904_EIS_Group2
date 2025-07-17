@@ -1004,4 +1004,58 @@ public class UserDAO extends BaseDao implements IUserDAO {
         }
     }
 
+    @Override
+    public boolean updateUserInfo(String uid, String firstName, String lastName, String email, String phone, String gender, Date birthdate, int roleId, int statusId, boolean isNewEmail) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`user`
+                     SET
+                     `first_name` = ?,
+                     `last_name` = ?,
+                     `birthdate` = ?,
+                     `phone` = ?,
+                     `email` = ?,
+                     `gender` = ?,
+                     `updated_at` = ?,
+                     `is_verified` = ?,
+                     `role_id` = ?,
+                     `status_id` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setDate(3, birthdate);
+            ps.setString(4, phone);
+            ps.setString(5, email);
+            ps.setString(6, gender);
+            ps.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
+
+            if (isNewEmail) {
+                ps.setBoolean(8, false);
+            } else {
+                ps.setBoolean(8, true);
+            }
+
+            ps.setInt(9, roleId);
+            ps.setInt(10, statusId);
+            ps.setString(11, uid);
+
+            return ps.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
 }

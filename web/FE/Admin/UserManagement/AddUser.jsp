@@ -401,18 +401,18 @@
                 const vietnamPhoneRegex = /^(?:\+?84|0)(3|5|7|8|9)\d{8}$/;
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-                if (firstName.trim().length <= 0) {
-                    showToast("Please enter valid first name!", "error");
+                if (firstName.trim().length <= 0 || firstName.trim().length > 50) {
+                    showToast("Please enter valid first name with length > 0 and < 50!", "error");
                     return;
                 }
 
-                if (lastName.trim().length <= 0) {
-                    showToast("Please enter valid last name!", "error");
+                if (lastName.trim().length <= 0 || lastName.trim().length > 50) {
+                    showToast("Please enter valid last name with length > 0 and < 50!", "error");
                     return;
                 }
 
-                if (username.trim().length <= 0) {
-                    showToast("Please enter valid username!", "error");
+                if (username.trim().length <= 0 || username.trim().length > 50) {
+                    showToast("Please enter valid username with length > 0 and < 50!", "error");
                     return;
                 }
 
@@ -426,8 +426,8 @@
                     return;
                 }
 
-                if (!emailRegex.test(email)) {
-                    showToast("Please enter valid email address!", "error");
+                if (!emailRegex.test(email) || email.trim().length > 80) {
+                    showToast("Please enter valid email address and length must be < 80!", "error");
                     return;
                 }
 
