@@ -973,4 +973,35 @@ public class UserDAO extends BaseDao implements IUserDAO {
         return true;
     }
 
+    @Override
+    public boolean updateUserStatus(String uid, int statusId) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`user`
+                     SET
+                     `updated_at` = ?,
+                     `status_id` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(2, statusId);
+            ps.setString(3, uid);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+    }
+
 }

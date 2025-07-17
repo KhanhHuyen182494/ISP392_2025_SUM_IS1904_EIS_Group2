@@ -34,7 +34,7 @@ import java.util.Map;
     "/manage/user/add",
     "/manage/user/edit",
     "/manage/user/delete",
-    "/manage/user/update"
+    "/manage/user/detail"
 })
 public class UserManagementController extends BaseAuthorization {
 
@@ -50,6 +50,8 @@ public class UserManagementController extends BaseAuthorization {
                 doGetUserList(request, response, user);
             case BASE_PATH + "/add" ->
                 doGetUserAdd(request, response, user);
+            case BASE_PATH + "/detail" ->
+                doGetUserDetail(request, response, user);
 
         }
     }
@@ -63,13 +65,45 @@ public class UserManagementController extends BaseAuthorization {
                 doGetUserList(request, response, user);
             case BASE_PATH + "/add" ->
                 doPostUserAdd(request, response, user);
+            case BASE_PATH + "/edit" ->
+                doPostUserUpdate(request, response, user);
+        }
+    }
+
+    private void doPostUserUpdate(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Map<String, Object> jsonResponse = new HashMap<>();
+
+        try {
+            String typeUpdate = request.getParameter("typeUpdate");
+
+            if (typeUpdate.equals("status")) {
+                String uid = request.getParameter("uid");
+                String statusIdStr = request.getParameter("statusId");
+
+                int statusId = Integer.parseInt(statusIdStr);
+
+                if (uDao.updateUserStatus(uid, statusId)) {
+                    jsonResponse.put("ok", true);
+                    jsonResponse.put("message", "Update user status success!");
+                    sendJsonResponse(response, jsonResponse);
+                } else {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Update user status failed!");
+                    sendJsonResponse(response, jsonResponse);
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            jsonResponse.put("ok", false);
+            jsonResponse.put("message", "An error occurred while updating user status: " + e.getMessage());
+            sendJsonResponse(response, jsonResponse);
         }
     }
 
     private void doPostUserAdd(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
 
         Map<String, Object> jsonResponse = new HashMap<>();
 
@@ -161,6 +195,20 @@ public class UserManagementController extends BaseAuthorization {
             jsonResponse.put("message", "An error occurred while creating the post: " + e.getMessage());
             sendJsonResponse(response, jsonResponse);
         }
+    }
+
+    private void doGetUserDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        String uid = request.getParameter("uid");
+
+        if (uid == null || uid.isEmpty()) {
+            response.sendError(404);
+            return;
+        }
+
+        User u = uDao.getById(uid);
+
+        request.setAttribute("u", u);
+        request.getRequestDispatcher("/FE/Admin/UserManagement/UserDetail.jsp").forward(request, response);
     }
 
     private void doGetUserAdd(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {

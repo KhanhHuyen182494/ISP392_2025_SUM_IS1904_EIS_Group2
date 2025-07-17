@@ -410,8 +410,8 @@
                                             <fmt:formatDate value="${user.created_at}" pattern="dd/MM/yyyy"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
+                                            <a href="${pageContext.request.contextPath}/manage/user/detail?uid=${user.id}" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
+                                            <a href="${pageContext.request.contextPath}/manage/user/edit?uid=${user.id}" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
                                             <c:choose>
                                                 <c:when test="${user.status.id == 4}">
                                                     <a href="#" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</a>
@@ -440,8 +440,8 @@
                         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
                                 <p class="text-sm text-gray-700">
-                                    Showing <span class="font-medium">${(currentPage - 1) * 10 + 1}</span>
-                                    to <span class="font-medium">${(currentPage * 10 > totalCount) ? totalCount : (currentPage * 10)}</span>
+                                    Showing <span class="font-medium">${(currentPage - 1) * 4 + 1}</span>
+                                    to <span class="font-medium">${(currentPage * 4 > totalCount) ? totalCount : (currentPage * 4)}</span>
                                     of <span class="font-medium">${totalCount}</span> results
                                 </p>
                             </div>
@@ -500,6 +500,31 @@
                                             });
                                         });
                                     });
+
+                                    function showToast(message, type = 'success') {
+                                        let backgroundColor;
+                                        if (type === "success") {
+                                            backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
+                                        } else if (type === "error") {
+                                            backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
+                                        } else if (type === "warning") {
+                                            backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
+                                        } else if (type === "info") {
+                                            backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
+                                        } else {
+                                            backgroundColor = "#333"; // Default color (dark gray)
+                                        }
+
+                                        Toastify({
+                                            text: message, // Dynamically set message
+                                            duration: 2000,
+                                            close: true,
+                                            gravity: "top",
+                                            position: "right",
+                                            backgroundColor: backgroundColor, // Dynamically set background color
+                                            stopOnFocus: true
+                                        }).showToast();
+                                    }
         </script>
     </body>
 </html>
