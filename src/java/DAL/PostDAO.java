@@ -1020,7 +1020,6 @@ public class PostDAO extends BaseDao implements IPostDAO {
                 logger.error("" + ex);
             }
         }
-
     }
 
     @Override
@@ -1301,6 +1300,38 @@ public class PostDAO extends BaseDao implements IPostDAO {
         }
 
         return pList;
+    }
+
+    @Override
+    public boolean updatePostForPostRequest(Post p) {
+        String sql = """
+                     UPDATE `fuhousefinder_homestay`.`post`
+                     SET
+                     `target_homestay_id` = ?,
+                     `content` = ?
+                     WHERE `id` = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, p.getHouse().getId());
+            ps.setString(2, p.getContent());
+            ps.setString(3, p.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("" + e);
+            return false;
+        } finally {
+            try {
+                this.closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
     }
 
 }

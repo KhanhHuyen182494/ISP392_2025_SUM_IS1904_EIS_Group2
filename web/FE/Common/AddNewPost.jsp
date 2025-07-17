@@ -567,8 +567,8 @@
                         }
                     }
 
-                    if (content.trim() === "") {
-                        showToast('Content can not be blank!', 'error');
+                    if (content.trim() === "" || content.trim().length > 1000) {
+                        showToast('Content can not be blank and max length is 1000!', 'error');
                         return;
                     }
 

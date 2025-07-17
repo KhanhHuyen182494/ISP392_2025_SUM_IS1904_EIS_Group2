@@ -49,6 +49,8 @@ public interface IPostDAO extends IBaseUUID<Post> {
     //Update
     public boolean updatePostStatus(String postId, int statusId);
 
+    public boolean updatePostForPostRequest(Post p);
+
     //Delete
     //Add
 }
