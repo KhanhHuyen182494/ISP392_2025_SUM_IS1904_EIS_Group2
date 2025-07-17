@@ -5,6 +5,9 @@
 package DAL.DAO;
 
 import Model.Payment;
+import Model.User;
+import java.sql.Date;
+import java.util.List;
 
 /**
  *
@@ -13,11 +16,18 @@ import Model.Payment;
 public interface IPaymentDAO {
 
     //GET
-    public Payment getPaymentByBookingId(String bookId);
+    public Payment getById(String id);
     
+    public Payment getPaymentByBookingId(String bookId);
+
+    public List<Payment> getListPaymentPaging(User u, int limit, int offset,
+            String search, Date createDate, Double minPrice, Double maxPrice, Integer statusId);
+
     //ADD
     public boolean addPayment(Payment p);
-    
+
     //UPDATE
     public boolean updatePayment(Payment p);
+    
+    public boolean updatePaymentStatus(String payId, int statusId);
 }

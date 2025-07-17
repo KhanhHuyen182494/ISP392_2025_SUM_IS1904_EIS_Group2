@@ -89,7 +89,7 @@ public class AuthorizationManagementController extends BaseAuthorization {
             Feature f = feaDao.getFeatureById(id);
 
             if (!name.equals(f.getName())) {
-                if (feaDao.isNameAvailable(name)) {
+                if (!feaDao.isNameAvailable(name)) {
                     jsonResponse.put("ok", false);
                     jsonResponse.put("message", "This feature name has already been existed!");
                     out.print(gson.toJson(jsonResponse));
@@ -99,7 +99,7 @@ public class AuthorizationManagementController extends BaseAuthorization {
             }
 
             if (!path.equals(f.getPath())) {
-                if (feaDao.isPathAvailable(path)) {
+                if (!feaDao.isPathAvailable(path)) {
                     jsonResponse.put("ok", false);
                     jsonResponse.put("message", "This feature path has already been existed!");
                     out.print(gson.toJson(jsonResponse));

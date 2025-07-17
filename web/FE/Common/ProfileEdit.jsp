@@ -295,7 +295,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-end gap-3 mt-4">
+            <div class="flex flex-wrap justify-center gap-3 mt-4">
                 <c:choose>
                     <c:when test="${sessionScope.user.id == requestScope.profile.id}">
                         <!-- Own Profile Actions -->
@@ -307,16 +307,47 @@
                                 </button>
                             </a>
                         </c:if>
-                        <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
-                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                Back to Profile
+                        <a href="${pageContext.request.contextPath}/review">
+                            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-star"></i>
+                                View Your's Reviews
                             </button>
                         </a>
-                        <c:if test="${sessionScope.user.role.id == 3}">
-                            <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                                <i class="fas fa-plus"></i>
-                                Add Post
+                        <a href="${pageContext.request.contextPath}/booking/history">
+                            <button class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-book"></i>
+                                View Your's Booking History
                             </button>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/profile?uid=${sessionScope.user.id}">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-edit"></i>
+                                Back to profile
+                            </button>
+                        </a>
+                        <c:if test="${sessionScope.user.role.id == 3 or sessionScope.user.role.id == 5 or sessionScope.user.role.id == 1}">
+                            <a href="${pageContext.request.contextPath}/post">
+                                <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    Add Post
+                                </button>
+                            </a>
+                        </c:if>
+                        <c:if test="${sessionScope.user.role.id == 3 or sessionScope.user.role.id == 5}">
+                            <a href="${pageContext.request.contextPath}/post-request">
+                                <button class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-blog"></i>
+                                    Post Request
+                                </button>
+                            </a>
+                        </c:if>
+                        <c:if test="${sessionScope.user.role.id == 5}">
+                            <a href="${pageContext.request.contextPath}/payment/history">
+                                <button class="bg-[#34c9b5] hover:bg-[##26998a] text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-money-bill"></i>
+                                    Payment History
+                                </button>
+                            </a>
                         </c:if>
                         <!--<a href="${pageContext.request.contextPath}/change-password">-->
                         <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >
@@ -335,10 +366,10 @@
                                 </button>
                             </a>
                         </c:if>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-user-plus"></i>
-                            Follow
-                        </button>
+                        <!--                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                                    <i class="fas fa-user-plus"></i>
+                                                    Follow
+                                                </button>-->
                     </c:otherwise>
                 </c:choose>
             </div>

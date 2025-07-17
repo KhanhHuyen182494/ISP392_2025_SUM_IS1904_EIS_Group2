@@ -65,7 +65,7 @@ public class BookingHistoryController extends BaseAuthorization {
 
         Integer statusId = (statusIdStr != null && !statusIdStr.isEmpty()) ? Integer.parseInt(statusIdStr) : null;
         int page = (pageStr != null && !pageStr.isEmpty()) ? Integer.parseInt(pageStr) : 1;
-        int limit = (limitStr != null && !limitStr.isEmpty()) ? Integer.parseInt(limitStr) : 10;
+        int limit = (limitStr != null && !limitStr.isEmpty()) ? Integer.parseInt(limitStr) : 5;
         int offset = (page - 1) * limit;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

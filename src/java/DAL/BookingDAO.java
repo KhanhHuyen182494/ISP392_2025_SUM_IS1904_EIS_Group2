@@ -162,6 +162,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         }
     }
 
+    @Override
     public boolean isRoomAvailable(String roomId, Date checkIn, Date checkOut) {
         String sql = """
                     SELECT 1 FROM `fuhousefinder_homestay`.`booking`

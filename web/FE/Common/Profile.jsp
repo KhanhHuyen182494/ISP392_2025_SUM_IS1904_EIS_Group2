@@ -377,6 +377,14 @@
                                 </button>
                             </a>
                         </c:if>
+                        <c:if test="${sessionScope.user.role.id == 5}">
+                            <a href="${pageContext.request.contextPath}/payment/history">
+                                <button class="bg-[#34c9b5] hover:bg-[##26998a] text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <i class="fas fa-money-bill"></i>
+                                    Payment History
+                                </button>
+                            </a>
+                        </c:if>
                         <!--<a href="${pageContext.request.contextPath}/change-password">-->
                         <button class="bg-red-400 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2" onclick="showChangePassword()" >
                             <i class="fa-solid fa-lock"></i>
@@ -394,10 +402,10 @@
                                 </button>
                             </a>
                         </c:if>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+<!--                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
                             <i class="fas fa-user-plus"></i>
                             Follow
-                        </button>
+                        </button>-->
                     </c:otherwise>
                 </c:choose>
             </div>
