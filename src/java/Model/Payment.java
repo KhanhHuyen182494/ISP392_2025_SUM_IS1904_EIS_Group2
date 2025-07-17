@@ -23,6 +23,10 @@ public class Payment {
     private String bank_code;
     private String method;
 
+    private Status status;
+    private User owner;
+    private Booking booking;
+
     public Payment() {
     }
 
@@ -104,6 +108,30 @@ public class Payment {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 
     @Override

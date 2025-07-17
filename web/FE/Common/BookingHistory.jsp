@@ -176,10 +176,10 @@
                     <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600">Show:</label>
                         <select onchange="changePageSize(this.value)" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                             <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
-                            <option value="25" ${pageSize == 25 ? 'selected' : ''}>25</option>
+                            <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
                             <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
-                            <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
                         </select>
                         <span class="text-sm text-gray-600">per page</span>
                     </div>

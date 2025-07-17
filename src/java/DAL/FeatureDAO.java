@@ -371,6 +371,8 @@ public class FeatureDAO extends BaseDao implements IFeatureDAO {
 
             ps.setString(1, name);
 
+            rs = ps.executeQuery();
+
             if (rs.next()) {
                 return false;
             }
@@ -400,6 +402,8 @@ public class FeatureDAO extends BaseDao implements IFeatureDAO {
             ps = con.prepareStatement(sql);
 
             ps.setString(1, path);
+
+            rs = ps.executeQuery();
 
             if (rs.next()) {
                 return false;
