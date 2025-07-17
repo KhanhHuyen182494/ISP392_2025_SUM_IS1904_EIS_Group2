@@ -53,7 +53,7 @@ public class RememberTokenDAO extends BaseDao implements IRememberTokenDAO {
     @Override
     public void updateToken(RememberToken oldToken) {
         String sql = """
-                     UPDATE `fuhousefinder`.`remember_tokens`
+                     UPDATE `fuhousefinder_homestay`.`remember_tokens`
                      SET
                      `token` = ?,
                      `created_date` = ?,
@@ -85,7 +85,7 @@ public class RememberTokenDAO extends BaseDao implements IRememberTokenDAO {
 
     @Override
     public void deleteToken(String rememberToken) {
-        String sql = "DELETE FROM fuhousefinder.remember_tokens WHERE token = ?;";
+        String sql = "DELETE FROM fuhousefinder_homestay.remember_tokens WHERE token = ?;";
 
         try {
             con = dbc.getConnection();
@@ -107,7 +107,7 @@ public class RememberTokenDAO extends BaseDao implements IRememberTokenDAO {
     @Override
     public void saveToken(RememberToken tokenObj) {
         String sql = """
-                     INSERT INTO `fuhousefinder`.`remember_tokens`
+                     INSERT INTO `fuhousefinder_homestay`.`remember_tokens`
                      (`user_id`,
                      `token`,
                      `created_date`,

@@ -18,4 +18,32 @@
         <error-code>403</error-code>
         <location>/FE/ErrorPages/403.jsp</location>
     </error-page>
+    <servlet>
+        <servlet-name>BookingManagementController</servlet-name>
+        <servlet-class>Controller.Admin.BookingManagementController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookingManagementController</servlet-name>
+        <url-pattern>/manage/booking</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingManagementController</servlet-name>
+        <url-pattern>/manage/booking/detail</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AuthorizationManagementController</servlet-name>
+        <servlet-class>Controller.Admin.AuthorizationManagementController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthorizationManagementController</servlet-name>
+        <url-pattern>/manage/authorization</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthorizationManagementController</servlet-name>
+        <url-pattern>/manage/authorization/edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthorizationManagementController</servlet-name>
+        <url-pattern>/manage/authorization/add</url-pattern>
+    </servlet-mapping>
 </web-app>
