@@ -22,6 +22,8 @@ public interface IPaymentDAO {
 
     public List<Payment> getListPaymentPaging(User u, int limit, int offset,
             String search, Date createDate, Double minPrice, Double maxPrice, Integer statusId);
+    
+    public List<Payment> getAllPayment();
 
     //ADD
     public boolean addPayment(Payment p);

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Task;
 
 import DAL.BookingDAO;
@@ -15,36 +11,49 @@ import Model.Status;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- *
- * @author Hien
- */
 @WebListener
 public class AutoTaskListener implements ServletContextListener {
 
     private ScheduledExecutorService scheduler;
-    private PaymentDAO pmDao = new PaymentDAO();
-    private BookingDAO bookDao = new BookingDAO();
-    private HouseDAO hDao = new HouseDAO();
-    private RoomDAO rDao = new RoomDAO();
+    private final PaymentDAO pmDao = new PaymentDAO();
+    private final BookingDAO bookDao = new BookingDAO();
+    private final HouseDAO hDao = new HouseDAO();
+    private final RoomDAO rDao = new RoomDAO();
+
+    private static final Logger LOGGER = Logger.getLogger(AutoTaskListener.class.getName());
+
+    // Booking Status
+    private static final int BOOKING_CONFIRMED = 34;
+    private static final int BOOKING_CHECKED_IN = 12;
+    private static final int BOOKING_CHECKED_OUT = 11;
+    private static final int BOOKING_CANCELED = 10;
+
+    // Payment Status
+    private static final int PAYMENT_EXPIRED = 39;
+
+    // Availability
+    private static final int HOUSE_AVAILABLE = 6;
+    private static final int ROOM_AVAILABLE = 26;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
-
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 checkBookings();
                 checkPayments();
             } catch (Exception e) {
-                // Log properly in real system
+                LOGGER.log(Level.SEVERE, "Scheduled task failed", e);
             }
         }, 0, 1, TimeUnit.MINUTES);
     }
@@ -57,38 +66,72 @@ public class AutoTaskListener implements ServletContextListener {
     }
 
     private void checkBookings() {
-        java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
-        List<Booking> allBooking = bookDao.getAllBooking();
+        LocalDate today = LocalDate.now();
+        List<Booking> allBookings = bookDao.getAllBooking();
 
-        for (Booking b : allBooking) {
-            Status status = b.getStatus();
-
-            // Auto Check-in Logic
-            if (b.getCheck_in().equals(today) && status.getId() == 34) {
-                bookDao.updateBookingStatus(b.getId(), 12);
-                System.out.println("Auto checked-in booking ID: " + b.getId());
+        for (Booking b : allBookings) {
+            if (b == null || b.getStatus() == null || b.getHomestay() == null) {
+                continue;
             }
 
-            // Auto Check-out Logic
-            if (b.getCheckout().equals(today) && status.getId() == 11) {
-                // Mark as checked-out
-                bookDao.updateBookingStatus(b.getId(), 11);
+            Status status = b.getStatus();
+            LocalDate checkInDate = b.getCheck_in().toLocalDate();
+            LocalDate checkOutDate = b.getCheckout().toLocalDate();
 
-                House h = hDao.getById(b.getHomestay().getId());
+            // Auto Check-in
+            if (checkInDate.equals(today) && status.getId() == BOOKING_CONFIRMED) {
+                bookDao.updateBookingStatus(b.getId(), BOOKING_CHECKED_IN);
+                LOGGER.info("Auto checked-in booking ID: " + b.getId());
+            }
 
-                if (h.isIs_whole_house()) {
-                    hDao.updateHomestayStatus(b.getHomestay().getId(), 6);
-                } else {
-                    rDao.updateRoomStatus(b.getRoom().getId(), b.getHomestay().getId(), 26);
-                }
-
-                System.out.println("Auto checked-out booking ID: " + b.getId());
+            // Auto Check-out
+            if (checkOutDate.equals(today) && status.getId() == BOOKING_CHECKED_IN) {
+                bookDao.updateBookingStatus(b.getId(), BOOKING_CHECKED_OUT);
+                releaseRoomOrHouse(b);
+                LOGGER.info("Auto checked-out booking ID: " + b.getId());
             }
         }
     }
 
     private void checkPayments() {
-        java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
-        List<Payment> allPayment = bookDao.getAllBooking();
+        LocalDateTime now = LocalDateTime.now();
+        List<Payment> allPayments = pmDao.getAllPayment();
+
+        for (Payment p : allPayments) {
+            if (p == null || p.getCreated_at() == null) {
+                continue;
+            }
+
+            Duration duration = Duration.between(p.getCreated_at().toLocalDateTime(), now);
+
+            if (duration.toMinutes() > 15 && p.getStatusId() != PAYMENT_EXPIRED) {
+                pmDao.updatePaymentStatus(p.getId(), PAYMENT_EXPIRED);
+                bookDao.updateBookingStatus(p.getBooking_id(), BOOKING_CANCELED);
+
+                Booking b = bookDao.getById(p.getBooking_id());
+                if (b != null) {
+                    releaseRoomOrHouse(b);
+                }
+
+                LOGGER.info("Payment ID " + p.getId() + " expired after 15 minutes. Booking ID " + p.getBooking_id() + " canceled.");
+            }
+        }
+    }
+
+    private void releaseRoomOrHouse(Booking b) {
+        if (b.getHomestay() == null) {
+            return;
+        }
+
+        House h = hDao.getById(b.getHomestay().getId());
+        if (h == null) {
+            return;
+        }
+
+        if (h.isIs_whole_house()) {
+            hDao.updateHomestayStatus(h.getId(), HOUSE_AVAILABLE);
+        } else if (b.getRoom() != null) {
+            rDao.updateRoomStatus(b.getRoom().getId(), h.getId(), ROOM_AVAILABLE);
+        }
     }
 }
