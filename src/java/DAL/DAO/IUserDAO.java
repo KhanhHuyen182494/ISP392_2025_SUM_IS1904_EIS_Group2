@@ -28,17 +28,17 @@ public interface IUserDAO extends IBaseUUID<User> {
     public User authenticateUser(String contact, String password);
 
     public User getByUidForProfile(String uid);
-    
+
     public List<User> getAllUserPaging(String keyword, Integer statusId, Integer roleId, Timestamp joinDate, int page, int pageSize);
-    
+
     public int countUserByStatusId(int statusId);
-    
+
     public int countNewUsers();
-    
+
     public int countAllUsers();
-    
+
     public List<User> searchUsers(String searchKey, int limit, int offset);
-    
+
     public int countSearchUsers(String searchKey);
 
     //Add
@@ -56,6 +56,10 @@ public interface IUserDAO extends IBaseUUID<User> {
 
     public boolean updateUserImage(String uid, String path, String type);
 
+    public boolean updateUserStatus(String uid, int statusId);
+    
+    public boolean updateUserInfo(String uid, String firstName, String lastName, String email, String phone, String gender, Date birthdate, int roleId, int statusId, boolean isNewEmail);
+
     //Search
     //Validate
     public boolean isValidPhoneNumber(String phone);
@@ -63,6 +67,6 @@ public interface IUserDAO extends IBaseUUID<User> {
     public boolean isValidEmail(String email);
 
     public boolean isValidPhone(String phone);
-    
+
     public boolean isValidUsername(String username);
 }

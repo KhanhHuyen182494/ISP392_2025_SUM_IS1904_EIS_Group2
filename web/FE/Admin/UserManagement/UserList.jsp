@@ -346,9 +346,6 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-
-                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -359,9 +356,6 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <c:forEach var="user" items="${userList}">
                                     <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <img class="h-10 w-10 rounded-full" src="${pageContext.request.contextPath}/Asset/Common/Avatar/${user.avatar}" alt="">
@@ -410,14 +404,14 @@
                                             <fmt:formatDate value="${user.created_at}" pattern="dd/MM/yyyy"/>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a href="#" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
+                                            <a href="${pageContext.request.contextPath}/manage/user/detail?uid=${user.id}" class="text-primary hover:text-secondary transition-colors duration-200">View</a>
+                                            <a href="${pageContext.request.contextPath}/manage/user/edit?uid=${user.id}" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Edit</a>
                                             <c:choose>
                                                 <c:when test="${user.status.id == 4}">
-                                                    <a href="#" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</a>
+                                                    <button type="button" onclick="updateUserStatus('${user.id}', 1, '${user.role.id}')" class="text-green-600 hover:text-green-900 transition-colors duration-200">Unban</button>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <a href="#" class="text-red-600 hover:text-red-900 transition-colors duration-200">Ban</a>
+                                                    <button type="button" onclick="updateUserStatus('${user.id}', 4, '${user.role.id}')" class="text-red-600 hover:text-red-900 transition-colors duration-200">Ban</button>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
@@ -440,8 +434,8 @@
                         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
                                 <p class="text-sm text-gray-700">
-                                    Showing <span class="font-medium">${(currentPage - 1) * 10 + 1}</span>
-                                    to <span class="font-medium">${(currentPage * 10 > totalCount) ? totalCount : (currentPage * 10)}</span>
+                                    Showing <span class="font-medium">${(currentPage - 1) * 4 + 1}</span>
+                                    to <span class="font-medium">${(currentPage * 4 > totalCount) ? totalCount : (currentPage * 4)}</span>
                                     of <span class="font-medium">${totalCount}</span> results
                                 </p>
                             </div>
@@ -473,33 +467,114 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                    // Simple interactivity for demo purposes
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        // Handle checkbox selections
-                                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                                        checkboxes.forEach(checkbox => {
-                                            checkbox.addEventListener('change', function () {
-                                                if (this.checked) {
-                                                    this.closest('tr')?.classList.add('bg-blue-50');
-                                                } else {
-                                                    this.closest('tr')?.classList.remove('bg-blue-50');
-                                                }
-                                            });
-                                        });
+                                    function updateUserStatus(uid, statusId, detailRoleId) {
+                                        const currentRoleId = '${sessionScope.user.role.id}';
 
-                                        // Handle action buttons
-                                        const actionButtons = document.querySelectorAll('button');
-                                        actionButtons.forEach(button => {
-                                            button.addEventListener('click', function (e) {
-                                                if (this.textContent.includes('Ban') || this.textContent.includes('Unban')) {
-                                                    e.preventDefault();
-                                                    const action = this.textContent.trim();
-                                                    const userName = this.closest('tr').querySelector('.text-sm.font-medium.text-gray-900').textContent;
-                                                    alert(`${action} action for ${userName} - This would normally show a confirmation dialog.`);
-                                                }
-                                            });
+                                        if (uid === '${sessionScope.user.id}') {
+                                            showToast('You cannot adjust yourself!', 'error');
+                                            return;
+                                        }
+
+                                        if (currentRoleId == detailRoleId) {
+                                            showToast('You cannot adjust user have the same role!', 'error');
+                                            return;
+                                        }
+
+                                        const statusText = {
+                                            4: 'ban',
+                                            1: 'active'
+                                        };
+
+                                        const statusName = statusText[statusId];
+
+                                        Swal.fire({
+                                            title: statusName.charAt(0).toUpperCase() + statusName.slice(1) + ` User`,
+                                            text: `Are you sure you want to ` + statusName + ` this user ?`,
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: statusId === 2 ? '#10b981' : statusId === 3 ? '#ef4444' : '#3b82f6',
+                                            cancelButtonColor: '#6b7280',
+                                            confirmButtonText: `Yes`
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                Swal.fire({
+                                                    title: 'Processing...',
+                                                    text: 'Please wait while we update this user status.',
+                                                    allowOutsideClick: false,
+                                                    allowEscapeKey: false,
+                                                    showConfirmButton: false,
+                                                    didOpen: () => {
+                                                        Swal.showLoading();
+                                                    }
+                                                });
+
+                                                $.ajax({
+                                                    url: '${pageContext.request.contextPath}/manage/user/edit',
+                                                    type: 'POST',
+                                                    data: {
+                                                        uid: uid,
+                                                        statusId: statusId,
+                                                        typeUpdate: "status"
+                                                    },
+                                                    success: function (response) {
+                                                        Swal.close();
+                                                        if (response.ok) {
+                                                            Swal.fire({
+                                                                title: 'Success!',
+                                                                text: `User has been ` + statusName + `ed successfully.`,
+                                                                icon: 'success',
+                                                                confirmButtonColor: '#3b82f6'
+                                                            }).then(() => {
+                                                                window.location.reload();
+                                                            });
+                                                        } else {
+                                                            Swal.fire({
+                                                                title: 'Error!',
+                                                                text: response.message || 'Something went wrong. Please try again.',
+                                                                icon: 'error',
+                                                                confirmButtonColor: '#ef4444'
+                                                            });
+                                                        }
+                                                    },
+                                                    error: function (xhr, status, error) {
+                                                        Swal.close();
+                                                        Swal.fire({
+                                                            title: 'Error!',
+                                                            text: 'Network error. Please check your connection and try again.',
+                                                            icon: 'error',
+                                                            confirmButtonColor: '#ef4444'
+                                                        });
+                                                        console.error('Error updating user status:', error);
+                                                    }
+                                                });
+                                            }
                                         });
-                                    });
+                                    }
+
+                                    function showToast(message, type = 'success') {
+                                        let backgroundColor;
+                                        if (type === "success") {
+                                            backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
+                                        } else if (type === "error") {
+                                            backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
+                                        } else if (type === "warning") {
+                                            backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
+                                        } else if (type === "info") {
+                                            backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
+                                        } else {
+                                            backgroundColor = "#333"; // Default color (dark gray)
+                                        }
+
+                                        Toastify({
+                                            text: message, // Dynamically set message
+                                            duration: 2000,
+                                            close: true,
+                                            gravity: "top",
+                                            position: "right",
+                                            backgroundColor: backgroundColor, // Dynamically set background color
+                                            stopOnFocus: true
+                                        }).showToast();
+                                    }
         </script>
     </body>
 </html>
