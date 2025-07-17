@@ -1,0 +1,5 @@
+[2025-07-17 07:58:53] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
+[2025-07-17 08:02:31] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
+[2025-07-17 08:02:31] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
+[2025-07-17 08:02:49] [ERROR] Error executing getAllFeaturePaging query: Before start of result set
+[2025-07-17 08:02:49] [ERROR] Error executing getAllFeaturePaging query: Before start of result set

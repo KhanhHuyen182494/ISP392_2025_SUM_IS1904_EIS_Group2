@@ -320,8 +320,8 @@
                     return;
                 }
 
-                if (path.trim().length <= 0 || path.trim().length > 50) {
-                    showToast("Please enter valid path (> 0 and < 50 length)!", "error");
+                if (path.trim().length <= 0 || path.trim().length > 50 || !path.trim().startsWith("/")) {
+                    showToast("Please enter valid path (> 0 and < 50 length, and must start with '/')!", "error");
                     return;
                 }
 
@@ -341,7 +341,7 @@
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const submitBtn = document.querySelector('button[type="submit"]');
+                        const submitBtn = $('#submitBtn');
                         const originalText = submitBtn.innerHTML;
                         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
                         submitBtn.disabled = true;
@@ -386,48 +386,6 @@
                     }
                 });
             });
-
-            // Handle form submission success/error messages
-            <c:if test="${not empty sessionScope.successMessage}">
-            Toastify({
-                text: "${sessionScope.successMessage}",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: {
-                    background: "#10b981",
-                }
-            }).showToast();
-                <c:remove var="successMessage" scope="session" />
-            </c:if>
-
-            <c:if test="${not empty sessionScope.errorMessage}">
-            Toastify({
-                text: "${sessionScope.errorMessage}",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: {
-                    background: "#ef4444",
-                }
-            }).showToast();
-                <c:remove var="errorMessage" scope="session" />
-            </c:if>
-
-            // Auto-generate username from first and last name (optional)
-            function generateUsername() {
-                const firstName = document.getElementById('firstName').value.toLowerCase();
-                const lastName = document.getElementById('lastName').value.toLowerCase();
-
-                if (firstName && lastName) {
-                    const username = firstName + '.' + lastName;
-                    document.getElementById('username').value = username;
-                }
-            }
-
-            // Add event listeners for auto-generation
-            document.getElementById('firstName').addEventListener('blur', generateUsername);
-            document.getElementById('lastName').addEventListener('blur', generateUsername);
 
             function showToast(message, type = 'success') {
                 let backgroundColor;

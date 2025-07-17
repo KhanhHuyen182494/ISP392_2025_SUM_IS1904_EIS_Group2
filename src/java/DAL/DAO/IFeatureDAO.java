@@ -5,6 +5,7 @@
 package DAL.DAO;
 
 import Model.Feature;
+import Model.Role;
 import java.util.List;
 
 /**
@@ -21,7 +22,15 @@ public interface IFeatureDAO {
 
     public List<Feature> getAllFeaturePaging(String keyword, int limit, int offset);
 
+    public int getCountAllFeature();
+
+    public boolean addFeatureRole(Feature f, List<Role> rList);
+
     public boolean add(Feature f);
 
     public boolean update(Feature f);
+    
+    public boolean isNameAvailable(String name);
+    
+    public boolean isPathAvailable(String path);
 }

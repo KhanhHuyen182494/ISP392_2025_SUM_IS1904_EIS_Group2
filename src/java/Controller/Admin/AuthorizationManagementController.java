@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +69,54 @@ public class AuthorizationManagementController extends BaseAuthorization {
             String path = request.getParameter("path");
             String[] roles = request.getParameterValues("roles[]");
 
-            // Do your DB insert / logic here...
-            jsonResponse.put("ok", true);
-            jsonResponse.put("message", "User created successfully!");
-        } catch (Exception ex) {
+            if (!feaDao.isNameAvailable(name)) {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "This feature name has already been existed!");
+                out.print(gson.toJson(jsonResponse));
+                out.flush();
+                return;
+            }
+
+            if (!feaDao.isPathAvailable(path)) {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "This feature path has already been existed!");
+                out.print(gson.toJson(jsonResponse));
+                out.flush();
+                return;
+            }
+
+            int fid = feaDao.getCountAllFeature() + 1;
+
+            Feature f = new Feature();
+            f.setId(fid);
+            f.setName(name);
+            f.setPath(path);
+
+            List<Role> rList = new ArrayList<>();
+
+            for (String roleIdStr : roles) {
+                int rid = Integer.parseInt(roleIdStr);
+                Role r = new Role();
+                r.setId(rid);
+
+                rList.add(r);
+            }
+
+            if (feaDao.add(f)) {
+                if (feaDao.addFeatureRole(f, rList)) {
+                    jsonResponse.put("ok", true);
+                    jsonResponse.put("message", "Add auth successfully!");
+                } else {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Add feature success but auth failed!");
+                }
+            } else {
+                jsonResponse.put("ok", false);
+                jsonResponse.put("message", "Add feature failed!" + f);
+            }
+        } catch (NumberFormatException ex) {
             jsonResponse.put("ok", false);
-            jsonResponse.put("message", "Error occurred while creating user.");
+            jsonResponse.put("message", "Error occurred while creating auth.");
         }
 
         out.print(gson.toJson(jsonResponse));

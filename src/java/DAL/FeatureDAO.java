@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import DAL.DAO.IFeatureDAO;
+import Model.Role;
 
 /**
  *
@@ -24,7 +25,12 @@ public class FeatureDAO extends BaseDao implements IFeatureDAO {
 
     public static void main(String[] args) {
         FeatureDAO fDao = new FeatureDAO();
-        System.out.println(fDao.getAllFeaturesByRoleId(2));
+        Feature f = new Feature();
+        f.setId(fDao.getCountAllFeature());
+        f.setPath("/path");
+        f.setName("path");
+//        System.out.println(fDao.add(f));
+        System.out.println(fDao.getCountAllFeature());
     }
 
     @Override
@@ -144,7 +150,31 @@ public class FeatureDAO extends BaseDao implements IFeatureDAO {
 
     @Override
     public boolean add(Feature f) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = """
+                     INSERT INTO `fuhousefinder_homestay`.`feature` (`id`, `name`, `path`)
+                     VALUES (?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setInt(1, f.getId());
+            ps.setString(2, f.getName());
+            ps.setString(3, f.getPath());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            logger.error("Error executing add feature query: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
     }
 
     @Override
@@ -207,6 +237,128 @@ public class FeatureDAO extends BaseDao implements IFeatureDAO {
         }
 
         return features;
+    }
+
+    @Override
+    public int getCountAllFeature() {
+        int count = 0;
+        String sql = """
+                 SELECT COUNT(*) as count FROM fuhousefinder_homestay.feature;
+                 """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error executing getCountAllFeature query: " + e.getMessage());
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+
+        return count;
+    }
+
+    @Override
+    public boolean addFeatureRole(Feature f, List<Role> rList) {
+        String sql = """
+                     INSERT INTO `fuhousefinder_homestay`.`role_feature` (`role_id`, `feature_id`, `status_id`)
+                     VALUES (?, ?, ?);
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            for (Role r : rList) {
+                ps.setInt(1, r.getId());
+                ps.setInt(2, f.getId());
+                ps.setInt(3, 14);
+
+                ps.addBatch();
+            }
+
+            return ps.executeBatch().length == rList.size();
+
+        } catch (SQLException e) {
+            logger.error("Error executing getAllFeaturePaging query: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public boolean isNameAvailable(String name) {
+        String sql = """
+                     SELECT * FROM fuhousefinder_homestay.feature WHERE name = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, name);
+
+            if (rs.next()) {
+                return false;
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error executing isNameAvailable query: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean isPathAvailable(String path) {
+        String sql = """
+                     SELECT * FROM fuhousefinder_homestay.feature WHERE path = ?;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, path);
+
+            if (rs.next()) {
+                return false;
+            }
+
+        } catch (SQLException e) {
+            logger.error("Error executing isPathAvailable query: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("Error closing resources: " + ex.getMessage());
+            }
+        }
+
+        return true;
     }
 
 }
