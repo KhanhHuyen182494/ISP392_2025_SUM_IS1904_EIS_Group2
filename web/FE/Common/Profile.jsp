@@ -1989,6 +1989,20 @@
                                         }
                                     });
                                 }
+
+                                function showLoading() {
+                                    Swal.fire({
+                                        title: 'Sending verification...',
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        },
+                                        allowOutsideClick: false,
+                                        showConfirmButton: false,
+                                        customClass: {
+                                            title: 'text-xl font-semibold'
+                                        }
+                                    });
+                                }
         </script>
     </body>
 </html>

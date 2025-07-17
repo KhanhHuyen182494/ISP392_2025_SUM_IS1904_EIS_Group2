@@ -182,38 +182,41 @@
                                         </div>-->
 
                     <!-- Content Management -->
-                    <div class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
-                        <div class="space-y-2">
-                            <a href="${pageContext.request.contextPath}/manage/post" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-pen-to-square w-5"></i>
-                                <span>All Posts</span>
-                            </a>
-                            <a href="${pageContext.request.contextPath}/manage/reviews" 
-                               class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                <i class="fas fa-star w-5"></i>
-                                <span>All Reviews</span>
-                            </a>
+                    <c:if test="${sessionScope.user.role.id == 1 || sessionScope.user.role.id == 4}">
+                        <div class="mb-6">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Content</h3>
+                            <div class="space-y-2">
+                                <a href="${pageContext.request.contextPath}/manage/post" 
+                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                    <i class="fas fa-pen-to-square w-5"></i>
+                                    <span>All Posts</span>
+                                </a>
+                                <a href="${pageContext.request.contextPath}/manage/reviews" 
+                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                    <i class="fas fa-star w-5"></i>
+                                    <span>All Reviews</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- System Settings -->
-                    <!--                    <div class="mb-6">
-                                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">System</h3>
-                                            <div class="space-y-2">
-                                                <a href="${pageContext.request.contextPath}/manage/settings" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-cog w-5"></i>
-                                                    <span>Settings</span>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/manage/logs" 
-                                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
-                                                    <i class="fas fa-file-alt w-5"></i>
-                                                    <span>System Logs</span>
-                                                </a>
-                                            </div>
-                                        </div>-->
+
+                        <!-- System Settings -->
+                        <div class="mb-6">
+                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">System</h3>
+                            <div class="space-y-2">
+                                <a href="${pageContext.request.contextPath}/manage/authorization" 
+                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200   ">
+                                    <i class="fas fa-cog w-5"></i>
+                                    <span>Authorizations</span>
+                                </a>
+    <!--                            <a href="${pageContext.request.contextPath}/manage/logs" 
+                                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 hover:text-primary transition-colors duration-200">
+                                    <i class="fas fa-file-alt w-5"></i>
+                                    <span>System Logs</span>
+                                </a>-->
+                            </div>
+                        </div>
+                    </c:if>
                 </nav>
             </aside>
 
