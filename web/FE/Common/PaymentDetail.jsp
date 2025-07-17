@@ -367,10 +367,6 @@
                                 <span class="detail-value">${payment.method}</span>
                             </div>
                             <div class="detail-row">
-                                <span class="detail-label">Transaction ID</span>
-                                <span class="detail-value">${payment.transaction_id != null ? payment.transaction_id : 'N/A'}</span>
-                            </div>
-                            <div class="detail-row">
                                 <span class="detail-label">Created Date</span>
                                 <span class="detail-value">
                                     <fmt:formatDate value="${payment.created_at}" pattern="dd/MM/yyyy HH:mm:ss" />
@@ -391,22 +387,22 @@
                     <div class="simple-card">
                         <div class="p-6 border-b border-gray-200">
                             <h2 class="text-xl font-semibold text-gray-800 mb-1">
-                                <i class="fas fa-home mr-2"></i>Property Information
+                                <i class="fas fa-home mr-2"></i>Homestay Information
                             </h2>
-                            <p class="text-gray-600 text-sm">Details about the booked property</p>
+                            <p class="text-gray-600 text-sm">Details about the booked homestay</p>
                         </div>
                         <div class="p-6">
                             <div class="flex items-start gap-4 mb-4">
-                                <img src="${pageContext.request.contextPath}/Asset/Property/Images/${payment.booking.homestay.main_image}" 
+                                <img src="${pageContext.request.contextPath}/Asset/Common/House/${payment.booking.homestay.medias[0].path}" 
                                      alt="${payment.booking.homestay.name}" 
                                      class="property-image">
                                 <div class="flex-1">
                                     <h3 class="text-lg font-semibold text-gray-800 mb-2">${payment.booking.homestay.name}</h3>
                                     <p class="text-gray-600 text-sm mb-2">
                                         <i class="fas fa-map-marker-alt mr-1"></i>
-                                        ${payment.booking.homestay.address}
+                                        ${payment.booking.homestay.address.detail} ${payment.booking.homestay.address.ward}, ${payment.booking.homestay.address.district}, ${payment.booking.homestay.address.province}, ${payment.booking.homestay.address.country}
                                     </p>
-                                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                                    <div class="flex items-center gap-4 text-sm text-gray-600 mb-2">
                                         <span>
                                             <c:choose>
                                                 <c:when test="${payment.booking.homestay.is_whole_house == true}">
@@ -417,35 +413,78 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </span>
+                                    </div>
+                                    <div class="flex items-center gap-4 text-sm text-gray-600">
                                         <span>
-                                            <i class="fas fa-users mr-1"></i>
-                                            ${payment.booking.homestay.max_guests} guests
+                                            <i class="fas fa-book mr-1"></i>${payment.booking.homestay.description}
                                         </span>
                                     </div>
+                                    <c:if test="${payment.booking.homestay.is_whole_house == true}">
+                                        <div class="flex items-center gap-4 text-sm text-gray-600 mt-2">
+                                            <span>
+                                                <i class="fas fa-money-bill mr-1"></i><fmt:formatNumber value="${payment.booking.homestay.price_per_night}" type="currency" currencySymbol="₫" />
+                                            </span>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Check-in Date</span>
                                 <span class="detail-value">
-                                    <fmt:formatDate value="${payment.booking.check_in_date}" pattern="dd/MM/yyyy" />
+                                    <fmt:formatDate value="${payment.booking.check_in}" pattern="dd/MM/yyyy" />
                                 </span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Check-out Date</span>
                                 <span class="detail-value">
-                                    <fmt:formatDate value="${payment.booking.check_out_date}" pattern="dd/MM/yyyy" />
+                                    <fmt:formatDate value="${payment.booking.checkout}" pattern="dd/MM/yyyy" />
                                 </span>
                             </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Number of Guests</span>
-                                <span class="detail-value">${payment.booking.num_guests}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Total Nights</span>
-                                <span class="detail-value">${payment.booking.total_nights}</span>
-                            </div>
+                            <c:if test="${payment.booking.homestay.is_whole_house == true}">
+                                <div class="detail-row">
+                                    <span class="detail-label">Total Nights</span>
+                                    <span class="detail-value">${(payment.booking.total_price - payment.booking.service_fee - payment.booking.cleaning_fee)/payment.booking.homestay.price_per_night}</span>
+                                </div>
+                            </c:if>
+                            <c:if test="${payment.booking.homestay.is_whole_house == false}">
+                                <div class="detail-row">
+                                    <span class="detail-label">Total Nights</span>
+                                    <span class="detail-value">${(payment.booking.total_price - payment.booking.service_fee - payment.booking.cleaning_fee)/payment.booking.room.price_per_night}</span>
+                                </div>
+                            </c:if>
                         </div>
                     </div>
+
+                    <c:if test="${payment.booking.homestay.is_whole_house == false}">
+                        <div class="simple-card">
+                            <div class="p-6 border-b border-gray-200">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-1">
+                                    <i class="fas fa-home mr-2"></i>Room Information
+                                </h2>
+                                <p class="text-gray-600 text-sm">Details about the booked room</p>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-start gap-4 mb-4">
+                                    <img src="${pageContext.request.contextPath}/Asset/Common/Room/${payment.booking.room.medias[0].path}" 
+                                         alt="${payment.booking.room.name}" 
+                                         class="property-image">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${payment.booking.room.name}</h3>
+                                        <div class="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                                            <span>
+                                                <i class="fas fa-bed mr-1"></i>${payment.booking.room.description}
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-4 text-sm text-gray-600">
+                                            <span>
+                                                <i class="fas fa-money-bill mr-1"></i><fmt:formatNumber value="${payment.booking.room.price_per_night}" type="currency" currencySymbol="₫" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:if>
 
                     <!-- Guest Information -->
                     <div class="simple-card">
@@ -458,20 +497,20 @@
                         <div class="p-6">
                             <div class="detail-row">
                                 <span class="detail-label">Guest Name</span>
-                                <span class="detail-value">${payment.booking.guest.first_name} ${payment.booking.guest.last_name}</span>
+                                <span class="detail-value">${payment.booking.tenant.first_name} ${payment.booking.tenant.last_name}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Email</span>
-                                <span class="detail-value">${payment.booking.guest.email}</span>
+                                <span class="detail-value">${payment.booking.tenant.email}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Phone</span>
-                                <span class="detail-value">${payment.booking.guest.phone != null ? payment.booking.guest.phone : 'N/A'}</span>
+                                <span class="detail-value">${payment.booking.tenant.phone}</span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Booking Date</span>
                                 <span class="detail-value">
-                                    <fmt:formatDate value="${payment.booking.booking_date}" pattern="dd/MM/yyyy HH:mm:ss" />
+                                    <fmt:formatDate value="${payment.booking.created_at}" pattern="dd/MM/yyyy HH:mm:ss" />
                                 </span>
                             </div>
                         </div>
@@ -498,10 +537,6 @@
                                 <i class="fas fa-file-contract"></i>
                                 View Contract
                             </a>
-                            <button onclick="window.print()" class="btn-secondary w-full">
-                                <i class="fas fa-print"></i>
-                                Print Receipt
-                            </button>
                             <a href="${pageContext.request.contextPath}/payment/history" class="btn-primary w-full">
                                 <i class="fas fa-list"></i>
                                 All Payments
@@ -516,23 +551,31 @@
                         </div>
                         <div class="p-6">
                             <div class="detail-row">
+                                <span class="detail-label">Deposit (20% total)</span>
+                                <span class="detail-value">
+                                    <fmt:formatNumber value="${payment.amount}" type="currency" currencySymbol="₫" />
+                                </span>
+                            </div>
+                            <div class="detail-row">
                                 <span class="detail-label">Subtotal</span>
                                 <span class="detail-value">
-                                    <fmt:formatNumber value="${payment.amount * 0.9}" type="currency" currencySymbol="₫" />
+                                    <fmt:formatNumber value="${payment.booking.total_price - payment.booking.service_fee - payment.booking.cleaning_fee}" type="currency" currencySymbol="₫" />
                                 </span>
                             </div>
                             <div class="detail-row">
                                 <span class="detail-label">Service Fee</span>
                                 <span class="detail-value">
-                                    <fmt:formatNumber value="${payment.amount * 0.1}" type="currency" currencySymbol="₫" />
+                                    <fmt:formatNumber value="${payment.booking.service_fee}" type="currency" currencySymbol="₫" />
                                 </span>
                             </div>
                             <div class="detail-row">
-                                <span class="detail-label">VAT (0%)</span>
-                                <span class="detail-value">₫0</span>
+                                <span class="detail-label">Cleaning Fee</span>
+                                <span class="detail-value">
+                                    <fmt:formatNumber value="${payment.booking.cleaning_fee}" type="currency" currencySymbol="₫" />
+                                </span>
                             </div>
                             <div class="detail-row" style="border-top: 2px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
-                                <span class="detail-label text-lg font-semibold">Total Amount</span>
+                                <span class="detail-label text-lg font-semibold">Total Deposit</span>
                                 <span class="detail-value amount-highlight">
                                     <fmt:formatNumber value="${payment.amount}" type="currency" currencySymbol="₫" />
                                 </span>
@@ -589,78 +632,78 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                                function updatePaymentStatus(payId, statusId) {
-                                    const statusText = {
-                                        39: 'Force Cancel'
-                                    };
+                                    function updatePaymentStatus(payId, statusId) {
+                                        const statusText = {
+                                            39: 'Force Cancel'
+                                        };
 
-                                    const statusName = statusText[statusId];
+                                        const statusName = statusText[statusId];
 
-                                    Swal.fire({
-                                        title: statusName.charAt(0).toUpperCase() + statusName.slice(1) + ` Payment`,
-                                        text: `Are you sure you want to ` + statusName + ` this payment (this action cannot be undone)?`,
-                                        icon: 'warning',
-                                        showCancelButton: true,
-                                        confirmButtonColor: '#ef4444',
-                                        cancelButtonColor: '#6b7280',
-                                        confirmButtonText: `Yes, ` + statusName + ` it!`
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            Swal.fire({
-                                                title: 'Processing...',
-                                                text: 'Please wait while we update the payment status.',
-                                                allowOutsideClick: false,
-                                                allowEscapeKey: false,
-                                                showConfirmButton: false,
-                                                didOpen: () => {
-                                                    Swal.showLoading();
-                                                }
-                                            });
+                                        Swal.fire({
+                                            title: statusName.charAt(0).toUpperCase() + statusName.slice(1) + ` Payment`,
+                                            text: `Are you sure you want to ` + statusName + ` this payment (this action cannot be undone)?`,
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#ef4444',
+                                            cancelButtonColor: '#6b7280',
+                                            confirmButtonText: `Yes, ` + statusName + ` it!`
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                Swal.fire({
+                                                    title: 'Processing...',
+                                                    text: 'Please wait while we update the payment status.',
+                                                    allowOutsideClick: false,
+                                                    allowEscapeKey: false,
+                                                    showConfirmButton: false,
+                                                    didOpen: () => {
+                                                        Swal.showLoading();
+                                                    }
+                                                });
 
-                                            $.ajax({
-                                                url: '${pageContext.request.contextPath}/payment/update',
-                                                type: 'POST',
-                                                data: {
-                                                    payId: payId,
-                                                    statusId: statusId
-                                                },
-                                                success: function (response) {
-                                                    Swal.close();
-                                                    if (response.ok) {
-                                                        Swal.fire({
-                                                            title: 'Success!',
-                                                            text: `Payment has been ` + statusName + `ed successfully.`,
-                                                            icon: 'success',
-                                                            confirmButtonColor: '#3b82f6'
-                                                        }).then(() => {
-                                                            window.location.reload();
-                                                        });
-                                                    } else {
+                                                $.ajax({
+                                                    url: '${pageContext.request.contextPath}/payment/update',
+                                                    type: 'POST',
+                                                    data: {
+                                                        payId: payId,
+                                                        statusId: statusId
+                                                    },
+                                                    success: function (response) {
+                                                        Swal.close();
+                                                        if (response.ok) {
+                                                            Swal.fire({
+                                                                title: 'Success!',
+                                                                text: `Payment has been ` + statusName + `ed successfully.`,
+                                                                icon: 'success',
+                                                                confirmButtonColor: '#3b82f6'
+                                                            }).then(() => {
+                                                                window.location.reload();
+                                                            });
+                                                        } else {
+                                                            Swal.fire({
+                                                                title: 'Error!',
+                                                                text: response.message || 'Something went wrong. Please try again.',
+                                                                icon: 'error',
+                                                                confirmButtonColor: '#ef4444'
+                                                            });
+                                                        }
+                                                    },
+                                                    error: function (xhr, status, error) {
+                                                        Swal.close();
                                                         Swal.fire({
                                                             title: 'Error!',
-                                                            text: response.message || 'Something went wrong. Please try again.',
+                                                            text: 'Network error. Please check your connection and try again.',
                                                             icon: 'error',
                                                             confirmButtonColor: '#ef4444'
                                                         });
+                                                        console.error('Error updating payment status:', error);
                                                     }
-                                                },
-                                                error: function (xhr, status, error) {
-                                                    Swal.close();
-                                                    Swal.fire({
-                                                        title: 'Error!',
-                                                        text: 'Network error. Please check your connection and try again.',
-                                                        icon: 'error',
-                                                        confirmButtonColor: '#ef4444'
-                                                    });
-                                                    console.error('Error updating payment status:', error);
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
+                                                });
+                                            }
+                                        });
+                                    }
 
-                                // Print styles
-                                const printStyles = `
+                                    // Print styles
+                                    const printStyles = `
                 @media print {
                     .no-print { display: none !important; }
                     .simple-card { box-shadow: none !important; border: 1px solid #ddd !important; }
@@ -669,18 +712,18 @@
                 }
             `;
 
-                                // Add print styles to head
-                                const styleSheet = document.createElement('style');
-                                styleSheet.textContent = printStyles;
-                                document.head.appendChild(styleSheet);
+                                    // Add print styles to head
+                                    const styleSheet = document.createElement('style');
+                                    styleSheet.textContent = printStyles;
+                                    document.head.appendChild(styleSheet);
 
-                                // Add no-print class to interactive elements
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const interactiveElements = document.querySelectorAll('button, .btn-primary, .btn-secondary, .btn-danger, .btn-success');
-                                    interactiveElements.forEach(el => {
-                                        el.classList.add('no-print');
+                                    // Add no-print class to interactive elements
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const interactiveElements = document.querySelectorAll('button, .btn-primary, .btn-secondary, .btn-danger, .btn-success');
+                                        interactiveElements.forEach(el => {
+                                            el.classList.add('no-print');
+                                        });
                                     });
-                                });
         </script>
     </body>
 </html>
