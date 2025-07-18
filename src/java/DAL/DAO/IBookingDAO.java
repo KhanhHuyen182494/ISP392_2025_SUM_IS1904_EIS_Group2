@@ -31,6 +31,8 @@ public interface IBookingDAO {
 
     public List<Booking> getListBookingAdminManage(int limit, int offset,
             String keyword, Date date, Integer statusId);
+    
+    public List<Booking> getAllBooking();
 
     //ADD
     public boolean addBooking(Booking b);

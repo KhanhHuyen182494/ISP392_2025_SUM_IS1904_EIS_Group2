@@ -33,7 +33,7 @@ public class PaymentDAO extends BaseDao implements IPaymentDAO {
         pm.setBank_code("NPC");
         pm.setUpdated_at(Timestamp.valueOf(LocalDateTime.now()));
 
-        System.out.println(pmDao.updatePayment(pm));
+        System.out.println(pmDao.getAllPayment().size());
     }
 
     @Override
@@ -330,6 +330,58 @@ public class PaymentDAO extends BaseDao implements IPaymentDAO {
         }
 
         return p;
+    }
+
+    @Override
+    public List<Payment> getAllPayment() {
+        List<Payment> pList = new ArrayList<>();
+        String sql = """
+                     SELECT p.`id`,
+                                                                     p.`user_id`,
+                                                                     p.`booking_id`,
+                                                                     p.`amount`,
+                                                                     p.`status_id`,
+                                                                     p.`method`,
+                                                                     p.`transaction_id`,
+                                                                     p.`created_at`,
+                                                                     p.`bank_code`,
+                                                                     p.`updated_at`
+                                                                 FROM `fuhousefinder_homestay`.`payment` p;
+                     """;
+
+        try {
+            con = dbc.getConnection();
+            ps = con.prepareStatement(sql);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Payment p = new Payment();
+
+                p.setId(rs.getString("id"));
+                p.setUser_id(rs.getString("user_id"));
+                p.setBooking_id(rs.getString("booking_id"));
+                p.setAmount(rs.getDouble("amount"));
+                p.setStatusId(rs.getInt("status_id"));
+                p.setMethod(rs.getString("method"));
+                p.setTransaction_id(rs.getString("transaction_id"));
+                p.setCreated_at(rs.getTimestamp("created_at"));
+                p.setBank_code(rs.getString("bank_code"));
+                p.setUpdated_at(rs.getTimestamp("updated_at"));
+
+                pList.add(p);
+            }
+        } catch (SQLException e) {
+            logger.error("Error getAllPayment: " + e);
+        } finally {
+            try {
+                closeResources();
+            } catch (Exception ex) {
+                logger.error("" + ex);
+            }
+        }
+
+        return pList;
     }
 
 }
