@@ -127,6 +127,20 @@ public class UserManagementController extends BaseAuthorization {
 
                 if (!u.getEmail().equals(email)) {
                     isUpdateEmail = true;
+
+                    if (!uDao.isValidEmail(email)) {
+                        jsonResponse.put("ok", false);
+                        jsonResponse.put("message", "Email already exists.");
+                        sendJsonResponse(response, jsonResponse);
+                        return;
+                    }
+                }
+
+                if (!uDao.isValidPhoneNumber(phone)) {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Phone is already existed!");
+                    sendJsonResponse(response, jsonResponse);
+                    return;
                 }
 
                 if (uDao.updateUserInfo(uid, firstName, lastName, email, phone, gender, bod, roleId, statusId, isUpdateEmail)) {

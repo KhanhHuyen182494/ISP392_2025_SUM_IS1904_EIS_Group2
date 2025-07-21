@@ -41,14 +41,14 @@ import java.util.logging.Logger;
     "/booking/contract/preview"
 })
 public class BookingController extends BaseAuthorization {
-
+    
     private static final Logger LOGGER = Logger.getLogger(HousesController.class.getName());
     private static final String BASE_PATH = "/booking";
-
+    
     @Override
     protected void doGetAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String path = request.getServletPath();
-
+        
         switch (path) {
             case BASE_PATH ->
                 doGetBookingDetail(request, response, user);
@@ -60,11 +60,11 @@ public class BookingController extends BaseAuthorization {
                 doGetContractPreview(request, response, user);
         }
     }
-
+    
     @Override
     protected void doPostAuthorized(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String path = request.getServletPath();
-
+        
         switch (path) {
             case BASE_PATH + "/confirm" ->
                 doPostBookingConfirm(request, response, user);
@@ -74,60 +74,60 @@ public class BookingController extends BaseAuthorization {
                 doPostGetContractPreview(request, response, user);
         }
     }
-
+    
     private void doGetBookingContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         try {
             String bookId = request.getParameter("bookId");
             System.out.println(bookId);
-
+            
             Booking b = bookDao.getById(bookId);
-
+            
             if (!user.getId().equals(b.getTenant().getId())) {
                 response.sendError(404);
                 return;
             }
-
+            
             Room r;
-
+            
             if (b.getRoom().getId() != null) {
                 r = roomDao.getById(b.getRoom().getId());
                 fullLoadRoomInfo(r);
                 b.setRoom(r);
             }
-
+            
             House h = hDao.getById(b.getHomestay().getId());
             fullLoadHouseInfomationSingle(h);
-
+            
             b.setHomestay(h);
-
+            
             System.out.println(b);
-
+            
             request.setAttribute("b", b);
             request.getRequestDispatcher("/FE/Common/BookingContract.jsp").forward(request, response);
         } catch (ServletException | IOException e) {
             LOGGER.log(Level.WARNING, "Error", e);
         }
     }
-
+    
     private void doPostBookingContract(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
+        
         Map<String, Object> responseData = new HashMap<>();
         PrintWriter out = response.getWriter();
-
+        
         try {
             String homestayId = request.getParameter("homestayId");
             String bookingType = request.getParameter("bookingType"); // "whole" or "room"
             String checkIn = request.getParameter("checkIn");
             String checkOut = request.getParameter("checkOut");
-
+            
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date checkin = new Date(sdf.parse(checkIn).getTime());
             Date checkout = new Date(sdf.parse(checkOut).getTime());
             String specialRequests = request.getParameter("specialRequests");
             String selectedRoomParam = request.getParameter("selectedRoom");
-
+            
             double subtotal = Double.parseDouble(request.getParameter("subtotal"));
             double serviceFee = Double.parseDouble(request.getParameter("serviceFee"));
             double cleaningFee = Double.parseDouble(request.getParameter("cleaningFee"));
@@ -135,13 +135,13 @@ public class BookingController extends BaseAuthorization {
             double depositAmount = Double.parseDouble(request.getParameter("depositAmount"));
             int nightCount = Integer.parseInt(request.getParameter("nightCount"));
             double pricePerNight = Double.parseDouble(request.getParameter("pricePerNight"));
-
+            
             House h = new House();
             h.setId(homestayId);
-
+            
             Status s = new Status();
             s.setId(8);
-
+            
             String bookingId = Generator.generateBookingId();
             Booking b = new Booking();
             b.setId(bookingId);
@@ -156,20 +156,20 @@ public class BookingController extends BaseAuthorization {
             b.setHomestay(h);
             b.setTenant(user);
             b.setStatus(s);
-
+            
             Room r = new Room();
-
+            
             if (bookingType.equals("room")) {
-
+                
                 boolean isValid = bookDao.isRoomAvailable(bookingId, checkin, checkout);
-
+                
                 if (!isValid) {
                     responseData.put("ok", false);
                     responseData.put("message", "This room is booked this date!");
                     out.print(gson.toJson(responseData));
                     return;
                 }
-
+                
                 r.setId(selectedRoomParam);
             } else if (bookingType.equals("whole")) {
                 boolean isValid = bookDao.isHouseAvailable(homestayId, checkin, checkout);
@@ -181,9 +181,9 @@ public class BookingController extends BaseAuthorization {
                     return;
                 }
             }
-
+            
             b.setRoom(r);
-
+            
             if (bookDao.addBooking(b)) {
                 responseData.put("ok", true);
                 responseData.put("bookId", bookingId);
@@ -192,34 +192,34 @@ public class BookingController extends BaseAuthorization {
                 responseData.put("ok", false);
                 responseData.put("message", "This room is booked this date!");
             }
-
+            
             out.print(gson.toJson(responseData));
         } catch (NumberFormatException | ParseException e) {
             LOGGER.log(Level.WARNING, "Error", e);
             sendErrorResponse(response, "Internal server error: " + e.getMessage(), 500);
         }
     }
-
+    
     private void doGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String bookId = request.getParameter("bookId");
-
+        
         Booking b = bookDao.getBookingDetailById(bookId);
-
+        
         House h = hDao.getById(b.getHomestay().getId());
         fullLoadHouseInfomation(h);
-
+        
         if (!h.isIs_whole_house()) {
             Room r = roomDao.getById(b.getRoom().getId());
             fullLoadRoomInfo(r);
             b.setRoom(r);
         }
-
+        
         b.setHomestay(h);
-
+        
         request.setAttribute("b", b);
         request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
-
+    
     private void doPostGetContractPreview(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String bookId = request.getParameter("bookId");
         String representativeName = request.getParameter("representativeName");
@@ -227,62 +227,63 @@ public class BookingController extends BaseAuthorization {
         String representativeEmail = request.getParameter("representativeEmail");
         String representativeRelationship = request.getParameter("representativeRelationship");
         String representativeNotes = request.getParameter("representativeNotes");
-
-        if (representativeName != null && !representativeName.isEmpty()) {
+        
+        if (representativeName != null) {
             Representative rp = new Representative();
             rp.setFull_name(representativeName);
             rp.setPhone(representativePhone);
             rp.setEmail(representativeEmail);
             rp.setRelationship(representativeRelationship);
             rp.setAdditional_notes(representativeNotes);
-
+            rp.setBooking_id(bookId);
+            
             rpDao.addRepresentative(rp);
         }
-
+        
         bookDao.updateBookingStatus(bookId, 9);
         Booking b = bookDao.getBookingDetailById(bookId);
-
+        
         House h = hDao.getById(b.getHomestay().getId());
         fullLoadHouseInfomation(h);
-
+        
         if (!h.isIs_whole_house()) {
             Room r = roomDao.getById(b.getRoom().getId());
             fullLoadRoomInfo(r);
             b.setRoom(r);
         }
-
+        
         b.setHomestay(h);
-
+        
         request.setAttribute("b", b);
         request.getRequestDispatcher("/FE/Common/BookingContractPreview.jsp").forward(request, response);
     }
-
+    
     private void doPostBookingConfirm(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-
+        
     }
-
+    
     private void doGetBookingDetail(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         String hid = request.getParameter("hid");
-
+        
         House h = hDao.getById(hid);
         fullLoadHouseInfomationSingle(h);
-
+        
         request.setAttribute("h", h);
         request.getRequestDispatcher("/FE/Common/Booking.jsp").forward(request, response);
     }
-
+    
     private void fullLoadHouseInfomationSingle(House h) {
         try {
             //Load address, images, likes, feedbacks
             String hid = h.getId();
-
+            
             User u = uDao.getById(h.getOwner().getId());
-
+            
             Address a = aDao.getAddressById(h.getAddress().getId());
             Status mediaS = new Status();
             mediaS.setId(21);
             List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
-
+            
             h.setOwner(u);
             h.setMedias(medias);
             h.setAddress(a);
@@ -292,31 +293,31 @@ public class BookingController extends BaseAuthorization {
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-
+    
     private void fullLoadRoomInfo(Room r) {
         try {
             Status s = new Status();
             s.setId(21);
             List<Media> mediaS = mDao.getMediaByObjectId(r.getId(), "Room", s);
-
+            
             r.setMedias(mediaS);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error during fullLoadPostInfomation process", e);
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-
+    
     private void fullLoadHouseInfomation(House h) {
         try {
             String hid = h.getId();
-
+            
             User u = uDao.getById(h.getOwner().getId());
-
+            
             Address a = aDao.getAddressById(h.getAddress().getId());
             Status mediaS = new Status();
             mediaS.setId(21);
             List<Media> medias = mDao.getMediaByObjectId(hid, "Homestay", mediaS);
-
+            
             h.setMedias(medias);
             h.setAddress(a);
             h.setOwner(u);
@@ -325,15 +326,15 @@ public class BookingController extends BaseAuthorization {
             log.error("Error during fullLoadPostInfomation process");
         }
     }
-
+    
     private void sendErrorResponse(HttpServletResponse response, String message, int statusCode)
             throws IOException {
         response.setStatus(statusCode);
-
+        
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("success", false);
         errorResponse.put("error", message);
-
+        
         PrintWriter out = response.getWriter();
         out.print(gson.toJson(errorResponse));
         out.flush();
