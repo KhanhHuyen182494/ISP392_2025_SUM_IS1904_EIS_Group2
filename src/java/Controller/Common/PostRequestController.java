@@ -88,6 +88,12 @@ public class PostRequestController extends BaseAuthorization {
 
         Post p = pDao.getPost(postId);
         fullLoadPostInfomation(p, user);
+
+        if (p.getStatus().getId() != 14 && !p.getOwner().getId().equals(user.getId())) {
+            response.sendError(404);
+            return;
+        }
+
         fullLoadHouseInfomation(p.getHouse());
 
         request.setAttribute("post", p);
