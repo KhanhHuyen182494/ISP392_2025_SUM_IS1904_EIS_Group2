@@ -402,10 +402,10 @@
                                 </button>
                             </a>
                         </c:if>
-<!--                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
-                            <i class="fas fa-user-plus"></i>
-                            Follow
-                        </button>-->
+                        <!--                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                                    <i class="fas fa-user-plus"></i>
+                                                    Follow
+                                                </button>-->
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -454,6 +454,16 @@
                                                 <p class="text-sm text-gray-500">Posted on <fmt:formatDate value="${post.created_at}" pattern="HH:mm dd/MM/yyyy" /></p>
                                             </div>
                                         </div>
+
+                                        <c:if test="${post.post_type.id != 5}">
+                                            <div class="inline-block">
+                                                <a href="${pageContext.request.contextPath}/post-request/detail?pid=${post.id}">
+                                                    <button class="px-3 py-1.5 text-gray-700 hover:text-blue-600 hover:bg-gray-100 rounded transition-colors duration-150 text-sm font-medium">
+                                                        Detail
+                                                    </button>
+                                                </a>
+                                            </div>
+                                        </c:if>
                                     </div>
 
                                     <p class="text-lg mb-4">
@@ -463,30 +473,39 @@
                                     <!-- Share/Repost Section -->
                                     <c:if test="${post.post_type.id == 5 and not empty post.parent_post}">
                                         <div class="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-blue-500">
-                                            <div class="flex items-center gap-3 mb-3">
-                                                <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-white">
-                                                    <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}">
-                                                        <img class="w-full h-full object-cover" 
-                                                             src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.parent_post.owner.avatar}" 
-                                                             alt="Avatar" loading="lazy" />
-                                                    </a>
+                                            <div class="flex items-center justify-between gap-3 mb-3">
+                                                <div class="flex items-center gap-3 mb-3">
+                                                    <div class="w-10 h-10 rounded-full overflow-hidden shadow-sm bg-white">
+                                                        <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}">
+                                                            <img class="w-full h-full object-cover" 
+                                                                 src="${pageContext.request.contextPath}/Asset/Common/Avatar/${post.parent_post.owner.avatar}" 
+                                                                 alt="Avatar" loading="lazy" />
+                                                        </a>
+                                                    </div>
+                                                    <div>
+                                                        <c:choose>
+                                                            <c:when test="${sessionScope.user_id == post.parent_post.owner.id}">
+                                                                <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
+                                                                   class="font-medium text-gray-700 hover:text-blue-600">You</a>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
+                                                                   class="font-medium text-gray-700 hover:text-blue-600">
+                                                                    ${post.parent_post.owner.first_name} ${post.parent_post.owner.last_name}
+                                                                </a>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <p class="text-xs text-gray-500">
+                                                            <fmt:formatDate value="${post.parent_post.created_at}" pattern="HH:mm dd/MM/yyyy" />
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <c:choose>
-                                                        <c:when test="${sessionScope.user_id == post.parent_post.owner.id}">
-                                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
-                                                               class="font-medium text-gray-700 hover:text-blue-600">You</a>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <a href="${pageContext.request.contextPath}/profile?uid=${post.parent_post.owner.id}" 
-                                                               class="font-medium text-gray-700 hover:text-blue-600">
-                                                                ${post.parent_post.owner.first_name} ${post.parent_post.owner.last_name}
-                                                            </a>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                    <p class="text-xs text-gray-500">
-                                                        <fmt:formatDate value="${post.parent_post.created_at}" pattern="HH:mm dd/MM/yyyy" />
-                                                    </p>
+                                                <div class="inline-block">
+                                                    <a href="${pageContext.request.contextPath}/post-request/detail?pid=${post.parent_post.id}">
+                                                        <button class="px-3 py-1.5 text-gray-700 hover:text-blue-600 hover:bg-gray-100 rounded transition-colors duration-150 text-sm font-medium">
+                                                            Detail
+                                                        </button>
+                                                    </a>
                                                 </div>
                                             </div>
 
@@ -592,6 +611,27 @@
                                                     </c:if>
                                                 </div>
                                             </div>
+
+                                            <c:if test="${post.parent_post.post_type.id == 1}"> 
+                                                <div class="px-6 py-4 flex gap-3">
+                                                    <button data-house-id="${post.parent_post.house.id}" onclick="book(this)" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors">
+                                                        <i class="fas fa-key mr-2"></i>
+                                                        Book
+                                                    </button>
+                                                    <button class="flex-1 bg-green-500 hover:bg-green-600 text-white-700 py-3 rounded-lg font-medium transition-colors text-white">
+                                                        <a href="${pageContext.request.contextPath}/owner-house/detail?hid=${post.parent_post.house.id}">
+                                                            <i class="fa-solid fa-house text-white"></i>
+                                                            View Detail
+                                                        </a>
+                                                    </button>
+                                                    <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-white-700 py-3 rounded-lg font-medium transition-colors view-review-btn" 
+                                                            data-house-id="${post.parent_post.house.id}" 
+                                                            data-house-name="${post.parent_post.house.name}">
+                                                        <i class="fas fa-comment mr-2"></i>
+                                                        View Review
+                                                    </button>
+                                                </div>
+                                            </c:if>
                                         </div>
                                     </c:if>
 
