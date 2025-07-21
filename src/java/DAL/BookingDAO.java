@@ -465,29 +465,24 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
     @Override
     public List<Booking> getListBookingHomestayOwnerManage(User u, int limit, int offset, String keyword, Date date, Integer statusId) {
         List<Booking> bList = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("""
-        SELECT 
-            b.*, s.name as StatusName
-        FROM
-            fuhousefinder_homestay.booking b
-            JOIN homestay h ON b.homestay_id = h.id
-            JOIN status s ON s.id = b.status_id
-            LEFT JOIN room r ON r.id = b.room_id
-            JOIN `User` us ON us.id = b.tenant_id
-        WHERE h.owner_id = ? 
-    """);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT b.*, s.name as StatusName ")
+                .append("FROM fuhousefinder_homestay.booking b ")
+                .append("JOIN homestay h ON b.homestay_id = h.id ")
+                .append("JOIN status s ON s.id = b.status_id ")
+                .append("LEFT JOIN room r ON r.id = b.room_id ")
+                .append("JOIN `User` us ON us.id = b.tenant_id ")
+                .append("WHERE h.owner_id = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(u.getId());
 
         if (keyword != null && !keyword.isEmpty()) {
-            sql.append("""
-            AND (
-                h.name LIKE ? OR 
-                r.name LIKE ? OR 
-                CONCAT_WS(' ', us.first_name, us.last_name) LIKE ?
-            )
-        """);
+            sql.append("AND (")
+                    .append("h.name LIKE ? OR ")
+                    .append("r.name LIKE ? OR ")
+                    .append("CONCAT_WS(' ', us.first_name, us.last_name) LIKE ?")
+                    .append(") ");
             String kw = "%" + keyword + "%";
             params.add(kw);
             params.add(kw);
@@ -495,16 +490,16 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         }
 
         if (date != null) {
-            sql.append(" AND DATE(b.created_at) = ? ");
+            sql.append("AND DATE(b.created_at) = ? ");
             params.add(new java.sql.Date(date.getTime()));
         }
 
         if (statusId != null) {
-            sql.append(" AND b.status_id = ? ");
+            sql.append("AND b.status_id = ? ");
             params.add(statusId);
         }
 
-        sql.append(" ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
+        sql.append("ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
         params.add(limit);
         params.add(offset);
 
@@ -514,12 +509,12 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
 
             for (int i = 0; i < params.size(); i++) {
                 Object param = params.get(i);
-                if (param instanceof String string) {
-                    ps.setString(i + 1, string);
-                } else if (param instanceof Integer integer) {
-                    ps.setInt(i + 1, integer);
-                } else if (param instanceof java.sql.Date sqlDate) {
-                    ps.setDate(i + 1, sqlDate);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) param);
+                } else if (param instanceof java.sql.Date) {
+                    ps.setDate(i + 1, (java.sql.Date) param);
                 } else {
                     ps.setObject(i + 1, param);
                 }
@@ -572,28 +567,23 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
     @Override
     public List<Booking> getListBookingAdminManage(int limit, int offset, String keyword, Date date, Integer statusId) {
         List<Booking> bList = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("""
-        SELECT 
-            b.*, s.name as StatusName
-        FROM
-            fuhousefinder_homestay.booking b
-            JOIN homestay h ON b.homestay_id = h.id
-            JOIN status s ON s.id = b.status_id
-            LEFT JOIN room r ON r.id = b.room_id
-            JOIN `User` us ON us.id = b.tenant_id
-        WHERE 1 = 1
-    """);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT b.*, s.name as StatusName ")
+                .append("FROM fuhousefinder_homestay.booking b ")
+                .append("JOIN homestay h ON b.homestay_id = h.id ")
+                .append("JOIN status s ON s.id = b.status_id ")
+                .append("LEFT JOIN room r ON r.id = b.room_id ")
+                .append("JOIN `User` us ON us.id = b.tenant_id ")
+                .append("WHERE 1 = 1 ");
 
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.isEmpty()) {
-            sql.append("""
-            AND (
-                h.name LIKE ? OR 
-                r.name LIKE ? OR 
-                CONCAT_WS(' ', us.first_name, us.last_name) LIKE ?
-            )
-        """);
+            sql.append("AND (")
+                    .append("h.name LIKE ? OR ")
+                    .append("r.name LIKE ? OR ")
+                    .append("CONCAT_WS(' ', us.first_name, us.last_name) LIKE ?")
+                    .append(") ");
             String kw = "%" + keyword + "%";
             params.add(kw);
             params.add(kw);
@@ -601,16 +591,16 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
         }
 
         if (date != null) {
-            sql.append(" AND DATE(b.created_at) = ? ");
+            sql.append("AND DATE(b.created_at) = ? ");
             params.add(new java.sql.Date(date.getTime()));
         }
 
         if (statusId != null) {
-            sql.append(" AND b.status_id = ? ");
+            sql.append("AND b.status_id = ? ");
             params.add(statusId);
         }
 
-        sql.append(" ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
+        sql.append("ORDER BY b.created_at DESC LIMIT ? OFFSET ? ");
         params.add(limit);
         params.add(offset);
 
@@ -620,12 +610,12 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
 
             for (int i = 0; i < params.size(); i++) {
                 Object param = params.get(i);
-                if (param instanceof String string) {
-                    ps.setString(i + 1, string);
-                } else if (param instanceof Integer integer) {
-                    ps.setInt(i + 1, integer);
-                } else if (param instanceof java.sql.Date sqlDate) {
-                    ps.setDate(i + 1, sqlDate);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) param);
+                } else if (param instanceof java.sql.Date) {
+                    ps.setDate(i + 1, (java.sql.Date) param);
                 } else {
                     ps.setObject(i + 1, param);
                 }
@@ -669,7 +659,7 @@ public class BookingDAO extends BaseDao implements IBookingDAO {
             }
 
         } catch (SQLException e) {
-            logger.error("Error fetching paginated homestay owner bookings with filters: " + e);
+            logger.error("Error fetching paginated admin booking list with filters: " + e);
         }
 
         return bList;

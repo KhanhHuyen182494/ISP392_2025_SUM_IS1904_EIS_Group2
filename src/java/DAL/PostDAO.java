@@ -614,58 +614,54 @@ public class PostDAO extends BaseDao implements IPostDAO {
     public List<Post> getPaginatedManagePost(String keyword, Integer statusId, Integer typeId, String homestayId, Date createdDate, Date updatedDate, int limit, int offset) {
         List<Post> pList = new ArrayList<>();
 
-        StringBuilder sql = new StringBuilder("""
-        SELECT 
-                            p.*, s.name as StatusName, pt.name as PostTypeName
-                        FROM
-                            fuhousefinder_homestay.post p
-                            LEFT JOIN homestay h ON p.target_homestay_id = h.id
-                            JOIN status s ON s.id = p.status_id
-                            JOIN `User` u ON u.id = p.user_id
-                            JOIN post_type pt ON pt.id = p.post_type_id
-                        WHERE 1 = 1
-    """);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ")
+                .append("p.*, s.name as StatusName, pt.name as PostTypeName ")
+                .append("FROM fuhousefinder_homestay.post p ")
+                .append("LEFT JOIN homestay h ON p.target_homestay_id = h.id ")
+                .append("JOIN status s ON s.id = p.status_id ")
+                .append("JOIN `User` u ON u.id = p.user_id ")
+                .append("JOIN post_type pt ON pt.id = p.post_type_id ")
+                .append("WHERE 1 = 1 ");
 
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.isEmpty()) {
-            sql.append("""
-            AND (
-                p.content LIKE ? OR 
-                CONCAT_WS(' ', u.first_name, u.last_name) LIKE ?
-            )
-        """);
+            sql.append("AND (")
+                    .append("p.content LIKE ? OR ")
+                    .append("CONCAT_WS(' ', u.first_name, u.last_name) LIKE ?")
+                    .append(") ");
             String kw = "%" + keyword + "%";
             params.add(kw);
             params.add(kw);
         }
 
         if (createdDate != null) {
-            sql.append(" AND DATE(p.created_at) = ? ");
+            sql.append("AND DATE(p.created_at) = ? ");
             params.add(new java.sql.Date(createdDate.getTime()));
         }
 
         if (updatedDate != null) {
-            sql.append(" AND DATE(p.updated_at) = ? ");
+            sql.append("AND DATE(p.updated_at) = ? ");
             params.add(new java.sql.Date(updatedDate.getTime()));
         }
 
         if (statusId != null) {
-            sql.append(" AND p.status_id = ? ");
+            sql.append("AND p.status_id = ? ");
             params.add(statusId);
         }
 
         if (typeId != null) {
-            sql.append(" AND p.post_type_id = ? ");
+            sql.append("AND p.post_type_id = ? ");
             params.add(typeId);
         }
 
         if (homestayId != null && !homestayId.isEmpty()) {
-            sql.append(" AND p.target_homestay_id = ? ");
+            sql.append("AND p.target_homestay_id = ? ");
             params.add(homestayId);
         }
 
-        sql.append(" ORDER BY p.created_at DESC LIMIT ? OFFSET ? ");
+        sql.append("ORDER BY p.created_at DESC LIMIT ? OFFSET ? ");
         params.add(limit);
         params.add(offset);
 
@@ -675,12 +671,12 @@ public class PostDAO extends BaseDao implements IPostDAO {
 
             for (int i = 0; i < params.size(); i++) {
                 Object param = params.get(i);
-                if (param instanceof String string) {
-                    ps.setString(i + 1, string);
-                } else if (param instanceof Integer integer) {
-                    ps.setInt(i + 1, integer);
-                } else if (param instanceof java.sql.Date sqlDate) {
-                    ps.setDate(i + 1, sqlDate);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) param);
+                } else if (param instanceof java.sql.Date) {
+                    ps.setDate(i + 1, (java.sql.Date) param);
                 } else {
                     ps.setObject(i + 1, param);
                 }
@@ -689,36 +685,34 @@ public class PostDAO extends BaseDao implements IPostDAO {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                Status psta = new Status();
-
                 Post p = new Post();
+
                 p.setId(rs.getString("id"));
                 p.setContent(rs.getString("content"));
                 p.setCreated_at(rs.getTimestamp("created_at"));
                 p.setUpdated_at(rs.getTimestamp("updated_at"));
                 p.setDeleted_at(rs.getTimestamp("deleted_at"));
 
-                House h = new House();
-                PostType pt = new PostType();
-
+                Status psta = new Status();
                 psta.setId(rs.getInt("status_id"));
                 psta.setName(rs.getString("StatusName"));
-                h.setId(rs.getString("target_homestay_id"));
-
                 p.setStatus(psta);
+
+                House h = new House();
+                h.setId(rs.getString("target_homestay_id"));
                 p.setHouse(h);
 
                 User owner = new User();
                 owner.setId(rs.getString("user_id"));
+                p.setOwner(owner);
 
+                PostType pt = new PostType();
                 pt.setId(rs.getInt("post_type_id"));
                 pt.setName(rs.getString("PostTypeName"));
+                p.setPost_type(pt);
 
                 Post parent = new Post();
                 parent.setId(rs.getString("parent_post_id"));
-
-                p.setOwner(owner);
-                p.setPost_type(pt);
                 p.setParent_post(parent);
 
                 pList.add(p);

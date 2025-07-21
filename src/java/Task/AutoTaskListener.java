@@ -50,12 +50,14 @@ public class AutoTaskListener implements ServletContextListener {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             try {
+                System.out.println("Start auto scan!" );
                 checkBookings();
                 checkPayments();
+                System.out.println("Auto scan task done!");
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Scheduled task failed", e);
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, 10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -68,7 +70,9 @@ public class AutoTaskListener implements ServletContextListener {
     private void checkBookings() {
         LocalDate today = LocalDate.now();
         List<Booking> allBookings = bookDao.getAllBooking();
-
+        
+        System.out.println("Start scan booking!");
+        
         for (Booking b : allBookings) {
             if (b == null || b.getStatus() == null || b.getHomestay() == null) {
                 continue;
@@ -79,7 +83,7 @@ public class AutoTaskListener implements ServletContextListener {
             LocalDate checkOutDate = b.getCheckout().toLocalDate();
 
             // Auto Check-in
-            if (checkInDate.equals(today) && status.getId() == BOOKING_CONFIRMED) {
+            if (checkInDate.equals(today) && (status.getId() == BOOKING_CONFIRMED || status.getId() == 9)) {
                 bookDao.updateBookingStatus(b.getId(), BOOKING_CHECKED_IN);
                 LOGGER.info("Auto checked-in booking ID: " + b.getId());
             }
@@ -97,6 +101,8 @@ public class AutoTaskListener implements ServletContextListener {
         LocalDateTime now = LocalDateTime.now();
         List<Payment> allPayments = pmDao.getAllPayment();
 
+        System.out.println("Start scan payments!");
+        
         for (Payment p : allPayments) {
             if (p == null || p.getCreated_at() == null) {
                 continue;
@@ -134,4 +140,5 @@ public class AutoTaskListener implements ServletContextListener {
             rDao.updateRoomStatus(b.getRoom().getId(), h.getId(), ROOM_AVAILABLE);
         }
     }
+    // 
 }

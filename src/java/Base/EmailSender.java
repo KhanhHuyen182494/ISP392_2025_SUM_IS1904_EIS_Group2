@@ -28,7 +28,7 @@ public class EmailSender {
     public static boolean sendEmailVerificationLink(User u) {
         boolean ok = false;
 
-        String link = "http://localhost:9999/fuhousefinder/activate?token=" + u.getVerification_token();
+        String link = "http://localhost:8080/fuhousefinder/activate?token=" + u.getVerification_token();
         String subject = "FUHF Verification";
         String message = "Hi " + u.getFirst_name() + " " + u.getLast_name() + ",\n\n"
                 + "Click this link to activate your account:\n" + link;

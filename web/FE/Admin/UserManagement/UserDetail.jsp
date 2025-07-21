@@ -246,9 +246,11 @@
                             </div>
                         </div>
                         <div class="flex space-x-3">
-                            <button id="editUserBtn" class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
-                                <i class="fas fa-edit mr-2"></i>Edit User
-                            </button>
+                            <a href="${pageContext.request.contextPath}/manage/user/edit?uid=${u.id}">
+                                <button id="editUserBtn" class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                                    <i class="fas fa-edit mr-2"></i>Edit User
+                                </button>
+                            </a>
                             <c:choose>
                                 <c:when test="${u.status.id == 4}">
                                     <button onclick="updateUserStatus('${u.id}', 1)" id="unbanUserBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-300">
@@ -349,74 +351,6 @@
                                 <span class="text-gray-900">${not empty u.address ? u.address : 'Not provided'}</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Activity Statistics -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-chart-line mr-2 text-primary"></i>
-                        Activity Statistics
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="text-center p-4 bg-blue-50 rounded-lg">
-                            <div class="text-3xl font-bold text-blue-600">${userStats.totalBookings}</div>
-                            <div class="text-sm text-gray-600 mt-1">Total Bookings</div>
-                        </div>
-                        <div class="text-center p-4 bg-green-50 rounded-lg">
-                            <div class="text-3xl font-bold text-green-600">${userStats.totalPosts}</div>
-                            <div class="text-sm text-gray-600 mt-1">Posts Created</div>
-                        </div>
-                        <div class="text-center p-4 bg-purple-50 rounded-lg">
-                            <div class="text-3xl font-bold text-purple-600">${userStats.totalReviews}</div>
-                            <div class="text-sm text-gray-600 mt-1">Reviews Given</div>
-                        </div>
-                        <div class="text-center p-4 bg-orange-50 rounded-lg">
-                            <div class="text-3xl font-bold text-orange-600">${userStats.loginCount}</div>
-                            <div class="text-sm text-gray-600 mt-1">Login Count</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                        <i class="fas fa-history mr-2 text-primary"></i>
-                        Recent Activity
-                    </h2>
-                    <div class="space-y-4">
-                        <c:forEach var="activity" items="${recentActivities}">
-                            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                                <div class="flex-shrink-0">
-                                    <c:choose>
-                                        <c:when test="${activity.type == 'booking'}">
-                                            <i class="fas fa-calendar-check text-blue-500"></i>
-                                        </c:when>
-                                        <c:when test="${activity.type == 'post'}">
-                                            <i class="fas fa-pen-to-square text-green-500"></i>
-                                        </c:when>
-                                        <c:when test="${activity.type == 'review'}">
-                                            <i class="fas fa-star text-yellow-500"></i>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <i class="fas fa-user text-gray-500"></i>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm text-gray-900">${activity.description}</p>
-                                    <p class="text-xs text-gray-500">
-                                        <fmt:formatDate value="${activity.timestamp}" pattern="dd/MM/yyyy HH:mm"/>
-                                    </p>
-                                </div>
-                            </div>
-                        </c:forEach>
-                        <c:if test="${empty recentActivities}">
-                            <div class="text-center py-8 text-gray-500">
-                                <i class="fas fa-inbox text-4xl mb-4"></i>
-                                <p>No recent activity found</p>
-                            </div>
-                        </c:if>
                     </div>
                 </div>
             </main>
