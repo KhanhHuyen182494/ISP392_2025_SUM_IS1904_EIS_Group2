@@ -48,6 +48,10 @@ public class AutoTaskListener implements ServletContextListener {
     private static final int HOUSE_AVAILABLE = 6;
     private static final int ROOM_AVAILABLE = 26;
 
+    private static final int STATUS_CONFIRM_PENDING = 8;
+    private static final int STATUS_PAYMENT_PENDING = 9;
+    private static final int AUTO_CANCEL_MINUTES = 15;
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -75,6 +79,7 @@ public class AutoTaskListener implements ServletContextListener {
     private void checkBookings() {
         LocalDate today = LocalDate.now();
         List<Booking> allBookings = bookDao.getAllBooking();
+        LocalDateTime now = LocalDateTime.now();
 
         System.out.println("Start scan booking!");
 
@@ -88,6 +93,14 @@ public class AutoTaskListener implements ServletContextListener {
 
             LocalDate checkInDate = b.getCheck_in().toLocalDate();
             LocalDate checkOutDate = b.getCheckout().toLocalDate();
+
+            Duration duration = Duration.between(b.getCreated_at().toLocalDateTime(), now);
+
+            if (duration.toMinutes() > AUTO_CANCEL_MINUTES && (b.getStatus().getId() == STATUS_CONFIRM_PENDING || b.getStatus().getId() == STATUS_PAYMENT_PENDING)) {
+                bookDao.updateBookingStatus(b.getId(), BOOKING_CANCELED);
+                LOGGER.info("Auto cancel booking ID: " + b.getId());
+                System.out.println("Auto cancel booking ID: " + b.getId());
+            }
 
             // Auto Check-in
             if (checkInDate.equals(today) && (status.getId() == BOOKING_CONFIRMED)) {
@@ -123,7 +136,7 @@ public class AutoTaskListener implements ServletContextListener {
 
             Duration duration = Duration.between(p.getCreated_at().toLocalDateTime(), now);
 
-            if (duration.toMinutes() > 15 && p.getStatusId() != PAYMENT_EXPIRED) {
+            if (duration.toMinutes() > AUTO_CANCEL_MINUTES && p.getStatusId() != PAYMENT_EXPIRED) {
                 pmDao.updatePaymentStatus(p.getId(), PAYMENT_EXPIRED);
                 bookDao.updateBookingStatus(p.getBooking_id(), BOOKING_CANCELED);
 
