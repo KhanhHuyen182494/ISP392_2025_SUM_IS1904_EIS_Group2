@@ -4,6 +4,7 @@ import DAL.BookingDAO;
 import DAL.HouseDAO;
 import DAL.PaymentDAO;
 import DAL.RoomDAO;
+import DAL.StatusDAO;
 import Model.Booking;
 import Model.House;
 import Model.Payment;
@@ -11,6 +12,7 @@ import Model.Status;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +31,7 @@ public class AutoTaskListener implements ServletContextListener {
     private final BookingDAO bookDao = new BookingDAO();
     private final HouseDAO hDao = new HouseDAO();
     private final RoomDAO rDao = new RoomDAO();
+    private final StatusDAO sDao = new StatusDAO();
 
     private static final Logger LOGGER = Logger.getLogger(AutoTaskListener.class.getName());
 
@@ -50,10 +53,12 @@ public class AutoTaskListener implements ServletContextListener {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                System.out.println("Start auto scan!" );
+                System.out.println("========================================================================================");
+                System.out.println("Start auto scan at " + Timestamp.valueOf(LocalDateTime.now()) + " !");
                 checkBookings();
                 checkPayments();
-                System.out.println("Auto scan task done!");
+                System.out.println("Auto scan task done " + Timestamp.valueOf(LocalDateTime.now()) + " !");
+                System.out.println("========================================================================================");
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Scheduled task failed", e);
             }
@@ -70,31 +75,39 @@ public class AutoTaskListener implements ServletContextListener {
     private void checkBookings() {
         LocalDate today = LocalDate.now();
         List<Booking> allBookings = bookDao.getAllBooking();
-        
+
         System.out.println("Start scan booking!");
-        
+
         for (Booking b : allBookings) {
             if (b == null || b.getStatus() == null || b.getHomestay() == null) {
                 continue;
             }
 
-            Status status = b.getStatus();
+            Status status = sDao.getStatusById(b.getStatus().getId());
+            b.setStatus(status);
+
             LocalDate checkInDate = b.getCheck_in().toLocalDate();
             LocalDate checkOutDate = b.getCheckout().toLocalDate();
 
             // Auto Check-in
-            if (checkInDate.equals(today) && (status.getId() == BOOKING_CONFIRMED || status.getId() == 9)) {
+            if (checkInDate.equals(today) && (status.getId() == BOOKING_CONFIRMED)) {
                 bookDao.updateBookingStatus(b.getId(), BOOKING_CHECKED_IN);
                 LOGGER.info("Auto checked-in booking ID: " + b.getId());
+                System.out.println("Auto checked-in booking ID: " + b.getId());
             }
 
             // Auto Check-out
             if (checkOutDate.equals(today) && status.getId() == BOOKING_CHECKED_IN) {
                 bookDao.updateBookingStatus(b.getId(), BOOKING_CHECKED_OUT);
                 releaseRoomOrHouse(b);
+                System.out.println("Auto checked-out booking ID: " + b.getId());
                 LOGGER.info("Auto checked-out booking ID: " + b.getId());
             }
         }
+
+        System.out.println("Scan booking completed!");
+        System.out.println("==========================================");
+
     }
 
     private void checkPayments() {
@@ -102,7 +115,7 @@ public class AutoTaskListener implements ServletContextListener {
         List<Payment> allPayments = pmDao.getAllPayment();
 
         System.out.println("Start scan payments!");
-        
+
         for (Payment p : allPayments) {
             if (p == null || p.getCreated_at() == null) {
                 continue;
@@ -122,6 +135,8 @@ public class AutoTaskListener implements ServletContextListener {
                 LOGGER.info("Payment ID " + p.getId() + " expired after 15 minutes. Booking ID " + p.getBooking_id() + " canceled.");
             }
         }
+
+        System.out.println("Scan payment completed!");
     }
 
     private void releaseRoomOrHouse(Booking b) {

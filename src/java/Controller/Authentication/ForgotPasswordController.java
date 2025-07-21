@@ -81,7 +81,7 @@ public class ForgotPasswordController extends HttpServlet {
 
             User u = uDao.getByEmail(email);
 
-            if (u == null) {
+            if (u.getId() == null) {
                 result.put("ok", false);
                 result.put("message", "Oops, we can not find your account, would you mind sign up?");
                 sendJsonResponse(response, result);
