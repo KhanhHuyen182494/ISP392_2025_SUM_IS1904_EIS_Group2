@@ -523,11 +523,11 @@
                                             const imgDiv = document.createElement('div');
                                             imgDiv.className = 'aspect-square';
                                             imgDiv.innerHTML = `
-            <img src="` + imageSrc + `" 
-                 alt="House image ` + (index + 1) + `" 
-                 class="w-full h-full object-cover rounded-lg shadow-md cursor-pointer hover:opacity-90 transition-opacity"
-                 onclick="openImageModal('` + imageSrc + `')">
-        `;
+                                                    <img src="` + imageSrc + `" 
+                                                         alt="House image ` + (index + 1) + `" 
+                                                         class="w-full h-full object-cover rounded-lg shadow-md cursor-pointer hover:opacity-90 transition-opacity"
+                                                         onclick="openImageModal('` + imageSrc + `')">
+                                                `;
                                             grid.appendChild(imgDiv);
                                         });
 
@@ -629,28 +629,28 @@
                                         if (rooms && rooms.length > 0) {
                                             rooms.forEach(room => {
                                                 const roomOption = `
-                <div class="border border-gray-300 rounded-lg p-4 cursor-pointer room-option hover:border-blue-500 hover:bg-blue-50 transition-all" 
-                     data-room-id="` + room.id + `" 
-                     data-room-price="` + room.price_per_night + `"
-                     data-room-max-guests="` + room.max_guests + `">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input type="radio" name="selectedRoom" value="` + room.id + `" class="mr-3">
-                            <div>
-                                <div class="font-semibold">` + room.name + `</div>
-                                <div class="text-sm text-gray-600">` + room.description || 'Private room' + `</div>
-                                <div class="text-sm text-gray-500 mt-1">
-                                    <i class="fas fa-users mr-1"></i>Max ` + room.max_guests + ` guests
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-semibold text-lg">₫` + room.price_per_night.toLocaleString() + `</div>
-                            <div class="text-sm text-gray-600">per night</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+                                                                    <div class="border border-gray-300 rounded-lg p-4 cursor-pointer room-option hover:border-blue-500 hover:bg-blue-50 transition-all" 
+                                                                         data-room-id="` + room.id + `" 
+                                                                         data-room-price="` + room.price_per_night + `"
+                                                                         data-room-max-guests="` + room.max_guests + `">
+                                                                        <div class="flex items-center justify-between">
+                                                                            <div class="flex items-center">
+                                                                                <input type="radio" name="selectedRoom" value="` + room.id + `" class="mr-3">
+                                                                                <div>
+                                                                                    <div class="font-semibold">` + room.name + `</div>
+                                                                                    <div class="text-sm text-gray-600">` + room.description || 'Private room' + `</div>
+                                                                                    <div class="text-sm text-gray-500 mt-1">
+                                                                                        <i class="fas fa-users mr-1"></i>Max ` + room.max_guests + ` guests
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="text-right">
+                                                                                <div class="font-semibold text-lg">₫` + room.price_per_night.toLocaleString() + `</div>
+                                                                                <div class="text-sm text-gray-600">per night</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                `;
                                                 roomsList.append(roomOption);
                                             });
 
@@ -828,9 +828,12 @@
 
                                     $(document).ready(function () {
                                         // Set minimum date to today
-                                        const today = new Date().toISOString().split('T')[0];
-                                        $('#checkIn').attr('min', today);
-                                        $('#checkOut').attr('min', today);
+                                        const tomorrow = new Date();
+                                        tomorrow.setDate(tomorrow.getDate() + 1);
+                                        const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+                                        $('#checkIn').attr('min', tomorrowString);
+                                        $('#checkOut').attr('min', tomorrowString);
 
                                         // Date change handlers
                                         $('#checkIn, #checkOut').on('change', function () {

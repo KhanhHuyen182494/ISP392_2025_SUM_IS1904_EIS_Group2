@@ -62,7 +62,7 @@ public class AutoTaskListener implements ServletContextListener {
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Scheduled task failed", e);
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 30, TimeUnit.SECONDS);
     }
 
     @Override
