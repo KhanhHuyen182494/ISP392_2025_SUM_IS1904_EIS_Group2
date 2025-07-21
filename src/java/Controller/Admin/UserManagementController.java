@@ -136,6 +136,13 @@ public class UserManagementController extends BaseAuthorization {
                     }
                 }
 
+                if (!uDao.isValidPhoneNumber(phone)) {
+                    jsonResponse.put("ok", false);
+                    jsonResponse.put("message", "Phone is already existed!");
+                    sendJsonResponse(response, jsonResponse);
+                    return;
+                }
+
                 if (uDao.updateUserInfo(uid, firstName, lastName, email, phone, gender, bod, roleId, statusId, isUpdateEmail)) {
                     jsonResponse.put("ok", true);
                     jsonResponse.put("message", "Update user success!");
