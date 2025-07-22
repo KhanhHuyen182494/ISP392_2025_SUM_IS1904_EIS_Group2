@@ -562,25 +562,15 @@
                                     <c:if test="${not empty post.content}">
                                         <p class="text-gray-700 mb-4">${fn:substring(post.content, 0, 200)}${fn:length(post.content) > 200 ? '...' : ''}</p>
                                     </c:if>
-                                    <c:if test="${not empty post.medias}">
-                                        <div class="media-grid">
-                                            <c:forEach var="media" items="${post.medias}" varStatus="status">
-                                                <c:if test="${status.index < 4}">
-                                                    <div class="media-item">
-                                                        <img src="${pageContext.request.contextPath}/Asset/Common/Media/${media.url}" alt="Post media"/>
-                                                    </div>
-                                                </c:if>
-                                            </c:forEach>
-                                        </div>
-                                    </c:if>
                                     <div class="flex items-center gap-4 text-gray-500 text-sm mb-4 mt-4">
                                         <span><i class="fas fa-heart mr-1"></i>${fn:length(post.likes)} likes</span>
                                         <span><i class="fas fa-comment mr-1"></i>${fn:length(post.reviews)} comments</span>
                                     </div>
                                     <div class="result-actions">
-                                        <a href="${pageContext.request.contextPath}/post-detail?pid=${post.id}" class="action-btn primary">
-                                            <i class="fas fa-eye mr-2"></i>
-                                            View Post
+                                        <a href="${pageContext.request.contextPath}/post-request/detail?pid=${post.id}">
+                                            <button class="px-3 py-1.5 text-gray-700 hover:text-blue-600 hover:bg-gray-100 rounded transition-colors duration-150 text-sm font-medium">
+                                                Detail
+                                            </button>
                                         </a>
                                     </div>
                                 </div>

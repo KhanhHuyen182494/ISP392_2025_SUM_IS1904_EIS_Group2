@@ -1636,6 +1636,86 @@
                                     });
                                 };
 
+                                $(document).on('click', 'button:contains("Share")', function () {
+                                    let user = '${sessionScope.user_id}';
+                                    if (user.trim() === '') {
+                                        Swal.fire({
+                                            title: 'You must login to use this feature',
+                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Custom icon',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Login now',
+                                            cancelButtonText: 'Back to Newsfeed',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                location.href = '${pageContext.request.contextPath}/login';
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                Swal.close();
+                                            }
+                                        });
+                                    } else {
+                                        let sharePost = $(this).data('post-share-id');
+                                        Swal.fire({
+                                            title: 'Wanna share this post?',
+                                            html: 'Say something about this post or leave blank?',
+                                            input: 'text',
+                                            inputPlaceholder: 'Add a message...',
+                                            imageUrl: `${pageContext.request.contextPath}/Asset/FUHF Logo/3.svg`,
+                                            imageWidth: 150,
+                                            imageHeight: 150,
+                                            imageAlt: 'Custom icon',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Share',
+                                            cancelButtonText: 'Cancel',
+                                            reverseButtons: true,
+                                            focusConfirm: false,
+                                            focusCancel: false,
+                                            customClass: {
+                                                popup: 'rounded-xl shadow-lg',
+                                                title: 'text-xl font-semibold',
+                                                confirmButton: 'bg-[#FF7700] text-white px-4 py-2 rounded',
+                                                cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+                                                actions: 'space-x-4'
+                                            },
+                                            buttonsStyling: false
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                const inputValue = result.value;
+                                                $.ajax({
+                                                    url: '${pageContext.request.contextPath}/post',
+                                                    type: 'POST',
+                                                    data: {
+                                                        typeWork: 'share',
+                                                        postId: sharePost,
+                                                        content: inputValue
+                                                    }
+                                                    , success: function (response) {
+                                                        if (response.ok) {
+                                                            showToast(response.message);
+                                                        } else {
+                                                            showToast(response.message, 'error');
+                                                        }
+                                                    }
+                                                });
+                                            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                                                Swal.close();
+                                            }
+                                        });
+                                    }
+                                });
         </script>
     </body>
 </html>

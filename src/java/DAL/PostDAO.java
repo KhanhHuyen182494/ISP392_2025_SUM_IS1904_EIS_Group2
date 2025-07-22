@@ -1050,7 +1050,7 @@ public class PostDAO extends BaseDao implements IPostDAO {
                      user u ON p.user_id = u.id
                  WHERE 
                      (p.content LIKE ? OR h.name LIKE ? OR h.description LIKE ? OR 
-                      CONCAT(u.first_name, ' ', u.last_name) LIKE ?)
+                      CONCAT(u.first_name, ' ', u.last_name) LIKE ?) AND p.status_id = 14
                  ORDER BY p.created_at DESC
                  LIMIT ? OFFSET ?
                  """;
