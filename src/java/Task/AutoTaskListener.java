@@ -43,6 +43,7 @@ public class AutoTaskListener implements ServletContextListener {
 
     // Payment Status
     private static final int PAYMENT_EXPIRED = 39;
+    private static final int PAYMENT_COMPLETED = 32;
 
     // Availability
     private static final int HOUSE_AVAILABLE = 6;
@@ -136,7 +137,7 @@ public class AutoTaskListener implements ServletContextListener {
 
             Duration duration = Duration.between(p.getCreated_at().toLocalDateTime(), now);
 
-            if (duration.toMinutes() > AUTO_CANCEL_MINUTES && p.getStatusId() != PAYMENT_EXPIRED) {
+            if (duration.toMinutes() > AUTO_CANCEL_MINUTES && p.getStatusId() != PAYMENT_COMPLETED) {
                 pmDao.updatePaymentStatus(p.getId(), PAYMENT_EXPIRED);
                 bookDao.updateBookingStatus(p.getBooking_id(), BOOKING_CANCELED);
 
