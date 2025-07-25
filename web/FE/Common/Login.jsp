@@ -108,7 +108,7 @@
                 e.preventDefault();
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData);
-                if (!data.contact || !data.password) {
+                if (!data.contact.trim() || !data.password.trim()) {
                     Toastify({
                         text: "Please fill in all fields",
                         backgroundColor: "#ef4444",

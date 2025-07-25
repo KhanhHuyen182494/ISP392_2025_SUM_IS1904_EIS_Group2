@@ -124,6 +124,11 @@
                 </div>
 
                 <div>
+                    <input type="text" name="phone" placeholder="Phone number" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                </div>
+
+                <div>
                     <input type="text" name="contact" placeholder="Email" 
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                 </div>
@@ -287,7 +292,7 @@
 
                 const emailRegex = /^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
 
-                if (!data.firstName.trim() || !data.lastName.trim() || !data.contact.trim() || !data.password.trim()) {
+                if (!data.firstName.trim() || !data.lastName.trim() || !data.contact.trim() || !data.password.trim() || !data.phone.trim()) {
                     showToast("Please fill in all required fields", "error");
                     return;
                 }
@@ -306,7 +311,13 @@
                     return;
                 }
 
-                console.log('Form data:', data);
+                if (data.phone) {
+                    const vietnamPhoneRegex = /^(?:\+?84|0)(3|5|7|8|9)\d{8}$/;
+                    if (!vietnamPhoneRegex.test(data.phone)) {
+                        showToast('Please enter a valid vietnamese phone number.', 'error');
+                        return;
+                    }
+                }
 
                 $.ajax({
                     url: '${pageContext.request.contextPath}/signup',
@@ -322,7 +333,8 @@
                         year: data.year,
                         gender: data.gender,
                         contact: data.contact,
-                        password: data.password
+                        password: data.password,
+                        phone: data.phone
                     },
                     success: function (response) {
                         if (response.ok == true) {

@@ -63,6 +63,14 @@ public class SignUpController extends HttpServlet {
             String year = request.getParameter("year");
             String gender = request.getParameter("gender");
             String passwordRaw = request.getParameter("password");
+            String phone = request.getParameter("phone");
+            
+            if(!userDAO.isValidPhone(phone)){
+                result.put("ok", false);
+                result.put("message", "Phone already exists.");
+                sendJsonResponse(response, result);
+                return;
+            }
 
             // Validate email
             if (!userDAO.isValidEmail(contact)) {
@@ -99,6 +107,7 @@ public class SignUpController extends HttpServlet {
             user.setStatus(status);
             user.setVerification_token(verificationToken);
             user.setToken_created(tokenCreated);
+            user.setPhone(phone);
 
             // Insert user and send email
             if (userDAO.add(user)) {

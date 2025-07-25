@@ -269,7 +269,7 @@
                                         class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
                                     Filter
                                 </button>
-                                <button type="button" onclick="location.href = '${pageContext.request.contextPath}/manage/user'"
+                                <button type="button" onclick="location.href = '${pageContext.request.contextPath}/manage/booking'"
                                         class="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-300">
                                     Clear Filter
                                 </button>
