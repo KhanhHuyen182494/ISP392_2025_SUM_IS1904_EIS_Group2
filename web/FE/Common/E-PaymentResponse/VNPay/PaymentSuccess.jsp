@@ -350,21 +350,11 @@
 
                         <!-- Quick Actions -->
                         <div class="border-t pt-4 space-y-3">
-                            <a href="${pageContext.request.contextPath}/booking/contract-preview?id=${param.bookingId}" 
+                            <a href="${pageContext.request.contextPath}/booking/contract/preview?bookId=${booking.id}" 
                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                                 <i class="fas fa-file-contract"></i>
                                 View Contract
                             </a>
-
-                            <button id="downloadReceiptBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i class="fas fa-download"></i>
-                                Download Receipt
-                            </button>
-
-                            <button id="emailReceiptBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i class="fas fa-envelope"></i>
-                                Email Receipt
-                            </button>
                         </div>
 
                         <!-- Payment Summary -->

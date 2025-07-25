@@ -366,16 +366,11 @@
                                 </div>
                             </form>
 
-                            <a href="${pageContext.request.contextPath}/booking/contract-preview?id=${param.bookingId}" 
+                            <a href="${pageContext.request.contextPath}/booking/contract/preview?bookId=${booking.id}" 
                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                                 <i class="fas fa-file-contract"></i>
                                 Review Booking
                             </a>
-
-                            <button id="refreshStatusBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i class="fas fa-sync-alt"></i>
-                                Refresh Status
-                            </button>
                         </div>
 
                         <!-- Session Summary -->
